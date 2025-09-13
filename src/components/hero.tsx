@@ -14,7 +14,7 @@ interface Props {
 export default function Hero({ initialShirts }: Props) {
   const [selectedFilter, setSelectedFilter] = useState("All");
   const [showFilter, setShowFilter] = useState(false);
-  const { shirts, setShirts } = useShirtStore();
+  const { setShirts } = useShirtStore();
 
   function changeFilter(filter: string) {
     setSelectedFilter(filter);
@@ -23,7 +23,7 @@ export default function Hero({ initialShirts }: Props) {
 
   return (
     <header className="mb-7 lg:mb-11 px-4 sm:px-[5%]">
-      <Heading title="Shirts Collection" itemsOnPage={shirts.length} />
+      <Heading title="Shirts Collection" />
       {/* Description */}
       <div className="mt-6 prose prose-sm light:prose-light sm:prose lg:prose-lg xl:prose-xl light:[&_a]:prose-light prose-h1:mb-4 prose-h1:text-5xl prose-h2:mb-4 prose-h2:text-4xl prose-h3:font-neutraface prose-h3:text-3xl max-w-3xl">
         <div className=" text-xl leading-8 transition-all duration-500 overflow-hidden line-clamp-3 max-h-48 lg:max-h-32">

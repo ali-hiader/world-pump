@@ -10,7 +10,7 @@ interface Props {
 
 function ServiceCard({ title, description, image }: Props) {
   return (
-    <div className="grid grid-cols-3 gap-4 shadow px-4 py-4 rounded-md">
+    <div className="grid sm:grid-cols-3 gap-4 shadow px-4 py-4 rounded-md">
       <div>
         <Image
           className="rounded-md object-contain"
@@ -20,7 +20,7 @@ function ServiceCard({ title, description, image }: Props) {
           height={300}
         />
       </div>
-      <div className="col-span-2 flex flex-col justify-center gap-2">
+      <div className="sm:col-span-2 flex flex-col justify-center gap-2">
         <h3 className="text-lg font-medium">{title}</h3>
         <p>{description}</p>
         <Link

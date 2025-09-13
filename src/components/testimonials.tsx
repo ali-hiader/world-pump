@@ -13,13 +13,13 @@ const logos = [
 
 function Testimonials() {
   return (
-    <section className="mt-24">
+    <section className="mt-16 lg:mt-24">
       <Heading
         title="Brands we Deal"
         summary="Partnering with trusted brands to bring you quality and reliability."
       />
 
-      <div className="flex gap-4 items-center mt-6">
+      <div className="grid grid-cols-3 sm:flex sm:flex-nowrap gap-4 items-center mt-6">
         {logos.map((logo) => (
           <div key={logo}>
             <Image src={logo} alt="Comapny's logo" width={200} height={100} />

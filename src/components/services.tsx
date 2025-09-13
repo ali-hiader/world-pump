@@ -37,13 +37,13 @@ export const services = [
 
 function Services() {
   return (
-    <section className="mt-24">
+    <section className="mt-16 lg:mt-24">
       <Heading
         title="Services"
         summary="Explore World Pumps Services & Facilities"
       />
 
-      <div className="grid grid-cols-2 gap-6 mt-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
         {services.map((service) => (
           <ServiceCard key={service.title} {...service} />
         ))}

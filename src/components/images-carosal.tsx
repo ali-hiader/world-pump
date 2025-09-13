@@ -1,5 +1,6 @@
-import React from "react";
+"use client";
 
+import React from "react";
 import {
   Carousel,
   CarouselContent,
@@ -12,22 +13,24 @@ import Image from "next/image";
 
 function ImagesCarosal() {
   return (
-    <Carousel className="h-[450px]">
+    <Carousel className="w-full">
       <CarouselContent>
         {carosalImages.map((image) => (
           <CarouselItem key={image} className="overflow-hidden">
-            <Image
-              className="w-full h-auto object-cover"
-              width={1000}
-              height={450}
-              src={image}
-              alt=""
-            />
+            <div className="relative w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[500px]">
+              <Image
+                src={image}
+                alt="Carousel Image"
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious />
-      <CarouselNext />
+      <CarouselPrevious className="hidden sm:flex" />
+      <CarouselNext className="hidden sm:flex" />
     </Carousel>
   );
 }

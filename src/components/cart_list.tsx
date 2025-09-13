@@ -17,14 +17,14 @@ function CartList() {
     0
   );
 
-  const totalItemsInCart = shirtsCartS.reduce(
-    (totalQty, item) => item.quantity + totalQty,
-    0
-  );
+  // const totalItemsInCart = shirtsCartS.reduce(
+  //   (totalQty, item) => item.quantity + totalQty,
+  //   0
+  // );
 
   return (
     <>
-      <Heading title="Cart" itemsOnPage={totalItemsInCart} />
+      <Heading title="Cart"  />
       {shirtsCartS.length === 0 ? (
         <DisplayAlert showBtn> No products in the cart!</DisplayAlert>
       ) : (

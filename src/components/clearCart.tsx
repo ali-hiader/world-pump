@@ -6,7 +6,7 @@ import { useEffect } from "react";
 function ClearCart() {
   const clearCartS = useCartStore((state) => state.clearCartS);
   useEffect(() => {
-    clearCartS();
+    // clearCartS();
   }, [clearCartS]);
   return null;
 }

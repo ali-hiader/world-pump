@@ -5,7 +5,7 @@ import Link from "next/link";
 
 function AboutCompany() {
   return (
-    <section className="mt-24 px-6">
+    <section className="mt-16 lg:mt-24 px-6">
       <Heading
         title="About Us"
         summary="Reliable Pumping Solutions for Every Need"
