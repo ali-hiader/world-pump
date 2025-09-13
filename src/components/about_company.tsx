@@ -1,6 +1,7 @@
 import React from "react";
 import Heading from "./heading";
 import Image from "next/image";
+import Link from "next/link";
 
 function AboutCompany() {
   return (
@@ -33,15 +34,22 @@ function AboutCompany() {
             ensuring your water systems remain strong, efficient, and
             worry-free.
           </p>
+
+          <Link
+            href={"/about"}
+            className="py-2 max-w-3/5 mt-10 text-lg rounded-md bg-secondary text-white flex items-center justify-center"
+          >
+            Learn More
+          </Link>
         </div>
 
         {/* Right Image */}
-        <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center px-6">
           <Image
-            className="rounded-2xl shadow-lg object-contain"
+            className="rounded-md w-full h-auto max-h-[500px] shadow-lg object-cover"
             src="/about.jpg"
-            width={300}
-            height={600}
+            width={500}
+            height={500}
             alt="About World Pumps"
           />
         </div>
