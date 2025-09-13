@@ -71,7 +71,7 @@ function Checkout({ cartItems }: Props) {
     <main className="px-4 sm:px-[5%] mb-12">
       <Heading
         title="Checkout"
-        itemsOnPage={cartItems.reduce((sum, shirt) => sum + shirt.quantity, 0)}
+        // itemsOnPage={cartItems.reduce((sum, shirt) => sum + shirt.quantity, 0)}
       />
       <section className="max-w-5xl mx-auto mt-12">
         <section className="grid grid-cols-1 md:grid-cols-2 items-center gap-4 mt-6 border-y border-y-primary/20 pt-4 pb-6">
