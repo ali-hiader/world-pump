@@ -13,14 +13,14 @@ export async function getCartDB(userId: string) {
   try {
     const cart = await db
       .select({
-        cartId: cart.id,
-        quantity: cart.quantity,
+        cartId: cartTable.id,
+        quantity: cartTable.quantity,
         ...getTableColumns(productTable),
       })
-      .from(cart)
-      .innerJoin(productTable, eq(cart.productId, productTable.id))
-      .where(and(eq(cart.createdBy, userId)))
-      .orderBy(desc(cart.id));
+      .from(cartTable)
+      .innerJoin(productTable, eq(cartTable.productId, productTable.id))
+      .where(and(eq(cartTable.createdBy, userId)))
+      .orderBy(desc(cartTable.id));
 
     return cart;
   } catch (error) {

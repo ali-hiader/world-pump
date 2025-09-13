@@ -67,8 +67,8 @@ export async function createOrder(sessionId: string, userEmail: string) {
 export async function getExsistingOrder(sessionId: string) {
   const order = await db
     .select()
-    .from(order)
-    .where(eq(order.sessionId, sessionId))
+    .from(orderTable)
+    .where(eq(orderTable.sessionId, sessionId))
     .limit(1);
   return order;
 }

@@ -6,7 +6,7 @@ import { SessionInitializer } from "@/components/session_initializer";
 import NavBar from "@/components/nav_bar";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { getCartDB } from "@/actions/cart-actions";
+// import { getCartDB } from "@/actions/cart-actions";
 import { CartProduct } from "@/lib/types";
 import ContactNavBar from "@/components/contact-nav";
 

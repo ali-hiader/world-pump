@@ -20,22 +20,52 @@ const schema = z.object({
 
   description: z.string().min(1, "Description cannot be empty"),
 
-  productDetail: z.string().min(1, "Product detail is required"),
-
   message: z.string().min(1, "Message is required"),
+
+  // new fields from productTable
+  discountPrice: z.string().optional().default("0"),
+
+  pumpType: z.string().min(1, "Pump type is required"),
+
+  horsepower: z.string().optional().default(""),
+
+  flowRate: z.string().optional().default(""),
+
+  head: z.string().optional().default(""),
+
+  voltage: z.string().optional().default(""),
+
+  warranty: z.string().optional().default(""),
+
+  gallery: z
+    .array(z.string().url({ message: "Gallery images must be valid URLs" }))
+    .optional()
+    .default([]),
 });
 
 export interface NewProductState {
   success: boolean;
+
   imageError?: string[];
   titleError?: string[];
   priceError?: string[];
   categoryError?: string[];
   descriptionError?: string[];
-  productDetailError?: string[];
   messageError?: string[];
+
+  // new fields from productTable
+  discountPriceError?: string[];
+  pumpTypeError?: string[];
+  horsepowerError?: string[];
+  flowRateError?: string[];
+  headError?: string[];
+  voltageError?: string[];
+  warrantyError?: string[];
+  galleryError?: string[];
+
   generalError?: string;
 }
+
 export async function addNewProduct(
   state: NewProductState | null,
   formdata: FormData
@@ -59,8 +89,17 @@ export async function addNewProduct(
       priceError: fieldErrors.price,
       categoryError: fieldErrors.category,
       descriptionError: fieldErrors.description,
-      productDetailError: fieldErrors.productDetail,
       messageError: fieldErrors.message,
+
+      // new ones
+      discountPriceError: fieldErrors.discountPrice,
+      pumpTypeError: fieldErrors.pumpType,
+      horsepowerError: fieldErrors.horsepower,
+      flowRateError: fieldErrors.flowRate,
+      headError: fieldErrors.head,
+      voltageError: fieldErrors.voltage,
+      warrantyError: fieldErrors.warranty,
+      galleryError: fieldErrors.gallery,
     };
   }
 
@@ -78,16 +117,29 @@ export async function addNewProduct(
       "/q_auto/f_auto" +
       result.url.split("/upload")[1];
 
-    await db.insert(product).values({
-      category: product.category,
-      description: product.description,
-      imageUrl,
-      message: product.message,
-      price: +product.price,
+    await db.insert(productTable).values({
       title: product.title,
       slug: slugifyIt(product.title),
+      category: product.category,
+      description: product.description,
+      imageUrl: imageUrl,
+      gallery: product.gallery ?? [], // optional
+      price: Number(product.price),
+      discountPrice: product.discountPrice
+        ? Number(product.discountPrice)
+        : null,
+      pumpType: product.pumpType,
+      horsepower: product.horsepower ?? null,
+      flowRate: product.flowRate ?? null,
+      head: product.head ?? null,
+      voltage: product.voltage ?? null,
+      warranty: product.warranty ?? null,
+      message: product.message,
       createdBy: session.user.id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
+
     throw redirect("/seller-dashboard");
   });
 

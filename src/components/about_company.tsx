@@ -11,7 +11,7 @@ function AboutCompany() {
         summary="Reliable Pumping Solutions for Every Need"
       />
 
-      <div className="grid md:grid-cols-2 gap-10 mt-10 items-center">
+      <div className="grid md:grid-cols-2 gap-10 mt-8 items-center">
         {/* Left Content */}
         <div className="space-y-4">
           <h4 className="text-xl font-semibold text-gray-800">

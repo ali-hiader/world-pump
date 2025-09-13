@@ -47,7 +47,7 @@ async function Analytics() {
 
   return (
     <main className="px-4 sm:px-[5%] pb-12">
-      <Heading title="Orders" itemsOnPage={orderItems.length} />
+      <Heading title="Orders" />
       <ul className="w-full">
         {orderItems.length === 0 ? (
           <DisplayAlert showBtn>Create Orders to view here!</DisplayAlert>

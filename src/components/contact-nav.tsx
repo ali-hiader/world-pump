@@ -4,7 +4,7 @@ import React from "react";
 
 function ContactNavBar() {
   return (
-    <section className="bg-primary text-white px-5 sm:px-[5%] py-3">
+    <section className="bg-primary text-white px-5 sm:px-[3%] py-3">
       <div className="mx-auto flex flex-col lg:flex-row items-center justify-between">
         {/* Left: Email */}
         <div className="text-center lg:text-left">

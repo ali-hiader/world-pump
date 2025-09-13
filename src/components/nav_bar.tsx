@@ -1,6 +1,6 @@
 "use client";
 
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -11,13 +11,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import CartIcon from "@/icons/cart";
-import UserIcon from "@/icons/user";
 import { useAuthStore } from "@/stores/auth_store";
-import { LoginIcon } from "@/icons/log_in";
 import PumpsCategories from "./pumps_categories";
 
 const navLinks = [
+  { href: "/", label: "Home" },
   { href: "/services", label: "Services" },
   { href: "/about-us", label: "About" },
   { href: "/contact", label: "Contact" },
@@ -26,90 +24,51 @@ const navLinks = [
 export default function NavBar() {
   const pathName = usePathname();
   const session = useAuthStore((state) => state.userIdAuthS);
-  // const renderLink = (link: {
-  //   href: string;
-  //   icon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
-  //   label: string;
-  // }) => {
-  //   const active = pathName === link.href;
-  //   return (
-  //     <Link
-  //       href={link.href}
-  //       key={link.href}
-  //       className={`${
-  //         active || (pathName === "/sign-up" && link.href === "/sign-in")
-  //           ? "bg-primary/15"
-  //           : "bg-primary/5 hover:bg-primary/10"
-  //       } flex justify-between items-center px-3 py-2 rounded-full `}
-  //     >
-  //       <p className="flex items-center gap-3">
-  //         <link.icon
-  //           className={`${active || (pathName === "/sign-up" && link.href === "/sign-in") ? "text-primary" : "text-gray-700"} size-6`}
-  //         />
-  //         <span
-  //           className={`${
-  //             active || (pathName === "/sign-up" && link.href === "/sign-in")
-  //               ? "text-primary"
-  //               : "text-gray-700"
-  //           } font-medium`}
-  //         >
-  //           {link.label}
-  //         </span>
-  //       </p>
-  //       {active && (
-  //         <span className="bg-primary/80 text-white ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-[10px]">
-  //           Current
-  //         </span>
-  //       )}
-  //     </Link>
-  //   );
-  // };
+  const [open, setOpen] = useState(false);
 
   return (
-    <nav className="flex justify-between items-start py-6 px-4 sm:px-[2%] shadow">
+    <nav className="sticky top-0 z-50 flex justify-between items-center py-4 px-4 sm:px-[2%] bg-white shadow-md">
+      {/* Logo */}
       <hgroup className="space-y-1">
         <Link
           href={"/"}
-          className="headingFont text-3xl font-extrabold cursor-pointer"
+          className="headingFont text-2xl sm:text-3xl font-extrabold cursor-pointer"
         >
-          world pumps
+          World Pumps
         </Link>
-        {/* <p className="text-gray-600">Timeless / Elegant</p> */}
       </hgroup>
 
       {/* Desktop Nav */}
       <ul className="hidden md:flex items-center justify-between gap-6">
-        <NavLink href="/" pathName={pathName}>
-          Home
-        </NavLink>
-        <PumpsCategories />
-
-        {navLinks.map((link) => (
-          <NavLink key={link.href} href={link.href} pathName={pathName}>
-            {link.label}
-          </NavLink>
+        {navLinks.map((link, index) => (
+          <div key={link.href} className="flex items-center gap-6">
+            <NavLink href={link.href} pathName={pathName}>
+              {link.label}
+            </NavLink>
+            {index === 0 && <PumpsCategories />} {/* Pumps after Home */}
+          </div>
         ))}
       </ul>
 
+      {/* Desktop Right Side */}
       <ul className="hidden md:flex items-center justify-between gap-6 mr-2">
         {session ? (
           <NavLink pathName={pathName} href={"/account"}>
-            <UserIcon className="size-7" />
+            Account
           </NavLink>
         ) : (
           <NavLink pathName={pathName} href={"/sign-in"}>
-            <LoginIcon className="size-7" />
+            Login
           </NavLink>
         )}
-
         <NavLink pathName={pathName} href={"/cart"}>
-          <CartIcon className="size-7" />
+          Cart
         </NavLink>
       </ul>
 
       {/* Mobile Nav (Dialog) */}
       <section className="md:hidden">
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <button className="relative cursor-pointer" aria-label="Open menu">
               <svg
@@ -118,7 +77,7 @@ export default function NavBar() {
                 height="22"
                 fill="none"
                 viewBox="0 0 18 18"
-                className="text-black dark:text-white"
+                className="text-black"
               >
                 <path
                   fill="currentColor"
@@ -127,17 +86,73 @@ export default function NavBar() {
               </svg>
             </button>
           </DialogTrigger>
-          <DialogContent className="p-6 rounded-md outline-2 outline-primary">
+          <DialogContent className="p-6 rounded-md outline-none">
             <DialogHeader>
-              <DialogTitle className="text-sm text-start">
+              <DialogTitle className="text-sm text-start font-normal">
                 Navigation
               </DialogTitle>
             </DialogHeader>
-            {/* <ul className="flex flex-col gap-2 mt-6">
-              {navLinks.map(renderLink)}
-              {!session && signUpLinks.map(renderLink)}
-              {session && signedUpLinks.map(renderLink)}
-            </ul> */}
+
+            <ul className="flex flex-col gap-2 mt-2">
+              {navLinks.map((link, index) => {
+                const active =
+                  pathName === link.href ||
+                  (pathName === "/sign-up" && link.href === "/sign-in");
+                return (
+                  <div key={link.href}>
+                    <li>
+                      <Link
+                        href={link.href}
+                        onClick={() => setOpen(false)}
+                        className={`block w-full px-4 py-2 rounded-md text-lg ${
+                          active
+                            ? "bg-secondary text-white"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                    {index === 0 && (
+                      <div className="mt-2">
+                        <PumpsCategories
+                          mobile
+                          onNavigate={() => setOpen(false)}
+                        />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+
+              {/* Auth + Cart */}
+              <li>
+                <Link
+                  href={session ? "/account" : "/sign-in"}
+                  onClick={() => setOpen(false)}
+                  className={`block w-full px-4 py-2 rounded-md text-lg ${
+                    pathName === (session ? "/account" : "/sign-in")
+                      ? "bg-secondary text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  {session ? "Account" : "Login"}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/cart"
+                  onClick={() => setOpen(false)}
+                  className={`block w-full px-4 py-2 rounded-md text-lg ${
+                    pathName === "/cart"
+                      ? "bg-secondary text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  Cart
+                </Link>
+              </li>
+            </ul>
           </DialogContent>
         </Dialog>
       </section>
@@ -148,24 +163,27 @@ export default function NavBar() {
 interface NavLinkProps {
   href: string;
   pathName: string;
+  onClick?: () => void;
 }
 
 function NavLink({
   href,
   pathName,
   children,
+  onClick,
 }: NavLinkProps & PropsWithChildren) {
   return (
     <li>
       <Link
         href={href}
+        onClick={onClick}
         className={`${
           pathName === href || (pathName === "/sign-up" && href === "/sign-in")
-            ? "text-primary border-b border-b-primary"
+            ? "text-primary font-medium border-b border-b-primary"
             : "text-black"
-        }  text-lg`}
+        } text-lg`}
       >
-        {children}{" "}
+        {children}
       </Link>
     </li>
   );

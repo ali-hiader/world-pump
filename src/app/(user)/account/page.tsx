@@ -1,14 +1,14 @@
-import SignOutBtn from "@/components/sign_out";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+// import SignOutBtn from "@/components/sign_out";
+// import { auth } from "@/lib/auth";
+// import { headers } from "next/headers";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+// import { redirect } from "next/navigation";
 import React from "react";
 
 async function UserAccountPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  // const session = await auth.api.getSession({
+  //   headers: await headers(),
+  // });
 
   // if (!session) {
   //   redirect("/sign-in");

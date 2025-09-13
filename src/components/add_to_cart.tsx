@@ -55,7 +55,7 @@ function AddToCartBtn({ shirtId }: Props) {
       {
         <button
           onClick={handleAddingToCart}
-          className="w-full border bg-secondary hover:bg-secondary/90 text-white rounded-md transition-all group px-6 py-2 cursor-pointer disabled:cursor-not-allowed relative"
+          className="w-full border bg-primary hover:bg-primary/90 text-white rounded-md transition-all group px-6 py-2 cursor-pointer disabled:cursor-not-allowed relative"
           type="button"
           disabled={loading}
         >

@@ -57,7 +57,7 @@ async function DetialsPage({ params }: Props) {
               <h2 className="text-slate-600">{shirt.category}</h2>
               <p className="text-xl font-semibold">${shirt.price}</p>
             </div>
-            <AddToCartBtn isHomePage={false} shirtId={shirt.id} />
+            <AddToCartBtn shirtId={shirt.id} />
           </div>
 
           <Accordion
