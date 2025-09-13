@@ -1,6 +1,6 @@
 "use client";
 
-import { SVGProps, JSX } from "react";
+import { PropsWithChildren } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -11,125 +11,100 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import AboutIcon from "@/icons/about";
 import CartIcon from "@/icons/cart";
-import { HomeIcon } from "@/icons/home";
-import { LoginIcon } from "@/icons/log_in";
 import UserIcon from "@/icons/user";
 import { useAuthStore } from "@/stores/auth_store";
+import { LoginIcon } from "@/icons/log_in";
+import PumpsCategories from "./pumps_categories";
 
 const navLinks = [
-  { href: "/", icon: HomeIcon, label: "Home" },
-  { href: "/about-us", icon: AboutIcon, label: "About" },
-];
-
-const signUpLinks = [{ href: "/sign-in", icon: LoginIcon, label: "Log In" }];
-
-const signedUpLinks = [
-  { href: "/account", icon: UserIcon, label: "Account" },
-  { href: "/cart", icon: CartIcon, label: "Cart" },
+  { href: "/services", label: "Services" },
+  { href: "/about-us", label: "About" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export default function NavBar() {
   const pathName = usePathname();
   const session = useAuthStore((state) => state.userIdAuthS);
-  const renderLink = (link: {
-    href: string;
-    icon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
-    label: string;
-  }) => {
-    const active = pathName === link.href;
-    return (
-      <Link
-        href={link.href}
-        key={link.href}
-        className={`${
-          active || (pathName === "/sign-up" && link.href === "/sign-in")
-            ? "bg-primary/15"
-            : "bg-primary/5 hover:bg-primary/10"
-        } flex justify-between items-center px-3 py-2 rounded-full `}
-      >
-        <p className="flex items-center gap-3">
-          <link.icon
-            className={`${active || (pathName === "/sign-up" && link.href === "/sign-in") ? "text-primary" : "text-gray-700"} size-6`}
-          />
-          <span
-            className={`${
-              active || (pathName === "/sign-up" && link.href === "/sign-in")
-                ? "text-primary"
-                : "text-gray-700"
-            } font-medium`}
-          >
-            {link.label}
-          </span>
-        </p>
-        {active && (
-          <span className="bg-primary/80 text-white ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-[10px]">
-            Current
-          </span>
-        )}
-      </Link>
-    );
-  };
+  // const renderLink = (link: {
+  //   href: string;
+  //   icon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
+  //   label: string;
+  // }) => {
+  //   const active = pathName === link.href;
+  //   return (
+  //     <Link
+  //       href={link.href}
+  //       key={link.href}
+  //       className={`${
+  //         active || (pathName === "/sign-up" && link.href === "/sign-in")
+  //           ? "bg-primary/15"
+  //           : "bg-primary/5 hover:bg-primary/10"
+  //       } flex justify-between items-center px-3 py-2 rounded-full `}
+  //     >
+  //       <p className="flex items-center gap-3">
+  //         <link.icon
+  //           className={`${active || (pathName === "/sign-up" && link.href === "/sign-in") ? "text-primary" : "text-gray-700"} size-6`}
+  //         />
+  //         <span
+  //           className={`${
+  //             active || (pathName === "/sign-up" && link.href === "/sign-in")
+  //               ? "text-primary"
+  //               : "text-gray-700"
+  //           } font-medium`}
+  //         >
+  //           {link.label}
+  //         </span>
+  //       </p>
+  //       {active && (
+  //         <span className="bg-primary/80 text-white ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-[10px]">
+  //           Current
+  //         </span>
+  //       )}
+  //     </Link>
+  //   );
+  // };
 
   return (
-    <nav
-      key={session ? "signed-in" : "signed-out"}
-      className="flex justify-between items-start mt-10 mb-20 px-4 sm:px-[5%]"
-    >
-      {/* Logo + Title */}
+    <nav className="flex justify-between items-start py-6 px-4 sm:px-[2%] shadow">
       <hgroup className="space-y-1">
         <Link
           href={"/"}
-          className="headingFont text-4xl font-extrabold cursor-pointer"
+          className="headingFont text-3xl font-extrabold cursor-pointer"
         >
-          linea
+          world pumps
         </Link>
-        <p className="text-gray-600">Timeless / Elegant</p>
+        {/* <p className="text-gray-600">Timeless / Elegant</p> */}
       </hgroup>
 
       {/* Desktop Nav */}
-      <ul className="hidden bg-primary text-white md:flex items-center justify-between gap-6 px-8 py-4 rounded-full">
+      <ul className="hidden md:flex items-center justify-between gap-6">
+        <NavLink href="/" pathName={pathName}>
+          Home
+        </NavLink>
+        <PumpsCategories />
+
         {navLinks.map((link) => (
-          <li key={link.href}>
-            <Link href={link.href}>
-              <link.icon
-                className={`${
-                  pathName === link.href ? "text-secondary " : "text-white "
-                } size-8`}
-              />
-            </Link>
-          </li>
+          <NavLink key={link.href} href={link.href} pathName={pathName}>
+            {link.label}
+          </NavLink>
         ))}
+      </ul>
 
-        {!session &&
-          signUpLinks.map((link) => (
-            <li key={link.href}>
-              <Link href={link.href}>
-                <link.icon
-                  className={`${
-                    pathName === link.href ||
-                    (pathName === "/sign-up" && link.href === "/sign-in")
-                      ? "text-secondary "
-                      : "text-white "
-                  } size-8`}
-                />
-              </Link>
-            </li>
-          ))}
+      <ul className="hidden md:flex items-center justify-between gap-6 mr-2">
+        {session ? (
+          <NavLink pathName={pathName} href={"/account"}>
+            <UserIcon className="size-7" />
+          </NavLink>
+        ) : (
+          <NavLink pathName={pathName} href={"/sign-in"}>
+            <LoginIcon className="size-7" />
+          </NavLink>
+        )}
 
-        {session &&
-          signedUpLinks.map((link) => (
-            <li key={link.href}>
-              <Link href={link.href}>
-                <link.icon
-                  className={`${
-                    pathName === link.href ? "text-secondary " : "text-white "
-                  } size-8`}
-                />
-              </Link>
-            </li>
-          ))}
+        <NavLink pathName={pathName} href={"/cart"}>
+          <CartIcon className="size-7" />
+        </NavLink>
       </ul>
 
       {/* Mobile Nav (Dialog) */}
@@ -158,14 +133,40 @@ export default function NavBar() {
                 Navigation
               </DialogTitle>
             </DialogHeader>
-            <ul className="flex flex-col gap-2 mt-6">
+            {/* <ul className="flex flex-col gap-2 mt-6">
               {navLinks.map(renderLink)}
               {!session && signUpLinks.map(renderLink)}
               {session && signedUpLinks.map(renderLink)}
-            </ul>
+            </ul> */}
           </DialogContent>
         </Dialog>
       </section>
     </nav>
+  );
+}
+
+interface NavLinkProps {
+  href: string;
+  pathName: string;
+}
+
+function NavLink({
+  href,
+  pathName,
+  children,
+}: NavLinkProps & PropsWithChildren) {
+  return (
+    <li>
+      <Link
+        href={href}
+        className={`${
+          pathName === href || (pathName === "/sign-up" && href === "/sign-in")
+            ? "text-primary border-b border-b-primary"
+            : "text-black"
+        }  text-lg`}
+      >
+        {children}{" "}
+      </Link>
+    </li>
   );
 }

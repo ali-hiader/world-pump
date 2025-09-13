@@ -1,5 +1,11 @@
+import ImagesCarosal from "@/components/images-carosal";
+
 async function HomePage() {
-  return <main>HomePage</main>;
+  return (
+    <main>
+      <ImagesCarosal />
+    </main>
+  );
 }
 
 export default HomePage;

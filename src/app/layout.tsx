@@ -1,6 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Lato } from "next/font/google";
+import { Cormorant_Garamond, Outfit } from "next/font/google";
 
 import { SessionInitializer } from "@/components/session_initializer";
 import NavBar from "@/components/nav_bar";
@@ -8,6 +8,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { getCartDB } from "@/actions/cart-actions";
 import { CartProduct } from "@/lib/types";
+import ContactNavBar from "@/components/contact-nav";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -15,10 +16,10 @@ const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
 });
 
-const lato = Lato({
+const outfit = Outfit({
   subsets: ["latin"],
   weight: ["300", "400", "700", "900"],
-  variable: "--font-lato",
+  variable: "--font-outfit",
 });
 
 export const metadata: Metadata = {
@@ -43,9 +44,10 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${lato.variable} ${cormorant.variable} antialiased bg-white max-w-[1500px] mx-auto`}
+        className={`${outfit.variable} ${cormorant.variable} antialiased bg-white max-w-[1500px] mx-auto`}
       >
         <SessionInitializer session={session?.user.id} cart={cart} />
+        <ContactNavBar />
         <NavBar />
         {children}
       </body>

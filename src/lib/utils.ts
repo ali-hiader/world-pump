@@ -179,3 +179,10 @@ export const shirts = [
   //     "Free standard shipping on all orders. Returns accepted within 30 days in original condition.",
   // },
 ];
+
+export const carosalImages = [
+  "/Pressure-Pump.webp",
+  "/submersible-pump.webp",
+  "/Vacuum-Pump.webp",
+  "/water_pump.webp",
+];

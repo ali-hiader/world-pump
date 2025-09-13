@@ -12,6 +12,7 @@ import { product } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import AddToCartBtn from "@/components/add_to_cart";
 import { ToastContainer } from "react-toastify";
+import DisplayAlert from "@/components/display_alert";
 
 interface Props {
   params: {
@@ -22,8 +23,12 @@ interface Props {
 async function DetialsPage({ params }: Props) {
   const { id } = params;
   const shirt = (
-    await db.selectDistinct().from(product).where(eq(product.slug, id))
+    await db.select().from(product).where(eq(product.slug, id))
   )[0];
+
+  if (!shirt) {
+    return <DisplayAlert showBtn={false}>No category found!</DisplayAlert>;
+  }
 
   const relatedShirts = await db
     .select()
