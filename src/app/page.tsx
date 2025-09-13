@@ -1,10 +1,14 @@
 import ImagesCarosal from "@/components/images-carosal";
+import NewArrivals from "@/components/new_arrivals";
 
 async function HomePage() {
   return (
-    <main>
+    <>
       <ImagesCarosal />
-    </main>
+      <main className="px-4 sm:px-[2%] pb-24">
+        <NewArrivals />
+      </main>
+    </>
   );
 }
 

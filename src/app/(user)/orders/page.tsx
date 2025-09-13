@@ -6,7 +6,7 @@ import { Order } from "@/lib/types";
 import { OrderItem as OrderItemI } from "@/lib/types";
 import { auth } from "@/lib/auth";
 import { db } from "@/index";
-import { orderItem, order } from "@/db/schema";
+import { orderItemTable, orderTable } from "@/db/schema";
 
 import Heading from "@/components/heading";
 import DisplayAlert from "@/components/display_alert";
@@ -25,15 +25,15 @@ async function Analytics() {
 
   const orders = await db
     .select()
-    .from(order)
-    .where(eq(order.userEmail, session.user.email));
+    .from(orderTable)
+    .where(eq(orderTable.userEmail, session.user.email));
 
   const orderItems = await Promise.all(
     orders.map(async (order) => {
       const items = await db
         .select()
-        .from(orderItem)
-        .where(eq(orderItem.orderId, order.id));
+        .from(orderItemTable)
+        .where(eq(orderItemTable.orderId, order.id));
       return {
         order,
         items,

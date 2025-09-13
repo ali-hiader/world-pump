@@ -1,32 +1,24 @@
-export interface UserProduct {
-  id: number;
-  title: string;
-  category: string;
-  description: string;
-  imageUrl: string;
-  price: number;
-  productDetail: string;
-  message: string;
-  createdBy: number;
-  user: {
-    id: number;
-    name: string;
-    image: string;
-    email: string;
-  };
-}
-
-export interface Product {
+export type Product = {
   id: number;
   title: string;
   slug: string;
   category: string;
   description: string;
   imageUrl: string;
+  gallery: string[] | null;
   price: number;
+  discountPrice?: number | null;
+  pumpType: string;
+  horsepower?: string | null;
+  flowRate?: string | null;
+  head?: string | null;
+  voltage?: string | null;
+  warranty?: string | null;
   message: string;
   createdBy: string;
-}
+  createdAt: Date | null;
+  updatedAt: Date | null;
+};
 
 export interface CartProduct {
   id: number;

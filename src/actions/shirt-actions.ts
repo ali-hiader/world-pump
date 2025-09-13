@@ -1,7 +1,7 @@
 "use server";
 import * as z from "zod";
 import { db } from "..";
-import { cart, product, user } from "@/db/schema";
+import { cartTable, productTable, user } from "@/db/schema";
 import { eq, getTableColumns, asc, like, sql, desc } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { slugifyIt } from "@/lib/utils";
@@ -101,21 +101,21 @@ export async function fetchAllProducts(
   offset: number,
   sortBy = "newest"
 ) {
-  let orderBy = asc(product.id);
+  let orderBy = asc(productTable.id);
   if (sortBy === "fromLow") {
-    orderBy = asc(product.price);
+    orderBy = asc(productTable.price);
   }
   if (sortBy === "fromHigh") {
-    orderBy = desc(product.price);
+    orderBy = desc(productTable.price);
   }
 
   const products = await db
     .select({
       user: { ...getTableColumns(user) },
-      ...getTableColumns(product),
+      ...getTableColumns(productTable),
     })
-    .from(product)
-    .innerJoin(user, eq(product.createdBy, user.id))
+    .from(productTable)
+    .innerJoin(user, eq(productTable.createdBy, user.id))
     .orderBy(orderBy)
     .limit(limit)
     .offset(offset);
@@ -131,12 +131,12 @@ export async function fetchSimilarProducts(
   const products = await db
     .select({
       user: { ...getTableColumns(user) },
-      ...getTableColumns(product),
+      ...getTableColumns(productTable),
     })
-    .from(product)
-    .innerJoin(user, eq(product.createdBy, user.id))
+    .from(productTable)
+    .innerJoin(user, eq(productTable.createdBy, user.id))
     .where(
-      sql`${product.category} = ${category} AND ${product.title} != ${productName}`
+      sql`${productTable.category} = ${category} AND ${productTable.title} != ${productName}`
     )
     .limit(9);
   return products;
@@ -162,18 +162,18 @@ export async function searchShirt(state: SearchShirtState, formdata: FormData) {
   const products = await db
     .select({
       user: { ...getTableColumns(user) },
-      ...getTableColumns(product),
+      ...getTableColumns(productTable),
     })
-    .from(product)
-    .innerJoin(user, eq(product.createdBy, user.id))
+    .from(productTable)
+    .innerJoin(user, eq(productTable.createdBy, user.id))
     .where(
       like(
-        sql`LOWER(${product.title})`,
+        sql`LOWER(${productTable.title})`,
         "%" + parsedData.data.search.toLowerCase() + "%"
       )
     )
     .limit(9)
-    .orderBy(asc(product.title));
+    .orderBy(asc(productTable.title));
   return products;
 }
 
@@ -181,17 +181,17 @@ export async function getProductDetail(slug: string) {
   const products = await db
     .select({
       user: { ...getTableColumns(user) },
-      ...getTableColumns(product),
+      ...getTableColumns(productTable),
     })
-    .from(product)
-    .innerJoin(user, eq(product.createdBy, user.id))
-    .where(like(product.slug, slug));
+    .from(productTable)
+    .innerJoin(user, eq(productTable.createdBy, user.id))
+    .where(like(productTable.slug, slug));
   return products;
 }
 
 export async function deleteProduct(id: number, imageUrl: string) {
-  await db.delete(cart).where(eq(cart.productId, id));
-  await db.delete(product).where(eq(product.id, id));
+  await db.delete(cartTable).where(eq(cartTable.productId, id));
+  await db.delete(productTable).where(eq(productTable.id, id));
 
   const filePathMatch = imageUrl.match(/products-images%2F(.+?)\?/);
   if (filePathMatch) {
@@ -209,12 +209,12 @@ export async function deleteProduct(id: number, imageUrl: string) {
 export async function getSingleShirt(shirtId: number) {
   const products = await db
     .select({
-      cartId: cart.id,
-      quantity: cart.quantity,
-      ...getTableColumns(product),
+      cartId: cartTable.id,
+      quantity: cartTable.quantity,
+      ...getTableColumns(productTable),
     })
-    .from(cart)
-    .innerJoin(product, eq(cart.productId, product.id))
-    .where(eq(cart.productId, shirtId));
+    .from(cartTable)
+    .innerJoin(productTable, eq(cartTable.productId, productTable.id))
+    .where(eq(cartTable.productId, shirtId));
   return products[0];
 }

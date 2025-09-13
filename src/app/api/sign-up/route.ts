@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { seedPumps } from "@/db/seed";
 
 const signUpSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
@@ -22,6 +23,7 @@ export interface SignUpResponseI {
 
 export async function POST(req: Request) {
   try {
+    seedPumps("1");
     const body = await req.json();
     const parsed = signUpSchema.safeParse(body);
 

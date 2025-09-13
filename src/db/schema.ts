@@ -23,7 +23,7 @@ export const user = pgTable("user", {
     .notNull(),
 });
 
-export const address = pgTable("address", {
+export const addressTable = pgTable("address", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
@@ -49,7 +49,7 @@ export const address = pgTable("address", {
     .notNull(),
 });
 
-export const admin = pgTable("admin", {
+export const adminTable = pgTable("admin", {
   id: text("id").primaryKey().notNull(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
@@ -96,21 +96,31 @@ export const verification = pgTable("verification", {
   updatedAt: timestamp("updated_at").$defaultFn(() => new Date()),
 });
 
-export const product = pgTable("product", {
+export const productTable = pgTable("product", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   title: varchar({ length: 255 }).notNull(),
   slug: varchar({ length: 255 }).notNull(),
   category: varchar({ length: 255 }).notNull(),
-  description: varchar({ length: 255 }).notNull(),
+  description: text().notNull(),
   imageUrl: varchar({ length: 255 }).notNull(),
+  gallery: text().array(),
   price: integer().notNull(),
+  discountPrice: integer(),
+  pumpType: varchar({ length: 100 }).notNull(),
+  horsepower: varchar({ length: 50 }),
+  flowRate: varchar({ length: 50 }),
+  head: varchar({ length: 50 }),
+  voltage: varchar({ length: 50 }),
+  warranty: varchar({ length: 100 }),
   message: varchar({ length: 255 }).notNull(),
   createdBy: text()
     .notNull()
-    .references(() => admin.id),
+    .references(() => adminTable.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const cart = pgTable("cart", {
+export const cartTable = pgTable("cart", {
   id: integer().notNull().generatedAlwaysAsIdentity().primaryKey(),
   quantity: integer().notNull(),
 
@@ -119,10 +129,10 @@ export const cart = pgTable("cart", {
     .references(() => user.id),
   productId: integer()
     .notNull()
-    .references(() => product.id),
+    .references(() => productTable.id),
 });
 
-export const order = pgTable("order", {
+export const orderTable = pgTable("order", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   userEmail: varchar("user_email").notNull(),
   sessionId: varchar("session_id").unique().notNull(),
@@ -131,9 +141,9 @@ export const order = pgTable("order", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const orderItem = pgTable("order_item", {
+export const orderItemTable = pgTable("order_item", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  orderId: integer("order_id").references(() => order.id),
+  orderId: integer("order_id").references(() => orderTable.id),
   productName: varchar("product_name", { length: 255 }).notNull(),
   quantity: integer("quantity").notNull(),
   price: integer("price").notNull(),

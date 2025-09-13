@@ -1,19 +1,27 @@
-import { product } from "@/db/schema";
+import { productTable } from "@/db/schema";
 import { db } from "..";
-import { shirts } from "@/lib/utils";
+import { pumps } from "@/lib/utils";
 
 // Seeder function
-export async function seedShirts(userId: string) {
-  const formattedShirts = shirts.map((shirt) => ({
-    title: shirt.name,
-    slug: shirt.id,
-    category: shirt.type,
-    description: shirt.description,
-    imageUrl: shirt.image,
-    price: parseInt(shirt.price.replace("$", "")), // convert "$240" → 240
-    message: shirt.shippingAndReturns,
-    createdBy: userId, // pass the logged-in user’s id or admin id
+export async function seedPumps(userId: string) {
+  const formattedPumps = pumps.map((pump) => ({
+    title: pump.title,
+    slug: pump.id,
+    category: pump.category,
+    description: pump.description,
+    imageUrl: pump.imageUrl,
+    gallery: pump.gallery || [],
+    price: pump.price,
+    discountPrice: pump.discountPrice ? pump.discountPrice : null,
+    pumpType: pump.pumpType,
+    horsepower: pump.horsepower,
+    flowRate: pump.flowRate,
+    head: pump.head,
+    voltage: pump.voltage,
+    warranty: pump.warranty,
+    message: pump.message,
+    createdBy: userId,
   }));
 
-  await db.insert(product).values(formattedShirts).onConflictDoNothing();
+  await db.insert(productTable).values(formattedPumps).onConflictDoNothing();
 }

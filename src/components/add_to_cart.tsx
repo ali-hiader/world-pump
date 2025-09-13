@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Bounce, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 
-import CartIcon from "@/icons/cart";
 import Spinner from "@/icons/spinner";
 
 import { addToCartDB } from "@/actions/cart-actions";
@@ -12,16 +11,15 @@ import useCartStore from "@/stores/cart_store";
 import { useAuthStore } from "@/stores/auth_store";
 
 interface Props {
-  isHomePage: boolean;
   shirtId: number;
 }
 
-function AddToCartBtn({ isHomePage, shirtId }: Props) {
+function AddToCartBtn({ shirtId }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const addProduct = useCartStore((state) => state.addShirtCartS);
   const session = useAuthStore((state) => state.userIdAuthS);
-  console.log(session);
+
   async function handleAddingToCart() {
     if (!session) return router.push("/sign-in");
 
@@ -54,18 +52,10 @@ function AddToCartBtn({ isHomePage, shirtId }: Props) {
 
   return (
     <>
-      {isHomePage ? (
-        loading ? (
-          <Spinner className="size-4 animate-spin" />
-        ) : (
-          <button onClick={handleAddingToCart}>
-            <CartIcon className="cursor-pointer size-4" />
-          </button>
-        )
-      ) : (
+      {
         <button
           onClick={handleAddingToCart}
-          className="mt-10 w-full border bg-secondary hover:bg-secondary/90 rounded-full transition-all group px-6 py-2 cursor-pointer disabled:cursor-not-allowed relative"
+          className="w-full border bg-secondary hover:bg-secondary/90 text-white rounded-md transition-all group px-6 py-2 cursor-pointer disabled:cursor-not-allowed relative"
           type="button"
           disabled={loading}
         >
@@ -74,7 +64,7 @@ function AddToCartBtn({ isHomePage, shirtId }: Props) {
           )}{" "}
           Add to cart
         </button>
-      )}
+      }
     </>
   );
 }

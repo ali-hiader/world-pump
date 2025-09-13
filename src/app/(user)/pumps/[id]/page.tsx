@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/accordion";
 import ProductCard from "@/components/product_card";
 import { db } from "@/index";
-import { product } from "@/db/schema";
+import { productTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import AddToCartBtn from "@/components/add_to_cart";
 import { ToastContainer } from "react-toastify";
@@ -23,7 +23,7 @@ interface Props {
 async function DetialsPage({ params }: Props) {
   const { id } = params;
   const shirt = (
-    await db.select().from(product).where(eq(product.slug, id))
+    await db.select().from(productTable).where(eq(productTable.slug, id))
   )[0];
 
   if (!shirt) {
@@ -32,8 +32,8 @@ async function DetialsPage({ params }: Props) {
 
   const relatedShirts = await db
     .select()
-    .from(product)
-    .where(eq(product.category, shirt.category));
+    .from(productTable)
+    .where(eq(productTable.category, shirt.category));
 
   return (
     <main className="w-full mb-16">

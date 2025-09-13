@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { eq, getTableColumns } from "drizzle-orm";
-import { cart, product } from "@/db/schema";
+import { cartTable, productTable } from "@/db/schema";
 import { db } from "@/index";
 import { auth } from "@/lib/auth";
 
@@ -21,13 +21,13 @@ async function CheckoutPage() {
 
   const cartItems = await db
     .select({
-      cartId: cart.id,
-      quantity: cart.quantity,
-      ...getTableColumns(product),
+      cartId: cartTable.id,
+      quantity: cartTable.quantity,
+      ...getTableColumns(productTable),
     })
-    .from(cart)
-    .innerJoin(product, eq(cart.productId, product.id))
-    .where(eq(cart.createdBy, session.user.id));
+    .from(cartTable)
+    .innerJoin(productTable, eq(cartTable.productId, productTable.id))
+    .where(eq(cartTable.createdBy, session.user.id));
 
   return <Checkout cartItems={cartItems} />;
 }

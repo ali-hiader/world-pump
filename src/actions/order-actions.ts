@@ -1,5 +1,5 @@
 "use server";
-import { cart, orderItem, order } from "@/db/schema";
+import { cartTable, orderItemTable, orderTable } from "@/db/schema";
 import { db } from "..";
 import { eq } from "drizzle-orm";
 import { stripe } from "@/lib/stripe-server";
@@ -28,7 +28,7 @@ export async function createOrder(sessionId: string, userEmail: string) {
     }
 
     const newOrder = await db
-      .insert(order)
+      .insert(orderTable)
       .values({
         userEmail: userEmail,
         sessionId,
@@ -41,7 +41,7 @@ export async function createOrder(sessionId: string, userEmail: string) {
       expand: ["data.price.product"],
     });
 
-    await db.insert(orderItem).values(
+    await db.insert(orderItemTable).values(
       lineItems.data.map((item) => ({
         orderId: newOrder[0].id,
         productName: item.description || "",
@@ -51,7 +51,7 @@ export async function createOrder(sessionId: string, userEmail: string) {
     );
     console.log("Order created successfully");
 
-    await db.delete(cart).where(eq(cart.createdBy, userEmail));
+    await db.delete(cartTable).where(eq(cartTable.createdBy, userEmail));
 
     return {
       message: "Order created successfully",
@@ -76,7 +76,7 @@ export async function getExsistingOrder(sessionId: string) {
 export async function getOrders(email: string) {
   const orders = await db
     .select()
-    .from(order)
-    .where(eq(order.userEmail, email));
+    .from(orderTable)
+    .where(eq(orderTable.userEmail, email));
   return orders;
 }

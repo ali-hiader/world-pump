@@ -36,17 +36,19 @@ export default async function RootLayout({
     headers: await headers(),
   });
 
-  let cart: CartProduct[] = [];
-  if (session) {
-    cart = await getCartDB(session.user.id);
-  }
+  const cart: CartProduct[] = [];
+  // if (session) {
+  //   cart = await getCartDB(session.user.id);
+  // }
 
   return (
     <html lang="en">
       <body
         className={`${outfit.variable} ${cormorant.variable} antialiased bg-white max-w-[1500px] mx-auto`}
       >
-        <SessionInitializer session={session?.user.id} cart={cart} />
+        {session && (
+          <SessionInitializer session={session?.user.id} cart={cart} />
+        )}
         <ContactNavBar />
         <NavBar />
         {children}
