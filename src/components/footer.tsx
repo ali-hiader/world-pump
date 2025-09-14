@@ -3,7 +3,7 @@ import { Facebook, Phone, Mail } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-gray-300 mt-24">
+    <footer className="bg-secondary text-white mt-24">
       <div className="max-w-7xl mx-auto px-6 py-12 grid md:grid-cols-[2fr_1fr_1fr_1fr] gap-8">
         {/* Company Info */}
         <div>
@@ -11,9 +11,9 @@ export default function Footer() {
             href={"/"}
             className="headingFont text-3xl font-extrabold cursor-pointer"
           >
-            world pumps
+            World Pumps
           </Link>{" "}
-          <p className="text-sm leading-relaxed max-w-3/4 mt-3">
+          <p className="text-sm leading-relaxed max-w-3/4 mt-3 text-gray-200">
             Providing reliable water pumps, filtration systems, swimming pool
             solutions, and premium brands to keep your water flowing and
             lifestyle comfortable.
