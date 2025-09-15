@@ -14,24 +14,7 @@ import {
   MenubarMenu,
   MenubarTrigger,
 } from "@/components/ui/menubar";
-
-const categories = [
-  { name: "Centrifugal Pumps", slug: "centrifugal-pumps" },
-  { name: "Circulating Pumps", slug: "circulating-pumps" },
-  { name: "Solar Pumps", slug: "solar-pumps" },
-  { name: "Pressure Pumps", slug: "pressure-pumps" },
-  { name: "Self-Priming Pumps", slug: "self-priming-pumps" },
-  {
-    name: "Submersible Pumps and Motors",
-    slug: "submersible-pumps-and-motors",
-  },
-  { name: "Submersible Sewage Pumps", slug: "submersible-sewage-pumps" },
-  { name: "High Pressure Washers", slug: "high-pressure-washers" },
-  { name: "Swimming Pool Pumps", slug: "swimming-pool-pumps" },
-  { name: "Chemical Dosing Pumps", slug: "chemical-dosing-pumps" },
-  { name: "Fountain Pumps", slug: "fountain-pumps" },
-  { name: "Gear Pumps", slug: "gear-pumps" },
-];
+import { categories } from "@/lib/utils";
 
 interface PumpsCategoriesProps {
   mobile?: boolean; // true → accordion, false → menubar
@@ -104,11 +87,10 @@ export default function PumpsCategories({
             return (
               <MenubarItem
                 key={category.slug}
-                pathName={pathName}
                 onClick={() => router.push(`/pumps/${category.slug}`)}
                 className={`text-base focus:outline-none rounded-none border border-gray-200 ${
                   active
-                    ? "bg-secondary text-white"
+                    ? "bg-primary  data-[variant=destructive]:text-white"
                     : "bg-gray-100 hover:bg-gray-200"
                 }`}
               >

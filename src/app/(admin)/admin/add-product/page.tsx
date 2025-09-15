@@ -1,9 +1,7 @@
 "use client";
 
-import { ChangeEvent, useActionState, useRef, useState } from "react";
 import Form from "next/form";
 import Image from "next/image";
-import { ImageIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,11 +12,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+import { ChangeEvent, useActionState, useRef, useState } from "react";
+import { ImageIcon } from "lucide-react";
+
 import Spinner from "@/icons/spinner";
-import { addNewProduct } from "@/actions/shirt-actions";
+import { addNewProduct } from "@/actions/product-actions";
+import Heading from "@/components/client/heading";
 
 function AddProduct() {
   const [state, formAction, pending] = useActionState(addNewProduct, null);
@@ -40,7 +43,8 @@ function AddProduct() {
 
   return (
     <main className="container py-8 px-4 max-w-[80%] mx-auto">
-      <Card className="p-6">
+      <Heading title="Add new product" />
+      <Card className="p-6 mt-8">
         <Form action={formAction} className="space-y-6">
           <div className="space-y-2">
             <label className="block text-sm font-medium">

@@ -1,5 +1,5 @@
 import React from "react";
-import { db } from "..";
+import { db } from "../..";
 import { productTable } from "@/db/schema";
 import ProductCard from "./product_card";
 import Heading from "./heading";

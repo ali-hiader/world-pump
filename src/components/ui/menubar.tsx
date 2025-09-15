@@ -88,13 +88,12 @@ function MenubarContent({
 function MenubarItem({
   className,
   inset,
-  pathName,
+
   variant = "destructive",
   ...props
 }: React.ComponentProps<typeof MenubarPrimitive.Item> & {
   inset?: boolean;
   variant?: "default" | "destructive";
-  pathName: string;
 }) {
   return (
     <MenubarPrimitive.Item
@@ -104,18 +103,13 @@ function MenubarItem({
       className={cn(
         "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden",
         // States
-        "hover:bg-primary hover:text-white",
+        "hover:bg-secondary hover:text-white",
         "focus:bg-accent focus:text-accent-foreground",
-        "data-[variant=destructive]:text-black data-[variant=destructive]:focus:bg-primary dark:data-[variant=destructive]:focus:bg-primary/20 data-[variant=destructive]:focus:text-white data-[variant=destructive]:*:[svg]:!text-destructive",
+        "data-[variant=destructive]:text-black data-[variant=destructive]:hover:bg-secondary dark:data-[variant=destructive]:focus:bg-primary/20 data-[variant=destructive]:focus:text-white data-[variant=destructive]:*:[svg]:!text-destructive",
         // Disabled
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         // Icons
         "data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground",
-
-        // ✅ Conditional style
-        pathName.startsWith("/pumps")
-          ? "text-primary border-b-2 border-primary"
-          : "",
         className
       )}
       {...props}

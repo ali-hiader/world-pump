@@ -162,17 +162,12 @@ export async function fetchAllProducts(
   }
 
   const products = await db
-    .select({
-      user: { ...getTableColumns(user) },
-      ...getTableColumns(productTable),
-    })
+    .select()
     .from(productTable)
-    .innerJoin(user, eq(productTable.createdBy, user.id))
     .orderBy(orderBy)
     .limit(limit)
     .offset(offset);
 
-  console.log(products);
   return products;
 }
 

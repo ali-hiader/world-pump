@@ -3,9 +3,9 @@
 import { Product } from "@/lib/types";
 import Image from "next/image";
 import Link from "next/link";
-import AddToCartBtn from "./add_to_cart";
+import AddToCartBtn from "../client/add_to_cart";
 
-export default function ProductCard({
+export default function AdminProductCard({
   id,
   title,
   slug,
@@ -14,8 +14,8 @@ export default function ProductCard({
   category,
 }: Product) {
   return (
-    <section className="w-full grid grid-rows-[4fr_auto] rounded-md h-96 gap-3 border border-secondary/40 px-2 py-4 shadow">
-      <Link href={`/shirts/${slug}`} className="block relative overflow-hidden">
+    <div className="w-full grid grid-rows-[4fr_auto] rounded-md h-96 gap-3 border border-secondary/40 px-2 py-4 shadow">
+      <Link href={`/pumps/${slug}`} className="block relative overflow-hidden">
         <Image
           src={imageUrl}
           alt={title}
@@ -43,6 +43,6 @@ export default function ProductCard({
         </div>
         <AddToCartBtn shirtId={id} />
       </div>
-    </section>
+    </div>
   );
 }

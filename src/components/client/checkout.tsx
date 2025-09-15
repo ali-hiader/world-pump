@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import Spinner from "@/icons/spinner";
 import { useState } from "react";
-import CheckoutProduct from "@/components/checkout_product";
+import CheckoutProduct from "@/components/client/checkout_product";
 import Heading from "./heading";
 import { CartProduct } from "@/lib/types";
 import DisplayAlert from "./display_alert";

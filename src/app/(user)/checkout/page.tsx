@@ -6,7 +6,7 @@ import { cartTable, productTable } from "@/db/schema";
 import { db } from "@/index";
 import { auth } from "@/lib/auth";
 
-import Checkout from "@/components/checkout";
+import Checkout from "@/components/client/checkout";
 
 export const dynamic = "force-dynamic";
 

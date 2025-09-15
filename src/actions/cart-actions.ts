@@ -7,7 +7,7 @@ import { and, desc, eq, getTableColumns } from "drizzle-orm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { getSingleShirt } from "./shirt-actions";
+import { getSingleShirt } from "./product-actions";
 
 export async function getCartDB(userId: string) {
   try {

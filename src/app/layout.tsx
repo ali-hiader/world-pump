@@ -2,14 +2,6 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Outfit } from "next/font/google";
 
-import { SessionInitializer } from "@/components/session_initializer";
-import NavBar from "@/components/nav_bar";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-// import { getCartDB } from "@/actions/cart-actions";
-import { CartProduct } from "@/lib/types";
-import ContactNavBar from "@/components/contact-nav";
-
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -32,25 +24,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  const cart: CartProduct[] = [];
-  // if (session) {
-  //   cart = await getCartDB(session.user.id);
-  // }
-
   return (
     <html lang="en">
       <body
         className={`${outfit.variable} ${cormorant.variable} antialiased bg-white max-w-[1500px] mx-auto`}
       >
-        {session && (
-          <SessionInitializer session={session?.user.id} cart={cart} />
-        )}
-        <ContactNavBar />
-        <NavBar />
         {children}
       </body>
     </html>

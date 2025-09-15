@@ -1,4 +1,4 @@
-import { CopyButton } from "./ui/shadcn-io/copy-button";
+import { CopyButton } from "../ui/shadcn-io/copy-button";
 
 interface Props {
   content: string;

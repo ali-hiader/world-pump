@@ -8,8 +8,8 @@ import { auth } from "@/lib/auth";
 import { db } from "@/index";
 import { orderItemTable, orderTable } from "@/db/schema";
 
-import Heading from "@/components/heading";
-import DisplayAlert from "@/components/display_alert";
+import Heading from "@/components/client/heading";
+import DisplayAlert from "@/components/client/display_alert";
 import { Card } from "@/components/ui/card";
 
 export const dynamic = "force-dynamic";

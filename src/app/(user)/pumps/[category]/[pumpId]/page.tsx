@@ -6,24 +6,24 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import ProductCard from "@/components/product_card";
+import ProductCard from "@/components/client/product_card";
 import { db } from "@/index";
 import { productTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import AddToCartBtn from "@/components/add_to_cart";
+import AddToCartBtn from "@/components/client/add_to_cart";
 import { ToastContainer } from "react-toastify";
-import DisplayAlert from "@/components/display_alert";
+import DisplayAlert from "@/components/client/display_alert";
 
 interface Props {
   params: {
-    id: string;
+    pumpId: string;
   };
 }
 
-async function DetialsPage({ params }: Props) {
-  const { id } = params;
+async function PumpDetialsPage({ params }: Props) {
+  const { pumpId } = params;
   const shirt = (
-    await db.select().from(productTable).where(eq(productTable.slug, id))
+    await db.select().from(productTable).where(eq(productTable.slug, pumpId))
   )[0];
 
   if (!shirt) {
@@ -97,4 +97,4 @@ async function DetialsPage({ params }: Props) {
   );
 }
 
-export default DetialsPage;
+export default PumpDetialsPage;

@@ -1,10 +1,9 @@
-import ImagesCarosal from "@/components/images-carosal";
-import NewArrivals from "@/components/new_arrivals";
-import AboutCompany from "@/components/about_company";
-import Services from "@/components/services";
-import Testimonials from "@/components/testimonials";
-import Footer from "@/components/footer";
-import Newsletter from "@/components/newsletter_signup";
+import ImagesCarosal from "@/components/client/images-carosal";
+import NewArrivals from "@/components/client/new_arrivals";
+import AboutCompany from "@/components/client/about_company";
+import Services from "@/components/client/services";
+import Testimonials from "@/components/client/testimonials";
+import Newsletter from "@/components/client/newsletter_signup";
 
 async function HomePage() {
   return (
@@ -30,7 +29,6 @@ async function HomePage() {
         </div>
         <Newsletter />
       </main>
-      <Footer />
     </>
   );
 }

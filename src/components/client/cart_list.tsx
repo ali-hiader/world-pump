@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import useCartStore from "@/stores/cart_store";
 import CartItem from "./cart_item";
-import DisplayAlert from "@/components/display_alert";
+import DisplayAlert from "@/components/client/display_alert";
 
 import { Button } from "@/components/ui/button";
 import Heading from "./heading";
@@ -24,7 +24,7 @@ function CartList() {
 
   return (
     <>
-      <Heading title="Cart"  />
+      <Heading title="Cart" />
       {shirtsCartS.length === 0 ? (
         <DisplayAlert showBtn> No products in the cart!</DisplayAlert>
       ) : (

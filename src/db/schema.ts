@@ -5,56 +5,195 @@ import {
   boolean,
   integer,
   varchar,
+  pgEnum,
+  uuid,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
-  name: text("name").notNull(),
-  email: text("email").notNull().unique(),
-  emailVerified: boolean("email_verified")
-    .$defaultFn(() => false)
-    .notNull(),
-  image: text("image"),
-  createdAt: timestamp("created_at")
-    .$defaultFn(() => new Date())
-    .notNull(),
-  updatedAt: timestamp("updated_at")
-    .$defaultFn(() => new Date())
-    .notNull(),
+  name: varchar("name", { length: 100 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  emailVerified: boolean("email_verified").default(false).notNull(),
+  image: varchar("image", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const addressTable = pgTable("address", {
-  id: text("id").primaryKey(),
+export const adminRoleEnum = pgEnum("admin_role", ["admin", "superadmin"]);
+
+export const adminTable = pgTable("admin", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  name: varchar("name", { length: 100 }).notNull(),
+  password: text("password").notNull(), // store hashed password
+  role: adminRoleEnum("role").default("admin").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const productStatusEnum = pgEnum("product_status", [
+  "active", // visible, purchasable
+  "inactive", // hidden, but still in DB
+  "discontinued", // no longer sold
+]);
+
+export const productTable = pgTable("product", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  title: varchar({ length: 255 }).notNull(),
+  slug: varchar({ length: 255 }).notNull().unique(),
+  categoryId: integer()
+    .notNull()
+    .references(() => categoryTable.id),
+  description: text().notNull(),
+  imageUrl: varchar({ length: 255 }).notNull(),
+  gallery: text().array(),
+  price: integer().notNull(),
+  discountPrice: integer(),
+  stock: integer().default(0).notNull(),
+  brand: varchar({ length: 100 }),
+  sku: varchar({ length: 100 }).unique(),
+  status: productStatusEnum("status").default("active").notNull(),
+  isFeatured: boolean().default(false),
+  pumpType: varchar({ length: 100 }).notNull(),
+  horsepower: varchar({ length: 50 }),
+  flowRate: varchar({ length: 50 }),
+  head: varchar({ length: 50 }),
+  voltage: varchar({ length: 50 }),
+  warranty: varchar({ length: 100 }),
+  message: varchar({ length: 255 }),
+  createdBy: integer()
+    .notNull()
+    .references(() => adminTable.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const categoryTable = pgTable("category", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  name: varchar({ length: 100 }).notNull().unique(),
+  slug: varchar({ length: 100 }).notNull().unique(),
+  isFeatured: boolean().default(false),
+  imageUrl: varchar({ length: 255 }),
+  description: text(), // optional, for SEO or details
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const cartTable = pgTable("cart", {
+  id: integer().notNull().generatedAlwaysAsIdentity().primaryKey(),
+  quantity: integer().notNull(),
+  createdBy: text()
+    .notNull()
+    .references(() => user.id),
+  productId: integer()
+    .notNull()
+    .references(() => productTable.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const paymentStatusEnum = pgEnum("payment_status", [
+  "pending", // initiated but not confirmed
+  "successful", // completed and verified
+  "failed", // failed attempt
+  "refunded", // refunded later
+]);
+
+export const paymentMethodEnum = pgEnum("payment_method", ["payfast", "cod"]);
+
+export const paymentTable = pgTable("payment", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  orderId: integer("order_id")
+    .notNull()
+    .references(() => orderTable.id, { onDelete: "cascade" }),
+  method: paymentMethodEnum("method").notNull(),
+  status: paymentStatusEnum("status").default("pending").notNull(),
+  // PayFast fields
+  payfastPaymentId: varchar("payfast_payment_id"), // pf_payment_id
+  merchantPaymentId: varchar("merchant_payment_id"), // your reference
+  signature: varchar("signature"), // PayFast verification signature
+  amount: integer("amount").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const orderStatusEnum = pgEnum("order_status", [
+  "pending", // created but not paid
+  "paid", // payment confirmed
+  "shipped", // on the way
+  "completed", // delivered
+  "cancelled", // cancelled by user or admin
+]);
+
+export const orderTable = pgTable("order", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  orderNumber: varchar("order_number", { length: 50 }) // human-readable ID
+    .notNull()
+    .unique(),
+
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  fullName: text("full_name").notNull(), // receiver’s name
+  userEmail: varchar("user_email").notNull(),
+
+  // Address references
+  shippingAddressId: uuid("shipping_address_id").references(
+    () => addressTable.id,
+    { onDelete: "set null" }
+  ),
+  billingAddressId: uuid("billing_address_id").references(
+    () => addressTable.id,
+    { onDelete: "set null" }
+  ),
+  paymentStatus: paymentStatusEnum("payment_status")
+    .default("pending")
+    .notNull(),
+  notes: text("notes"),
+  totalAmount: integer("total_amount").notNull(),
+  status: orderStatusEnum("status").default("pending").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const orderItemTable = pgTable("order_item", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  orderId: integer("order_id")
+    .notNull()
+    .references(() => orderTable.id, { onDelete: "cascade" }),
+  productId: integer("product_id")
+    .notNull()
+    .references(() => productTable.id, { onDelete: "set null" }),
+  productName: varchar("product_name", { length: 255 }).notNull(),
+  sku: varchar("sku", { length: 100 }),
+  quantity: integer("quantity").notNull(),
+  unitPrice: integer("unit_price").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const addressTypeEnum = pgEnum("address_type", ["shipping", "billing"]);
+
+export const addressTable = pgTable("address", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  type: addressTypeEnum("type").default("shipping").notNull(),
+
+  fullName: text("full_name").notNull(),
   phone: text("phone").notNull(),
   addressLine1: text("address_line1").notNull(),
   addressLine2: text("address_line2"),
   city: text("city").notNull(),
   state: text("state"),
   postalCode: text("postal_code"),
-  country: text("country")
-    .$defaultFn(() => "Pakistan")
-    .notNull(),
-  isDefault: boolean("is_default")
-    .$defaultFn(() => false)
-    .notNull(),
-  createdAt: timestamp("created_at")
-    .$defaultFn(() => new Date())
-    .notNull(),
-  updatedAt: timestamp("updated_at")
-    .$defaultFn(() => new Date())
-    .notNull(),
+  country: text("country").default("Pakistan").notNull(),
+
+  isDefault: boolean("is_default").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const adminTable = pgTable("admin", {
-  id: text("id").primaryKey().notNull(),
-  email: text("email").notNull().unique(),
-  password: text("password").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+// better-auth specific
 
 export const session = pgTable("session", {
   id: text("id").primaryKey(),
@@ -94,57 +233,4 @@ export const verification = pgTable("verification", {
   expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").$defaultFn(() => new Date()),
   updatedAt: timestamp("updated_at").$defaultFn(() => new Date()),
-});
-
-export const productTable = pgTable("product", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  title: varchar({ length: 255 }).notNull(),
-  slug: varchar({ length: 255 }).notNull(),
-  category: varchar({ length: 255 }).notNull(),
-  description: text().notNull(),
-  imageUrl: varchar({ length: 255 }).notNull(),
-  gallery: text().array(),
-  price: integer().notNull(),
-  discountPrice: integer(),
-  pumpType: varchar({ length: 100 }).notNull(),
-  horsepower: varchar({ length: 50 }),
-  flowRate: varchar({ length: 50 }),
-  head: varchar({ length: 50 }),
-  voltage: varchar({ length: 50 }),
-  warranty: varchar({ length: 100 }),
-  message: varchar({ length: 255 }).notNull(),
-  createdBy: text()
-    .notNull()
-    .references(() => adminTable.id),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-export const cartTable = pgTable("cart", {
-  id: integer().notNull().generatedAlwaysAsIdentity().primaryKey(),
-  quantity: integer().notNull(),
-
-  createdBy: text()
-    .notNull()
-    .references(() => user.id),
-  productId: integer()
-    .notNull()
-    .references(() => productTable.id),
-});
-
-export const orderTable = pgTable("order", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  userEmail: varchar("user_email").notNull(),
-  sessionId: varchar("session_id").unique().notNull(),
-  totalAmount: integer("total_amount").notNull(),
-  status: varchar("status", { length: 50 }).notNull().default("completed"),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const orderItemTable = pgTable("order_item", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  orderId: integer("order_id").references(() => orderTable.id),
-  productName: varchar("product_name", { length: 255 }).notNull(),
-  quantity: integer("quantity").notNull(),
-  price: integer("price").notNull(),
 });

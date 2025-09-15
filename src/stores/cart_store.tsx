@@ -5,10 +5,10 @@ interface CartStore {
   shirtsCartS: CartProduct[];
   setShirtsCartS: (products: CartProduct[]) => void;
   addShirtCartS: (product: CartProduct, userId: string) => void;
-  increaseShirtQuantityCartS: (productId: number, userId: string) => void;
-  decreaseShirtQuantityCartS: (productId: number, userId: string) => void;
-  removeShirtCartS: (productId: number, userId: string) => void;
-  clearCartS: (userId: string) => void;
+  increaseShirtQuantityCartS: (productId: number, userId: number) => void;
+  decreaseShirtQuantityCartS: (productId: number, userId: number) => void;
+  removeShirtCartS: (productId: number, userId: number) => void;
+  clearCartS: (userId: number) => void;
 }
 
 const useCartStore = create<CartStore>((set) => ({

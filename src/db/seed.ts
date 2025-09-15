@@ -1,27 +1,54 @@
-import { productTable } from "@/db/schema";
+import { categoryTable, productTable } from "@/db/schema";
 import { db } from "..";
-import { pumps } from "@/lib/utils";
+import { categories, pumps } from "@/lib/utils";
 
-// Seeder function
-export async function seedPumps(userId: string) {
+type ProductStatus = "active" | "inactive" | "discontinued";
+export async function seedPumps(userId: number) {
   const formattedPumps = pumps.map((pump) => ({
     title: pump.title,
-    slug: pump.id,
-    category: pump.category,
+    slug: pump.slug,
+    categoryId: pump.categoryId, // ✅ fixed
     description: pump.description,
     imageUrl: pump.imageUrl,
     gallery: pump.gallery || [],
     price: pump.price,
-    discountPrice: pump.discountPrice ? pump.discountPrice : null,
+    discountPrice: pump.discountPrice ?? null,
+    stock: pump.stock ?? 0, // ✅ added
+    brand: pump.brand ?? null,
+    sku: pump.sku ?? null,
+    status: (pump.status as unknown as ProductStatus) ?? "active",
+    isFeatured: pump.isFeatured ?? false,
     pumpType: pump.pumpType,
-    horsepower: pump.horsepower,
-    flowRate: pump.flowRate,
-    head: pump.head,
-    voltage: pump.voltage,
-    warranty: pump.warranty,
-    message: pump.message,
+    horsepower: pump.horsepower ?? null,
+    flowRate: pump.flowRate ?? null,
+    head: pump.head ?? null,
+    voltage: pump.voltage ?? null,
+    warranty: pump.warranty ?? null,
+    message: pump.message ?? null,
     createdBy: userId,
   }));
 
-  await db.insert(productTable).values(formattedPumps).onConflictDoNothing();
+  try {
+    console.log("🌱 Seeding products...");
+
+    await db.delete(productTable);
+    await db.insert(productTable).values(formattedPumps);
+
+    console.log("✅ Products seeded successfully!");
+  } catch (error) {
+    console.error("❌ Error seeding products:", error);
+  }
+}
+
+export async function seedCategories() {
+  try {
+    console.log("🌱 Seeding categories...");
+
+    await db.delete(categoryTable);
+    await db.insert(categoryTable).values(categories);
+
+    console.log("✅ Categories seeded successfully!");
+  } catch (error) {
+    console.error("❌ Error seeding categories:", error);
+  }
 }
