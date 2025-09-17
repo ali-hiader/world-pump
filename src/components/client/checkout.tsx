@@ -5,7 +5,7 @@ import Spinner from "@/icons/spinner";
 import { useState } from "react";
 import CheckoutProduct from "@/components/client/checkout_product";
 import Heading from "./heading";
-import { CartProduct } from "@/lib/types";
+import { CartItemType } from "@/lib/types";
 import DisplayAlert from "./display_alert";
 import CardItemCopy from "./card_copy_item";
 
@@ -25,7 +25,7 @@ const cardData = [
 ];
 
 interface Props {
-  cartItems: CartProduct[];
+  cartItems: CartItemType[];
 }
 
 function Checkout({ cartItems }: Props) {
@@ -62,16 +62,16 @@ function Checkout({ cartItems }: Props) {
   if (cartItems.length === 0) {
     return (
       <DisplayAlert showBtn={false}>
-        Please add shirts to cart to review here!
+        Please add Products to cart to review here!
       </DisplayAlert>
     );
   }
 
   return (
-    <main className="px-4 sm:px-[5%] mb-12">
+    <main className="px-4 sm:px-[5%] mb-12 mt-8">
       <Heading
         title="Checkout"
-        // itemsOnPage={cartItems.reduce((sum, shirt) => sum + shirt.quantity, 0)}
+        // itemsOnPage={cartItems.reduce((sum, Product) => sum + Product.quantity, 0)}
       />
       <section className="max-w-5xl mx-auto mt-12">
         <section className="grid grid-cols-1 md:grid-cols-2 items-center gap-4 mt-6 border-y border-y-primary/20 pt-4 pb-6">
@@ -106,7 +106,7 @@ function Checkout({ cartItems }: Props) {
             <Button
               onClick={handleCheckout}
               disabled={isLoading}
-              className="sm:w-96 w-full self-center bg-secondary hover:bg-secondary/90 cursor-pointer transition-all duration-300 text-white rounded-full py-6"
+              className="sm:w-96 w-full self-center bg-secondary hover:bg-secondary/90 cursor-pointer transition-all duration-300 text-white rounded-md py-6"
             >
               {isLoading ? (
                 <Spinner className="size-7 animate-spin [&>path]:stroke-white" />

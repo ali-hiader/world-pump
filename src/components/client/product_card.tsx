@@ -1,48 +1,67 @@
 "use client";
 
-import { Product } from "@/lib/types";
 import Image from "next/image";
 import Link from "next/link";
+
+import { ProductType } from "@/lib/types";
+import { Badge } from "@/components/ui/badge";
 import AddToCartBtn from "./add_to_cart";
 
-export default function ProductCard({
-  id,
-  title,
-  slug,
-  imageUrl,
-  price,
-  category,
-}: Product) {
+export default function ProductCard({ product }: { product: ProductType }) {
+  if (!product) return;
   return (
-    <div className="w-full grid grid-rows-[4fr_auto] rounded-md h-96 gap-3 border border-secondary/40 px-2 py-4 shadow">
-      <Link href={`/pumps/${slug}`} className="block relative overflow-hidden">
+    <div className="w-full relative grid grid-rows-[4fr_auto] rounded-md h-96 gap-3 border border-secondary/40 px-2 py-4 shadow">
+      <Link
+        href={`/pumps/${product.slug}`}
+        className="block relative overflow-hidden h-48"
+      >
         <Image
-          src={imageUrl}
-          alt={title}
+          src={product.imageUrl}
+          alt={`${product.brand} ${product.title}`}
           fill
-          className="object-contain w-10 h-auto transition-opacity duration-500"
+          className="object-contain transition-opacity duration-500"
           sizes="(max-width: 1024px) 640px, 30vw"
         />
       </Link>
-      <div className="flex mt-2 gap-1.5 flex-col px-2">
-        {/* Product Name */}
-        <h3 className="my-0">
-          <Link href={`/shirts/${slug}`}>{title}</Link>
+
+      <div className="flex mt-2 gap-2 flex-col px-2">
+        <h3 className="my-0 font-medium text-sm flex flex-col sm:text-base">
+          <Link href={`/pumps/${product.slug}`}>
+            {product.brand} {product.pumpType} {product.horsepower}
+          </Link>
+          <span className="text-xs sm:text-sm text-muted-foreground">
+            ({product.sku})
+          </span>
         </h3>
 
-        {/* Product Type */}
-        <div>
-          <h2 className="text-sm text-slate-600">{category}</h2>
+        <div className="flex items-baseline gap-2 mb-4">
+          {product.discountPrice ? (
+            <>
+              <span className="font-semibold text-emerald-600">
+                Rs {product.discountPrice.toLocaleString()}
+              </span>
+              <span className="line-through text-sm text-rose-400">
+                Rs {product.price.toLocaleString()}
+              </span>
+            </>
+          ) : (
+            <span className="font-semibold">
+              Rs {product.price.toLocaleString()}
+            </span>
+          )}
         </div>
 
-        {/* Price + Color Options */}
-        <div className="flex flex-col gap-2 sm:flex-row sm:justify-between mb-4">
-          {/* Price */}
-          <p className="">Price from _</p>
-          <span className="">${price}</span>
-        </div>
-        <AddToCartBtn shirtId={id} />
+        <AddToCartBtn productId={product.id} />
       </div>
+
+      {product.discountPrice && (
+        <Badge className="absolute top-2 right-2 bg-rose-500 text-white">
+          {Math.round(
+            ((product.price - product.discountPrice) / product.price) * 100
+          )}
+          % OFF
+        </Badge>
+      )}
     </div>
   );
 }

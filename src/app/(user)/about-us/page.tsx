@@ -2,7 +2,7 @@ import React from "react";
 
 function AboutUsPage() {
   return (
-    <main className="px-4 sm:px-[5%]">
+    <main className="px-4 sm:px-[5%] mt-8">
       <h1 className="relative w-fit headingFont text-4xl md:text-7xl text-gray-900 font-bold">
         About Us
       </h1>

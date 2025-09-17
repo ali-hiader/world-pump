@@ -16,7 +16,7 @@ export default async function Cart() {
   }
 
   return (
-    <main className="px-4 sm:px-[5%] mx-auto pt-2 pb-6">
+    <main className="px-4 sm:px-[5%] mx-auto pt-2 pb-6 mt-8">
       <CartList />
     </main>
   );

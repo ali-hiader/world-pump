@@ -2,25 +2,32 @@
 
 import { useEffect } from "react";
 import { useAuthStore } from "@/stores/auth_store";
-import { CartProduct } from "@/lib/types";
+import { CartItemType, CategoryType } from "@/lib/types";
 import useCartStore from "@/stores/cart_store";
+import useProductsStore from "@/stores/pump_store";
 
 interface Props {
   session: string | undefined;
-  cart: CartProduct[];
+  cart: CartItemType[];
+  categories: CategoryType[];
 }
 
-export function SessionInitializer({ session, cart }: Props) {
+export function SessionInitializer({ session, cart, categories }: Props) {
   const setSession = useAuthStore((s) => s.setUserIdAuthS);
-  const { setShirtsCartS: setProducts } = useCartStore();
+  const { setCartProducts_S } = useCartStore();
+  const setCategories = useProductsStore((state) => state.setCategories);
 
   useEffect(() => {
     setSession(session);
   }, [session, setSession]);
 
   useEffect(() => {
-    setProducts(cart);
-  }, [cart, setProducts]);
+    setCartProducts_S(cart);
+  }, [cart, setCartProducts_S]);
+
+  useEffect(() => {
+    setCategories(categories);
+  }, [categories, setCategories]);
 
   return null;
 }

@@ -72,7 +72,7 @@ export default function SignInPage() {
   }
 
   return (
-    <main className="flex flex-col items-center justify-start h-[calc(100vh-30vh)]">
+    <main className="flex flex-col items-center justify-start h-[calc(100vh-30vh)] mt-8">
       <h1 className="text-5xl font-bold headingFont mb-8 text-primary">
         Sign In
       </h1>

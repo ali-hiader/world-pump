@@ -1,66 +1,66 @@
 import { create } from "zustand";
-import { CartProduct } from "@/lib/types";
+import { CartItemType } from "@/lib/types";
 
 interface CartStore {
-  shirtsCartS: CartProduct[];
-  setShirtsCartS: (products: CartProduct[]) => void;
-  addShirtCartS: (product: CartProduct, userId: string) => void;
-  increaseShirtQuantityCartS: (productId: number, userId: number) => void;
-  decreaseShirtQuantityCartS: (productId: number, userId: number) => void;
-  removeShirtCartS: (productId: number, userId: number) => void;
-  clearCartS: (userId: number) => void;
+  cartProducts_S: CartItemType[];
+  setCartProducts_S: (products: CartItemType[]) => void;
+  addCartProduct_S: (product: CartItemType, userId: string) => void;
+  increaseCartProductQuantity_S: (productId: number, userId: string) => void;
+  decreaseCartProductQuantity_S: (productId: number, userId: string) => void;
+  removeCartProduct_S: (productId: number, userId: string) => void;
+  clearCart_S: (userId: string) => void;
 }
 
 const useCartStore = create<CartStore>((set) => ({
-  shirtsCartS: [],
-  setShirtsCartS: (products) => set({ shirtsCartS: products }),
+  cartProducts_S: [],
+  setCartProducts_S: (products) => set({ cartProducts_S: products }),
 
-  addShirtCartS: (product, userId) =>
+  addCartProduct_S: (product, userId) =>
     set((state) => {
-      const exsistingShirtIdx = state.shirtsCartS.findIndex(
-        (p) => p.id !== product.id && p.createdBy === userId
+      const exsistingProductIdx = state.cartProducts_S.findIndex(
+        (p) => p.id !== product.id && p.addedBy === userId
       );
-      if (exsistingShirtIdx !== -1) {
+      if (exsistingProductIdx !== -1) {
         return {
-          shirtsCartS: state.shirtsCartS.map((p) =>
-            p.id === product.id && p.createdBy === userId
+          cartProducts_S: state.cartProducts_S.map((p) =>
+            p.id === product.id && p.addedBy === userId
               ? { ...p, quantity: p.quantity + 1 }
               : p
           ),
         };
       } else {
         return {
-          shirtsCartS: [...state.shirtsCartS, product],
+          cartProducts_S: [...state.cartProducts_S, product],
         };
       }
     }),
 
-  increaseShirtQuantityCartS: (productId, userId) =>
+  increaseCartProductQuantity_S: (productId, userId) =>
     set((state) => ({
-      shirtsCartS: state.shirtsCartS.map((product) =>
-        product.id === productId && product.createdBy === userId
+      cartProducts_S: state.cartProducts_S.map((product) =>
+        product.id === productId && product.addedBy === userId
           ? { ...product, quantity: product.quantity + 1 }
           : product
       ),
     })),
 
-  decreaseShirtQuantityCartS: (productId, userId) =>
+  decreaseCartProductQuantity_S: (productId, userId) =>
     set((state) => {
-      const exsistingShirt = state.shirtsCartS.find(
-        (p) => p.id === productId && p.createdBy === userId
+      const exsistingProduct = state.cartProducts_S.find(
+        (p) => p.id === productId && p.addedBy === userId
       );
-      if (!exsistingShirt) return state;
+      if (!exsistingProduct) return state;
 
-      if (exsistingShirt.quantity === 1) {
+      if (exsistingProduct.quantity === 1) {
         return {
-          shirtsCartS: state.shirtsCartS.filter(
-            (p) => p.id !== productId && p.createdBy === userId
+          cartProducts_S: state.cartProducts_S.filter(
+            (p) => p.id !== productId && p.addedBy === userId
           ),
         };
       } else {
         return {
-          shirtsCartS: state.shirtsCartS.map((p) =>
-            p.id === productId && p.createdBy === userId
+          cartProducts_S: state.cartProducts_S.map((p) =>
+            p.id === productId && p.addedBy === userId
               ? { ...p, quantity: p.quantity - 1 }
               : p
           ),
@@ -68,17 +68,17 @@ const useCartStore = create<CartStore>((set) => ({
       }
     }),
 
-  removeShirtCartS: (productId) =>
+  removeCartProduct_S: (productId) =>
     set((state) => ({
-      shirtsCartS: state.shirtsCartS.filter(
+      cartProducts_S: state.cartProducts_S.filter(
         (product) => product.id !== productId
       ),
     })),
 
-  clearCartS: (userId) =>
+  clearCart_S: (userId) =>
     set((state) => ({
-      shirtsCartS: state.shirtsCartS.filter(
-        (shirt) => shirt.createdBy !== userId
+      cartProducts_S: state.cartProducts_S.filter(
+        (product) => product.addedBy !== userId
       ),
     })),
 }));

@@ -22,26 +22,26 @@ interface Props {
 
 async function PumpDetialsPage({ params }: Props) {
   const { pumpId } = params;
-  const shirt = (
+  const Product = (
     await db.select().from(productTable).where(eq(productTable.slug, pumpId))
   )[0];
 
-  if (!shirt) {
+  if (!Product) {
     return <DisplayAlert showBtn={false}>No category found!</DisplayAlert>;
   }
 
-  const relatedShirts = await db
+  const relatedProducts = await db
     .select()
     .from(productTable)
-    .where(eq(productTable.category, shirt.category));
+    .where(eq(productTable.category, Product.category));
 
   return (
     <main className="w-full mb-16">
       <section className="flex gap-8 w-full px-4 sm:px-[15%]  max-w-fit mx-auto border-b border-b-black">
         <div className="relative h-fit lg:min-w-md min-w-sm">
           <Image
-            src={shirt.imageUrl}
-            alt={shirt.title}
+            src={Product.imageUrl}
+            alt={Product.title}
             width={800}
             height={800}
             className="w-full h-auto object-cover object-center"
@@ -50,14 +50,14 @@ async function PumpDetialsPage({ params }: Props) {
         <section className="w-full flex flex-col">
           <div className="flex mt-4 sm:mt-2 flex-col py-2">
             <div className="flex flex-row flex-nowrap justify-between items-center text-2xl font-medium">
-              {shirt.title}
+              {Product.title}
             </div>
 
             <div className="flex flex-col gap-2 mt-0.5">
-              <h2 className="text-slate-600">{shirt.category}</h2>
-              <p className="text-xl font-semibold">${shirt.price}</p>
+              <h2 className="text-slate-600">{Product.category}</h2>
+              <p className="text-xl font-semibold">${Product.price}</p>
             </div>
-            <AddToCartBtn shirtId={shirt.id} />
+            <AddToCartBtn productId={Product.id} />
           </div>
 
           <Accordion
@@ -67,15 +67,15 @@ async function PumpDetialsPage({ params }: Props) {
             defaultValue="item-1"
           >
             <AccordionItem value="item-1">
-              <AccordionTrigger>Shirt Description</AccordionTrigger>
+              <AccordionTrigger>Product Description</AccordionTrigger>
               <AccordionContent className="flex flex-col gap-4 text-balance">
-                {shirt.description}
+                {Product.description}
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-2">
               <AccordionTrigger>Shipping Details</AccordionTrigger>
               <AccordionContent className="flex flex-col gap-4 text-balance">
-                {shirt.message}
+                {Product.message}
               </AccordionContent>
             </AccordionItem>
           </Accordion>
@@ -87,8 +87,8 @@ async function PumpDetialsPage({ params }: Props) {
           you may also like
         </h2>
         <div className="grid sm:grid-cols-3 gap-x-6 gap-y-10 px-4 mt-12">
-          {relatedShirts.map((shirt) => (
-            <ProductCard key={shirt.id} {...shirt} />
+          {relatedProducts.map((Product) => (
+            <ProductCard key={Product.id} {...Product} />
           ))}
         </div>
       </section>

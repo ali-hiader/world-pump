@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { Order } from "@/lib/types";
+import { OrderType } from "@/lib/types";
 import { OrderItem as OrderItemI } from "@/lib/types";
 import { auth } from "@/lib/auth";
 import { db } from "@/index";
@@ -41,12 +41,12 @@ async function Analytics() {
     })
   );
 
-  function getTime(order: Order) {
+  function getTime(order: OrderType) {
     return `${order.createdAt?.getHours()}:${order.createdAt?.getMinutes()}:${order.createdAt?.getSeconds()} - ${order.createdAt?.getDate()}/${order.createdAt?.getMonth()}/${order.createdAt?.getFullYear()}`;
   }
 
   return (
-    <main className="px-4 sm:px-[5%] pb-12">
+    <main className="px-4 sm:px-[5%] pb-12 mt-8">
       <Heading title="Orders" />
       <ul className="w-full">
         {orderItems.length === 0 ? (
@@ -94,7 +94,7 @@ function OrderItem({ item }: Props) {
             {item.productName} ({item.quantity})
           </h3>
           <p className="font-medium headingFont text-emerald-700">
-            ${item.price * item.quantity}
+            ${item.unitPrice * item.quantity}
           </p>
         </div>
       </section>

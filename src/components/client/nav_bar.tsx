@@ -66,7 +66,6 @@ export default function NavBar() {
         </NavLink>
       </ul>
 
-      {/* Mobile Nav (Dialog) */}
       <section className="md:hidden">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
@@ -125,7 +124,6 @@ export default function NavBar() {
                 );
               })}
 
-              {/* Auth + Cart */}
               <li>
                 <Link
                   href={session ? "/account" : "/sign-in"}

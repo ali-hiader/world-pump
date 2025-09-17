@@ -1,11 +1,18 @@
 import React from "react";
 import { db } from "../..";
-import { productTable } from "@/db/schema";
+import { categoryTable, productTable } from "@/db/schema";
 import ProductCard from "./product_card";
 import Heading from "./heading";
+import { eq, getTableColumns } from "drizzle-orm";
 
 async function NewArrivals() {
-  const products = await db.select().from(productTable);
+  const products = await db
+    .select({
+      categoryName: categoryTable.name,
+      ...getTableColumns(productTable),
+    })
+    .from(productTable)
+    .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id));
   return (
     <section className="mt-16 md:mt-24 lg:mt-32">
       <Heading
@@ -14,7 +21,7 @@ async function NewArrivals() {
       />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-12">
         {products.map((product) => (
-          <ProductCard key={product.slug} {...product} />
+          <ProductCard key={product.slug} product={product} />
         ))}
       </div>
     </section>

@@ -2,7 +2,7 @@
 import Spinner from "@/icons/spinner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CartProduct } from "@/lib/types";
+import { CartItemType } from "@/lib/types";
 import {
   decreaseQtyDB,
   increaseQtyDB,
@@ -15,15 +15,15 @@ import useCartStore from "@/stores/cart_store";
 import { useAuthStore } from "@/stores/auth_store";
 
 interface Props {
-  product: CartProduct;
+  product: CartItemType;
 }
 
 function CartItem({ product }: Props) {
   const userIdAuthS = useAuthStore((state) => state.userIdAuthS);
   const {
-    decreaseShirtQuantityCartS,
-    removeShirtCartS,
-    increaseShirtQuantityCartS,
+    decreaseCartProductQuantity_S: decreaseProductQuantityCartS,
+    removeCartProduct_S: removeProductCartS,
+    increaseCartProductQuantity_S: increaseProductQuantityCartS,
   } = useCartStore();
 
   const [loading, setLoading] = useState({
@@ -38,7 +38,7 @@ function CartItem({ product }: Props) {
     try {
       setLoading((prev) => ({ ...prev, increase: true }));
       await increaseQtyDB(product.id, userIdAuthS);
-      increaseShirtQuantityCartS(product.id, userIdAuthS);
+      increaseProductQuantityCartS(product.id, userIdAuthS);
     } catch (error) {
       console.error("Failed to increase item's qty:", error);
     } finally {
@@ -52,7 +52,7 @@ function CartItem({ product }: Props) {
     try {
       setLoading((prev) => ({ ...prev, decrease: true }));
       await decreaseQtyDB(productId, userIdAuthS);
-      decreaseShirtQuantityCartS(productId, userIdAuthS);
+      decreaseProductQuantityCartS(productId, userIdAuthS);
     } catch (error) {
       console.error("Failed to decrease item's qty:", error);
     } finally {
@@ -66,7 +66,7 @@ function CartItem({ product }: Props) {
     try {
       setLoading((prev) => ({ ...prev, delete: true }));
       await removeFromCartDB(productId, userIdAuthS);
-      removeShirtCartS(productId, userIdAuthS);
+      removeProductCartS(productId, userIdAuthS);
     } catch (error) {
       console.error("Failed to remove item:", error);
     } finally {
@@ -77,9 +77,9 @@ function CartItem({ product }: Props) {
   return (
     <Card
       key={product.cartId}
-      className="h-fit grid grid-cols-[auto_1fr] lg:grid-cols-[1fr_3fr] min-h-36 gap-5 overflow-hidden  px-6 py-4"
+      className="h-fit grid grid-cols-[auto_1fr] lg:grid-cols-[1fr_3fr] min-h-36 gap-5 overflow-hidden rounded-md  px-6 py-4"
     >
-      <div className="relative border border-border shadow overflow-hidden min-h-30 max-w-1/3 lg:max-w-full lg:min-h-full min-w-20 lg:min-w-full">
+      <div className="relative overflow-hidden min-h-30 max-w-1/3 lg:max-w-full lg:min-h-full min-w-20 lg:min-w-full">
         <Image
           src={product.imageUrl}
           alt={product.title}
@@ -97,7 +97,8 @@ function CartItem({ product }: Props) {
         </div>
 
         <p className="text-sm text-muted-foreground mt-1">
-          <span className="sm:inline hidden">Category:</span> {product.category}
+          <span className="sm:inline hidden">Category:</span>{" "}
+          {product.categoryId}
         </p>
 
         <div className="flex items-center justify-between mt-5">
@@ -110,7 +111,7 @@ function CartItem({ product }: Props) {
               disabled={loading.decrease}
             >
               {loading.decrease ? (
-                <Spinner className="size-4 animate-spin" />
+                <Spinner className="size-4 animate-spin stroke-black" />
               ) : (
                 <Minus className="size-2" />
               )}
@@ -127,7 +128,7 @@ function CartItem({ product }: Props) {
               disabled={loading.increase}
             >
               {loading.increase ? (
-                <Spinner className="size-4 animate-spin" />
+                <Spinner className="size-4 animate-spin stroke-black" />
               ) : (
                 <Plus className="sze-2" />
               )}
@@ -143,7 +144,7 @@ function CartItem({ product }: Props) {
             disabled={loading.delete}
           >
             {loading.delete ? (
-              <Spinner className="size-4 animate-spin" />
+              <Spinner className="size-4 animate-spin stroke-rose-600" />
             ) : (
               <Trash2 className="h-4 w-4 text-rose-600" />
             )}

@@ -32,7 +32,7 @@ function AllPumpsPage() {
 
   return (
     <>
-      <header className="w-full relative max-h-[500px]">
+      <header className="w-full relative max-h-[500px] ">
         <Image
           src={"/submersible-pump.webp"}
           alt="Pump Image"
@@ -43,10 +43,12 @@ function AllPumpsPage() {
       </header>
 
       <main className="px-4 sm:p-[3%] lg:mt-20 mt-16">
-        <Heading title={selectedCategory} />
+        <Heading
+          title={selectedCategory ? selectedCategory.name : "All Pumps"}
+        />
         {products.length === 0 ? (
           <DisplayAlert showBtn={false}>
-            Thanks for visiting, No shirts in the stores!
+            Thanks for visiting, No Products in the stores!
           </DisplayAlert>
         ) : (
           <>
@@ -55,7 +57,7 @@ function AllPumpsPage() {
             </section>
             <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-12">
               {products.map((product) => (
-                <ProductCard key={product.slug} {...product} />
+                <ProductCard key={product.slug} product={product} />
               ))}
             </section>
           </>

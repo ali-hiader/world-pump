@@ -1,9 +1,13 @@
+import Spinner from "@/icons/spinner";
 import React from "react";
 
 function LoadingPage() {
   return (
-    <div className="h-[100vh-30vh] flex items-center justify-center mt-20">
-      Loading...
+    <div className="h-screen flex items-center flex-col gap-5 justify-center">
+      <h2 className="headingFont text-4xl font-bold">
+        Thanks for visiting World Pumps!
+      </h2>
+      <Spinner className="size-9 animate-spin stroke-black" />
     </div>
   );
 }

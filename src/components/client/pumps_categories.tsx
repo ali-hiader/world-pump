@@ -6,7 +6,6 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
-import { usePathname, useRouter } from "next/navigation";
 import {
   Menubar,
   MenubarContent,
@@ -14,7 +13,8 @@ import {
   MenubarMenu,
   MenubarTrigger,
 } from "@/components/ui/menubar";
-import { categories } from "@/lib/utils";
+import useProductsStore from "@/stores/pump_store";
+import { usePathname, useRouter } from "next/navigation";
 
 interface PumpsCategoriesProps {
   mobile?: boolean; // true → accordion, false → menubar
@@ -27,9 +27,9 @@ export default function PumpsCategories({
 }: PumpsCategoriesProps) {
   const pathName = usePathname();
   const router = useRouter();
+  const categories = useProductsStore((state) => state.categories);
 
   if (mobile) {
-    // Mobile Accordion Version
     return (
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value="pumps">

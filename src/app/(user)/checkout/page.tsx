@@ -23,6 +23,7 @@ async function CheckoutPage() {
     .select({
       cartId: cartTable.id,
       quantity: cartTable.quantity,
+      addedBy: cartTable.createdBy,
       ...getTableColumns(productTable),
     })
     .from(cartTable)

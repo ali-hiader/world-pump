@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Outfit } from "next/font/google";
+import { Toaster } from "sonner";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -30,6 +31,7 @@ export default async function RootLayout({
         className={`${outfit.variable} ${cormorant.variable} antialiased bg-white max-w-[1500px] mx-auto`}
       >
         {children}
+        <Toaster />
       </body>
     </html>
   );

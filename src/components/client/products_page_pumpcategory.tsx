@@ -5,14 +5,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { categories } from "@/lib/utils";
 import useProductsStore from "@/stores/pump_store";
 
 function ProductsPagePumpsCategory() {
-  const { setSelectedCategory } = useProductsStore();
+  const { categories, setSelectedCategory } = useProductsStore();
 
   function handleSelect(value: string) {
-    setSelectedCategory(value);
+    const s_category = value === "all" ? null : value;
+    setSelectedCategory(s_category);
   }
   return (
     <Select onValueChange={handleSelect}>
@@ -24,9 +24,9 @@ function ProductsPagePumpsCategory() {
         />
       </SelectTrigger>
       <SelectContent className="max-h-56">
-        <SelectItem value="All Pumps">All</SelectItem>
+        <SelectItem value="all">All Pumps</SelectItem>
         {categories.map((category) => (
-          <SelectItem key={category.slug} value={category.name}>
+          <SelectItem key={category.slug} value={category.slug}>
             {category.name}
           </SelectItem>
         ))}

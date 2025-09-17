@@ -1,7 +1,7 @@
 "use server";
 import * as z from "zod";
 import { db } from "..";
-import { cartTable, productTable, user } from "@/db/schema";
+import { cartTable, categoryTable, productTable, user } from "@/db/schema";
 import { eq, getTableColumns, asc, like, sql, desc } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { slugifyIt } from "@/lib/utils";
@@ -162,8 +162,15 @@ export async function fetchAllProducts(
   }
 
   const products = await db
-    .select()
+    .select({
+      categoryName: categoryTable.name,
+      ...getTableColumns(productTable),
+    })
     .from(productTable)
+    .innerJoin(
+      categoryTable,
+      eq(productTable.categoryId, productTable.categoryId)
+    )
     .orderBy(orderBy)
     .limit(limit)
     .offset(offset);
@@ -172,7 +179,7 @@ export async function fetchAllProducts(
 }
 
 export async function fetchSimilarProducts(
-  category: string,
+  categoryId: string,
   productName: string
 ) {
   const products = await db
@@ -183,7 +190,7 @@ export async function fetchSimilarProducts(
     .from(productTable)
     .innerJoin(user, eq(productTable.createdBy, user.id))
     .where(
-      sql`${productTable.category} = ${category} AND ${productTable.title} != ${productName}`
+      sql`${productTable.categoryId} = ${categoryId} AND ${productTable.title} != ${productName}`
     )
     .limit(9);
   return products;
@@ -193,11 +200,14 @@ const searchSchema = z.object({
   search: z.string("Enter product name in form of text."),
 });
 
-interface SearchShirtState {
+interface SearchProductState {
   inputError: string;
 }
 
-export async function searchShirt(state: SearchShirtState, formdata: FormData) {
+export async function searchProduct(
+  state: SearchProductState,
+  formdata: FormData
+) {
   const parsedData = searchSchema.safeParse(formdata);
 
   if (!parsedData.success) {
@@ -253,15 +263,16 @@ export async function deleteProduct(id: number, imageUrl: string) {
   redirect("/seller-dashboard");
 }
 
-export async function getSingleShirt(shirtId: number) {
+export async function getSingleProduct(productId: number) {
   const products = await db
     .select({
       cartId: cartTable.id,
       quantity: cartTable.quantity,
+      addedBy: cartTable.createdBy,
       ...getTableColumns(productTable),
     })
     .from(cartTable)
     .innerJoin(productTable, eq(cartTable.productId, productTable.id))
-    .where(eq(cartTable.productId, shirtId));
+    .where(eq(cartTable.productId, productId));
   return products[0];
 }

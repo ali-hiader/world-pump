@@ -1,23 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { Bounce, toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 
 import Spinner from "@/icons/spinner";
 
 import { addToCartDB } from "@/actions/cart-actions";
+
 import useCartStore from "@/stores/cart_store";
 import { useAuthStore } from "@/stores/auth_store";
+import { toast } from "sonner";
 
 interface Props {
-  shirtId: number;
+  productId: number;
 }
 
-function AddToCartBtn({ shirtId }: Props) {
+function AddToCartBtn({ productId }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const addProduct = useCartStore((state) => state.addShirtCartS);
+  const addProduct = useCartStore((state) => state.addCartProduct_S);
   const session = useAuthStore((state) => state.userIdAuthS);
 
   async function handleAddingToCart() {
@@ -25,22 +26,25 @@ function AddToCartBtn({ shirtId }: Props) {
 
     try {
       setLoading(true);
-      const cartProduct = await addToCartDB(shirtId, session);
+      const cartProduct = await addToCartDB(productId, session);
       addProduct(cartProduct, session);
 
-      toast.info("Added to Cart!", {
-        position: "bottom-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-        transition: Bounce,
-        className: "rounded-none",
-        closeButton: true,
+      toast("Added to cart", {
         style: {
-          background: "#d4af37",
+          backgroundColor: "#6b7280",
+          color: "#fff",
+          fontFamily: "cursive",
+          fontSize: "16px",
+        },
+        position: "top-right",
+
+        actionButtonStyle: {
+          backgroundColor: "#fff",
+          color: "#000",
+        },
+        action: {
+          label: "Cart",
+          onClick: () => router.push("/cart"),
         },
       });
     } catch (error) {
@@ -60,7 +64,7 @@ function AddToCartBtn({ shirtId }: Props) {
           disabled={loading}
         >
           {loading && (
-            <Spinner className="animate-spin size-6 absolute top-2  left-0 translate-x-1/2" />
+            <Spinner className="animate-spin size-6 absolute top-2 left-0 translate-x-1/2" />
           )}{" "}
           Add to cart
         </button>

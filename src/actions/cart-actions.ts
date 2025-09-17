@@ -7,7 +7,7 @@ import { and, desc, eq, getTableColumns } from "drizzle-orm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { getSingleShirt } from "./product-actions";
+import { getSingleProduct } from "./product-actions";
 
 export async function getCartDB(userId: string) {
   try {
@@ -15,6 +15,7 @@ export async function getCartDB(userId: string) {
       .select({
         cartId: cartTable.id,
         quantity: cartTable.quantity,
+        addedBy: cartTable.createdBy,
         ...getTableColumns(productTable),
       })
       .from(cartTable)
@@ -29,39 +30,42 @@ export async function getCartDB(userId: string) {
   }
 }
 
-export async function getSingleCartProductDB(shirtId: number, userId: string) {
+export async function getSingleCartProductDB(
+  productId: number,
+  userId: string
+) {
   const products = await db
     .select()
     .from(cartTable)
     .where(
-      and(eq(cartTable.productId, shirtId), eq(cartTable.createdBy, userId))
+      and(eq(cartTable.productId, productId), eq(cartTable.createdBy, userId))
     );
   return products[0];
 }
 
-export async function addToCartDB(shirtId: number, userId: string) {
-  const exsistingProduct = await getSingleCartProductDB(shirtId, userId);
+export async function addToCartDB(productId: number, userId: string) {
+  const exsistingProduct = await getSingleCartProductDB(productId, userId);
 
   if (!exsistingProduct) {
     const newCartProduct = await db
       .insert(cartTable)
       .values({
         createdBy: userId,
-        productId: shirtId,
+        productId: productId,
         quantity: 1,
       })
       .returning();
     revalidatePath("/cart");
-    return await getSingleShirt(newCartProduct[0].productId);
+    return await getSingleProduct(newCartProduct[0].productId);
   } else {
-    const increasedQtyCartProduct = await increaseQtyDB(shirtId, userId);
+    const increasedQtyCartProduct = await increaseQtyDB(productId, userId);
     revalidatePath("/cart");
-    return await getSingleShirt(increasedQtyCartProduct[0].productId);
+    return await getSingleProduct(increasedQtyCartProduct[0].productId);
   }
 }
 
-export async function increaseQtyDB(shirtId: number, userId: string) {
-  const exsistingProduct = await getSingleCartProductDB(shirtId, userId);
+export async function increaseQtyDB(productId: number, userId: string) {
+  const exsistingProduct = await getSingleCartProductDB(productId, userId);
   revalidatePath("/cart");
 
   return await db
@@ -70,16 +74,16 @@ export async function increaseQtyDB(shirtId: number, userId: string) {
       quantity: exsistingProduct.quantity + 1,
     })
     .where(
-      and(eq(cartTable.productId, shirtId), eq(cartTable.createdBy, userId))
+      and(eq(cartTable.productId, productId), eq(cartTable.createdBy, userId))
     )
     .returning();
 }
 
-export async function decreaseQtyDB(shirtId: number, userId: string) {
-  const exsistingProduct = await getSingleCartProductDB(shirtId, userId);
+export async function decreaseQtyDB(productId: number, userId: string) {
+  const exsistingProduct = await getSingleCartProductDB(productId, userId);
 
   if (exsistingProduct.quantity === 1) {
-    await removeFromCartDB(shirtId, userId);
+    await removeFromCartDB(productId, userId);
     revalidatePath("/cart");
 
     return "success";
@@ -99,12 +103,12 @@ export async function decreaseQtyDB(shirtId: number, userId: string) {
       .returning();
   }
 }
-export async function removeFromCartDB(shirtId: number, userId: string) {
+export async function removeFromCartDB(productId: number, userId: string) {
   revalidatePath("/cart");
   await db
     .delete(cartTable)
     .where(
-      and(eq(cartTable.productId, shirtId), eq(cartTable.createdBy, userId))
+      and(eq(cartTable.productId, productId), eq(cartTable.createdBy, userId))
     );
 
   const cartProducts = await getCartDB(userId);

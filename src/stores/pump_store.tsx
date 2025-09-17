@@ -1,20 +1,39 @@
 import { create } from "zustand";
-import { Product } from "@/lib/types";
+import { CategoryType, ProductType } from "@/lib/types";
 
 interface ProductStore {
-  products: Product[];
-  selectedCategory: string;
-  setProducts: (products: Product[]) => void;
-  setSelectedCategory: (category: string) => void;
+  products: ProductType[];
+  selectedCategory: CategoryType | null;
+  categories: CategoryType[];
+  setProducts: (products: ProductType[]) => void;
+  setSelectedCategory: (categorySlug: string | null) => void;
+  setCategories: (categories: CategoryType[]) => void;
 }
 
 const useProductsStore = create<ProductStore>((set) => ({
   products: [],
+  categories: [],
   setProducts: (products) => set({ products }),
-  selectedCategory: "all",
-  setSelectedCategory: (category) =>
+  selectedCategory: {
+    id: 1,
+    slug: "all",
+    name: "All",
+    isFeatured: false,
+    imageUrl: null,
+    description: null,
+    createdAt: null,
+    updatedAt: null,
+  },
+  setSelectedCategory: (categorySlug) =>
+    set((state) => ({
+      selectedCategory:
+        categorySlug === null
+          ? null
+          : state.categories.find((c) => c.slug === categorySlug),
+    })),
+  setCategories: (categories) =>
     set({
-      selectedCategory: category,
+      categories,
     }),
 }));
 

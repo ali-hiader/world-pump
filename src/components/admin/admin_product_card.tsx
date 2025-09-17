@@ -27,7 +27,7 @@ export default function AdminProductCard({
       <div className="flex mt-2 gap-1.5 flex-col px-2">
         {/* Product Name */}
         <h3 className="my-0">
-          <Link href={`/shirts/${slug}`}>{title}</Link>
+          <Link href={`/Products/${slug}`}>{title}</Link>
         </h3>
 
         {/* Product Type */}
@@ -41,7 +41,7 @@ export default function AdminProductCard({
           <p className="">Price from _</p>
           <span className="">${price}</span>
         </div>
-        <AddToCartBtn shirtId={id} />
+        <AddToCartBtn productId={id} />
       </div>
     </div>
   );

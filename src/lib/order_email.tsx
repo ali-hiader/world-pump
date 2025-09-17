@@ -135,7 +135,7 @@ export const OrderEamil = () => (
                 Brazil 2022/23 Stadium Goalkeeper
               </Text>
               <Text style={recomendations.text}>
-                Men&apos;s Nike Dri-FIT Short-Sleeve Football Shirt
+                Men&apos;s Nike Dri-FIT Short-Sleeve Football Product
               </Text>
             </Column>
             <Column style={recomendations.product} align="center">

@@ -28,7 +28,7 @@ async function CallBackPage({ searchParams }: SuccessPageProps) {
   }
 
   return (
-    <main className="px-4 sm:px-[5%] w-full flex flex-col items-center mt-12">
+    <main className="px-4 sm:px-[5%] w-full flex flex-col items-center mt-16">
       <h1 className="relative w-full  text-center headingFont text-4xl md:text-6xl text-gray-900 font-bold">
         Order Confirmed!
       </h1>
