@@ -8,6 +8,7 @@ import DisplayAlert from "@/components/client/display_alert";
 
 import { Button } from "@/components/ui/button";
 import Heading from "./heading";
+import { formatPKR } from "@/lib/utils";
 
 function CartList() {
   const { cartProducts_S } = useCartStore();
@@ -39,7 +40,7 @@ function CartList() {
         <footer className="mt-12 space-y-4 flex flex-col max-w-5xl mx-auto">
           <div className="flex justify-between w-full px-6 text-gray-700">
             <p className="font-medium">Amount to Pay</p>
-            <p className="font-medium">${totalPrice.toFixed(2)}</p>
+            <p className="font-bold headingFont ">{formatPKR(totalPrice)}</p>
           </div>
           <Link href={"/checkout"} className="sm:w-fit self-center w-full">
             <Button className="sm:w-96 w-full bg-secondary cursor-pointer hover:bg-secondary/90 transition-all duration-300 text-white rounded-md py-6">

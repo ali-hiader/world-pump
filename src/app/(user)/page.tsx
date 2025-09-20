@@ -1,5 +1,5 @@
 import ImagesCarosal from "@/components/client/images-carosal";
-import NewArrivals from "@/components/client/new_arrivals";
+import FeaturedProducts from "@/components/client/featured-products";
 import AboutCompany from "@/components/client/about_company";
 import Services from "@/components/client/services";
 import Testimonials from "@/components/client/testimonials";
@@ -8,11 +8,11 @@ import Newsletter from "@/components/client/newsletter_signup";
 async function HomePage() {
   return (
     <>
-      <header id="carousel">
+      <header id="carousel" className="max-w-screen">
         <ImagesCarosal />
       </header>
-      <main className="px-4 sm:px-[2%]">
-        <NewArrivals />
+      <main className="px-4 sm:px-[2%] max-w-[1500px] mx-auto">
+        <FeaturedProducts />
         <AboutCompany />
         <Testimonials />
         <Services />

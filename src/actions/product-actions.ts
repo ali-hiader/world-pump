@@ -2,7 +2,7 @@
 import * as z from "zod";
 import { db } from "..";
 import { cartTable, categoryTable, productTable, user } from "@/db/schema";
-import { eq, getTableColumns, asc, like, sql, desc } from "drizzle-orm";
+import { eq, getTableColumns, asc, like, sql, desc, and, gte, lte } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { slugifyIt } from "@/lib/utils";
 import { uploadImage, deleteImage } from "@/lib/cloudinary";
@@ -117,28 +117,26 @@ export async function addNewProduct(
       "/q_auto/f_auto" +
       result.url.split("/upload")[1];
 
-    await db.insert(productTable).values({
-      title: product.title,
-      slug: slugifyIt(product.title),
-      category: product.category,
-      description: product.description,
-      imageUrl: imageUrl,
-      gallery: product.gallery ?? [], // optional
-      price: Number(product.price),
-      discountPrice: product.discountPrice
-        ? Number(product.discountPrice)
-        : null,
-      pumpType: product.pumpType,
-      horsepower: product.horsepower ?? null,
-      flowRate: product.flowRate ?? null,
-      head: product.head ?? null,
-      voltage: product.voltage ?? null,
-      warranty: product.warranty ?? null,
-      message: product.message,
-      createdBy: session.user.id,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
+    // await db.insert(productTable).values({
+    //   title: product.title,
+    //   slug: slugifyIt(product.title),
+    //   category: product.category,
+    //   description: product.description,
+    //   imageUrl: imageUrl,
+    //   gallery: product.gallery ?? [], // optional
+    //   price: Number(product.price),
+    //   discountPrice: product.discountPrice
+    //     ? Number(product.discountPrice)
+    //     : null,
+    //   pumpType: product.pumpType,
+    //   horsepower: product.horsepower ?? null,
+    //   flowRate: product.flowRate ?? null,
+    //   head: product.head ?? null,
+    //   voltage: product.voltage ?? null,
+    //   warranty: product.warranty ?? null,
+    //   message: product.message,
+    //   createdBy: session.user.id,
+    // });
 
     throw redirect("/seller-dashboard");
   });
@@ -148,33 +146,43 @@ export async function addNewProduct(
   };
 }
 
-export async function fetchAllProducts(
-  limit: number,
-  offset: number,
-  sortBy = "newest"
-) {
-  let orderBy = asc(productTable.id);
-  if (sortBy === "fromLow") {
-    orderBy = asc(productTable.price);
-  }
-  if (sortBy === "fromHigh") {
-    orderBy = desc(productTable.price);
-  }
+export async function fetchAllProducts() {
+  // limit: number,
+  // offset: number,
+  // sortBy = "newest"
+  // let orderBy = asc(productTable.id);
+  // if (sortBy === "fromLow") {
+  //   orderBy = asc(productTable.price);
+  // }
+  // if (sortBy === "fromHigh") {
+  //   orderBy = desc(productTable.price);
+  // }
 
   const products = await db
     .select({
-      categoryName: categoryTable.name,
+      categorySlug: categoryTable.slug,
       ...getTableColumns(productTable),
     })
     .from(productTable)
-    .innerJoin(
-      categoryTable,
-      eq(productTable.categoryId, productTable.categoryId)
-    )
-    .orderBy(orderBy)
-    .limit(limit)
-    .offset(offset);
+    .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id));
+  // .orderBy(orderBy)
+  // .limit(limit)
+  // .offset(offset);
 
+  return products;
+}
+
+export async function fetchFeaturedProducts(limit = 8) {
+  const products = await db
+    .select({
+      categorySlug: categoryTable.slug,
+      ...getTableColumns(productTable),
+    })
+    .from(productTable)
+    .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id))
+    .where(and(eq(productTable.isFeatured, true), eq(productTable.status, "active")))
+    .orderBy(desc(productTable.createdAt))
+    .limit(limit);
   return products;
 }
 
@@ -263,7 +271,7 @@ export async function deleteProduct(id: number, imageUrl: string) {
   redirect("/seller-dashboard");
 }
 
-export async function getSingleProduct(productId: number) {
+export async function getSingleProductForCart(productId: number) {
   const products = await db
     .select({
       cartId: cartTable.id,
@@ -275,4 +283,209 @@ export async function getSingleProduct(productId: number) {
     .innerJoin(productTable, eq(cartTable.productId, productTable.id))
     .where(eq(cartTable.productId, productId));
   return products[0];
+}
+
+export async function fetchSingleProduct(productSlug: string) {
+  const products = await db
+    .select({
+      categorySlug: categoryTable.slug,
+      ...getTableColumns(productTable),
+    })
+    .from(productTable)
+    .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id))
+    .where(eq(productTable.slug, productSlug));
+
+  return products[0];
+}
+
+export async function fetchRelatedProducts(categoryId: number) {
+  const products = await db
+    .select({
+      categorySlug: categoryTable.slug,
+      ...getTableColumns(productTable),
+    })
+    .from(productTable)
+    .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id))
+    .where(eq(productTable.categoryId, categoryId));
+
+  return products;
+}
+
+export type ProductFilters = {
+  minPrice?: number;
+  maxPrice?: number;
+  pumpType?: string;
+  brand?: string;
+  horsepower?: string;
+  sort?: "newest" | "price_asc" | "price_desc";
+};
+
+export async function fetchProductsByCategorySlug(
+  categorySlug: string,
+  filters: ProductFilters = {}
+) {
+  const orderBy =
+    filters.sort === "price_asc"
+      ? asc(productTable.price)
+      : filters.sort === "price_desc"
+      ? desc(productTable.price)
+      : desc(productTable.createdAt);
+
+  const whereClauses = [
+    eq(categoryTable.slug, categorySlug),
+    eq(productTable.status, "active"),
+  ] as any[];
+
+  if (typeof filters.minPrice === "number") {
+    whereClauses.push(gte(productTable.price, filters.minPrice));
+  }
+  if (typeof filters.maxPrice === "number") {
+    whereClauses.push(lte(productTable.price, filters.maxPrice));
+  }
+  if (filters.pumpType && filters.pumpType.trim().length > 0) {
+    whereClauses.push(eq(sql`LOWER(${productTable.pumpType})`, filters.pumpType.toLowerCase()));
+  }
+  if (filters.brand && filters.brand.trim().length > 0) {
+    whereClauses.push(eq(sql`LOWER(${productTable.brand})`, filters.brand.toLowerCase()));
+  }
+  if (filters.horsepower && filters.horsepower.trim().length > 0) {
+    whereClauses.push(eq(sql`LOWER(${productTable.horsepower})`, filters.horsepower.toLowerCase()));
+  }
+
+  const products = await db
+    .select({
+      categorySlug: categoryTable.slug,
+      ...getTableColumns(productTable),
+    })
+    .from(productTable)
+    .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id))
+    .where(and(...whereClauses))
+    .orderBy(orderBy);
+
+  return products;
+}
+
+export async function getCategoryBySlug(slug: string) {
+  const rows = await db
+    .select({ ...getTableColumns(categoryTable) })
+    .from(categoryTable)
+    .where(eq(categoryTable.slug, slug))
+    .limit(1);
+  return rows[0] || null;
+}
+
+export async function getCategoryPumpTypes(slug: string) {
+  // Fetch distinct pumpType values for a category (or all)
+  const base = db
+    .select({ pumpType: productTable.pumpType })
+    .from(productTable)
+    .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id));
+  const rows =
+    slug === "all"
+      ? await base.where(eq(productTable.status, "active"))
+      : await base.where(and(eq(categoryTable.slug, slug), eq(productTable.status, "active")));
+  const set = new Set(rows.map((r) => r.pumpType).filter(Boolean));
+  return Array.from(set).sort((a, b) => a.localeCompare(b));
+}
+
+export async function getCategoryBrands(slug: string) {
+  const base = db
+    .select({ brand: productTable.brand })
+    .from(productTable)
+    .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id));
+  const rows =
+    slug === "all"
+      ? await base.where(eq(productTable.status, "active"))
+      : await base.where(and(eq(categoryTable.slug, slug), eq(productTable.status, "active")));
+  const set = new Set(rows.map((r) => r.brand).filter((b): b is string => Boolean(b)));
+  return Array.from(set).sort((a, b) => a.localeCompare(b));
+}
+
+export async function getCategoryHorsepowers(slug: string) {
+  const base = db
+    .select({ hp: productTable.horsepower })
+    .from(productTable)
+    .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id));
+  const rows =
+    slug === "all"
+      ? await base.where(eq(productTable.status, "active"))
+      : await base.where(and(eq(categoryTable.slug, slug), eq(productTable.status, "active")));
+  const set = new Set(rows.map((r) => r.hp).filter((h): h is string => Boolean(h)));
+  return Array.from(set).sort((a, b) => a.localeCompare(b));
+}
+
+export async function getAllCategories() {
+  const rows = await db
+    .select({ ...getTableColumns(categoryTable) })
+    .from(categoryTable)
+    .orderBy(asc(categoryTable.name));
+  return rows;
+}
+
+export async function fetchProductsByCategoryPaginated(
+  categorySlug: string,
+  filters: ProductFilters = {},
+  page = 1,
+  limit = 12
+) {
+  const orderBy =
+    filters.sort === "price_asc"
+      ? asc(productTable.price)
+      : filters.sort === "price_desc"
+      ? desc(productTable.price)
+      : desc(productTable.createdAt);
+
+  const whereClauses = [eq(productTable.status, "active")] as any[];
+  if (categorySlug !== "all") {
+    whereClauses.push(eq(categoryTable.slug, categorySlug));
+  }
+
+  if (typeof filters.minPrice === "number") {
+    whereClauses.push(gte(productTable.price, filters.minPrice));
+  }
+  if (typeof filters.maxPrice === "number") {
+    whereClauses.push(lte(productTable.price, filters.maxPrice));
+  }
+  if (filters.pumpType && filters.pumpType.trim().length > 0) {
+    whereClauses.push(
+      eq(sql`LOWER(${productTable.pumpType})`, filters.pumpType.toLowerCase())
+    );
+  }
+  if (filters.brand && filters.brand.trim().length > 0) {
+    whereClauses.push(
+      eq(sql`LOWER(${productTable.brand})`, filters.brand.toLowerCase())
+    );
+  }
+  if (filters.horsepower && filters.horsepower.trim().length > 0) {
+    whereClauses.push(
+      eq(
+        sql`LOWER(${productTable.horsepower})`,
+        filters.horsepower.toLowerCase()
+      )
+    );
+  }
+
+  const offset = Math.max(0, (page - 1) * limit);
+
+  const [products, countRows] = await Promise.all([
+    db
+      .select({
+        categorySlug: categoryTable.slug,
+        ...getTableColumns(productTable),
+      })
+      .from(productTable)
+      .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id))
+      .where(and(...whereClauses))
+      .orderBy(orderBy)
+      .limit(limit)
+      .offset(offset),
+    db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(productTable)
+      .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id))
+      .where(and(...whereClauses)),
+  ]);
+
+  const total = countRows[0]?.count ?? 0;
+  return { products, total };
 }

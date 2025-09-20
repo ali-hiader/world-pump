@@ -7,7 +7,7 @@ import { and, desc, eq, getTableColumns } from "drizzle-orm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { getSingleProduct } from "./product-actions";
+import { getSingleProductForCart } from "./product-actions";
 
 export async function getCartDB(userId: string) {
   try {
@@ -56,11 +56,11 @@ export async function addToCartDB(productId: number, userId: string) {
       })
       .returning();
     revalidatePath("/cart");
-    return await getSingleProduct(newCartProduct[0].productId);
+    return await getSingleProductForCart(newCartProduct[0].productId);
   } else {
     const increasedQtyCartProduct = await increaseQtyDB(productId, userId);
     revalidatePath("/cart");
-    return await getSingleProduct(increasedQtyCartProduct[0].productId);
+    return await getSingleProductForCart(increasedQtyCartProduct[0].productId);
   }
 }
 

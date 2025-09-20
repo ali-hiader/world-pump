@@ -4,10 +4,10 @@ import React from "react";
 
 function ContactNavBar() {
   return (
-    <section className="bg-primary text-white px-5 sm:px-[3%] py-3">
-      <div className="mx-auto flex flex-col lg:flex-row items-center justify-between">
+    <section className=" bg-primary text-white">
+      <div className="mx-auto max-w-[1600px] flex items-center justify-between px-5 sm:px-[3%] py-3 gap-1">
         {/* Left: Email */}
-        <div className="text-center lg:text-left">
+        <div>
           <span className="mr-2 font-semibold bg-white text-primary rounded px-1 py-0.5">
             Email:
           </span>
@@ -16,7 +16,7 @@ function ContactNavBar() {
 
         {/* Right: Phone & Social */}
         <div className="flex items-center gap-4 lg:mt-0">
-          <div className="border-r border-r-white pr-4">
+          <div className="border-r border-r-white pr-4 lg:block hidden">
             <span className="font-semibold">Call:</span>
             <a href="tel:+923064403039" className="ml-2 hover:underline">
               +92 306 4403039

@@ -13,6 +13,7 @@ import Image from "next/image";
 import { useState } from "react";
 import useCartStore from "@/stores/cart_store";
 import { useAuthStore } from "@/stores/auth_store";
+import { formatPKR } from "@/lib/utils";
 
 interface Props {
   product: CartItemType;
@@ -92,7 +93,7 @@ function CartItem({ product }: Props) {
         <div className="flex justify-between">
           <h3 className="font-medium">{product.title}</h3>
           <p className="font-medium headingFont text-emerald-700">
-            ${product.price}
+            {formatPKR(product.price)}
           </p>
         </div>
 

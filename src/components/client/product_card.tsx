@@ -6,13 +6,14 @@ import Link from "next/link";
 import { ProductType } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import AddToCartBtn from "./add_to_cart";
+import { formatPKR } from "@/lib/utils";
 
 export default function ProductCard({ product }: { product: ProductType }) {
   if (!product) return;
   return (
-    <div className="w-full relative grid grid-rows-[4fr_auto] rounded-md h-96 gap-3 border border-secondary/40 px-2 py-4 shadow">
+    <div className="min-w-72 max-w-96 w-full relative grid grid-rows-[4fr_auto] rounded-md h-96 gap-3 border border-secondary/40 px-2 py-4 shadow">
       <Link
-        href={`/pumps/${product.slug}`}
+        href={`/pumps/${product.categorySlug}/${product.slug}`}
         className="block relative overflow-hidden h-48"
       >
         <Image
@@ -26,7 +27,7 @@ export default function ProductCard({ product }: { product: ProductType }) {
 
       <div className="flex mt-2 gap-2 flex-col px-2">
         <h3 className="my-0 font-medium text-sm flex flex-col sm:text-base">
-          <Link href={`/pumps/${product.slug}`}>
+          <Link href={`/pumps/${product.categorySlug}/${product.slug}`}>
             {product.brand} {product.pumpType} {product.horsepower}
           </Link>
           <span className="text-xs sm:text-sm text-muted-foreground">
@@ -38,16 +39,14 @@ export default function ProductCard({ product }: { product: ProductType }) {
           {product.discountPrice ? (
             <>
               <span className="font-semibold text-emerald-600">
-                Rs {product.discountPrice.toLocaleString()}
+                {formatPKR(product.discountPrice)}
               </span>
               <span className="line-through text-sm text-rose-400">
-                Rs {product.price.toLocaleString()}
+                {formatPKR(product.price)}
               </span>
             </>
           ) : (
-            <span className="font-semibold">
-              Rs {product.price.toLocaleString()}
-            </span>
+            <span className="font-semibold">{formatPKR(product.price)}</span>
           )}
         </div>
 

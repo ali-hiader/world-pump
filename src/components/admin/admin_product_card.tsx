@@ -4,6 +4,7 @@ import { Product } from "@/lib/types";
 import Image from "next/image";
 import Link from "next/link";
 import AddToCartBtn from "../client/add_to_cart";
+import { formatPKR } from "@/lib/utils";
 
 export default function AdminProductCard({
   id,
@@ -39,7 +40,7 @@ export default function AdminProductCard({
         <div className="flex flex-col gap-2 sm:flex-row sm:justify-between mb-4">
           {/* Price */}
           <p className="">Price from _</p>
-          <span className="">${price}</span>
+          <span className="">{formatPKR(price)}</span>
         </div>
         <AddToCartBtn productId={id} />
       </div>

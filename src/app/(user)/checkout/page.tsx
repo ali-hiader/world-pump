@@ -30,7 +30,17 @@ async function CheckoutPage() {
     .innerJoin(productTable, eq(cartTable.productId, productTable.id))
     .where(eq(cartTable.createdBy, session.user.id));
 
-  return <Checkout cartItems={cartItems} />;
+  const payfastEnabled = Boolean(
+    process.env.PAYFAST_MERCHANT_ID && process.env.PAYFAST_MERCHANT_KEY
+  );
+
+  return (
+    <Checkout
+      cartItems={cartItems}
+      userName={session.user.name}
+      payfastEnabled={payfastEnabled}
+    />
+  );
 }
 
 export default CheckoutPage;

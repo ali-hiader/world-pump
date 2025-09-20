@@ -14,7 +14,8 @@ import {
   MenubarTrigger,
 } from "@/components/ui/menubar";
 import useProductsStore from "@/stores/pump_store";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 interface PumpsCategoriesProps {
   mobile?: boolean; // true → accordion, false → menubar
@@ -26,7 +27,6 @@ export default function PumpsCategories({
   onNavigate,
 }: PumpsCategoriesProps) {
   const pathName = usePathname();
-  const router = useRouter();
   const categories = useProductsStore((state) => state.categories);
 
   if (mobile) {
@@ -50,11 +50,9 @@ export default function PumpsCategories({
                 const active = pathName === `/pumps/${category.slug}`;
                 return (
                   <li key={category.slug}>
-                    <button
-                      onClick={() => {
-                        router.push(`/pumps/${category.slug}`);
-                        onNavigate?.();
-                      }}
+                    <Link
+                      href={`/pumps/${category.slug}`}
+                      onClick={onNavigate}
                       className={`block w-full px-6 py-2 rounded-md text-left text-sm transition ${
                         active
                           ? "bg-secondary text-white"
@@ -62,7 +60,7 @@ export default function PumpsCategories({
                       }`}
                     >
                       {category.name}
-                    </button>
+                    </Link>
                   </li>
                 );
               })}
@@ -85,16 +83,17 @@ export default function PumpsCategories({
           {categories.map((category) => {
             const active = pathName === `/pumps/${category.slug}`;
             return (
-              <MenubarItem
-                key={category.slug}
-                onClick={() => router.push(`/pumps/${category.slug}`)}
-                className={`text-base focus:outline-none rounded-none border border-gray-200 ${
-                  active
-                    ? "bg-primary  data-[variant=destructive]:text-white"
-                    : "bg-gray-100 hover:bg-gray-200"
-                }`}
-              >
-                {category.name}
+              <MenubarItem key={category.slug} className="p-0">
+                <Link
+                  href={`/pumps/${category.slug}`}
+                  className={`block w-full px-3 py-2 text-base focus:outline-none border border-gray-200 ${
+                    active
+                      ? "bg-primary text-white"
+                      : "bg-gray-100 hover:bg-gray-200 text-black"
+                  }`}
+                >
+                  {category.name}
+                </Link>
               </MenubarItem>
             );
           })}

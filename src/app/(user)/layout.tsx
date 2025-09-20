@@ -12,6 +12,7 @@ import { CartItemType } from "@/lib/types";
 import { getCartDB } from "@/actions/cart-actions";
 import { db } from "@/index";
 import { categoryTable } from "@/db/schema";
+import { fetchAllProducts } from "@/actions/product-actions";
 
 async function UserLayout({ children }: PropsWithChildren) {
   const session = await auth.api.getSession({
@@ -19,6 +20,7 @@ async function UserLayout({ children }: PropsWithChildren) {
   });
 
   const categories = await db.select().from(categoryTable);
+  const initialProducts = await fetchAllProducts();
 
   let cart: CartItemType[] = [];
   if (session) {
@@ -27,15 +29,14 @@ async function UserLayout({ children }: PropsWithChildren) {
 
   return (
     <>
-      {session && (
-        <SessionInitializer
-          session={session?.user.id}
-          cart={cart}
-          categories={categories}
-        />
-      )}
+      <SessionInitializer
+        session={session?.user.id}
+        cart={cart}
+        categories={categories}
+        products={initialProducts}
+      />
       <ContactNavBar />
-      <NavBar />
+      <NavBar categories={categories} />
       {children}
       <Footer />
     </>

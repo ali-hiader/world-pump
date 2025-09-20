@@ -3,54 +3,84 @@
 import { Button } from "@/components/ui/button";
 import Spinner from "@/icons/spinner";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import CheckoutProduct from "@/components/client/checkout_product";
 import Heading from "./heading";
 import { CartItemType } from "@/lib/types";
 import DisplayAlert from "./display_alert";
-import CardItemCopy from "./card_copy_item";
-
-const cardData = [
-  {
-    label: "Card Number",
-    content: "4242 4242 4242 4242",
-  },
-  {
-    label: "CVC (any 3 digits)",
-    content: "123",
-  },
-  {
-    label: "M/Y (any future date)",
-    content: "12/30",
-  },
-];
+import Address, { AddressesData } from "./address";
+import Payment from "./payment";
+import { formatPKR } from "@/lib/utils";
 
 interface Props {
   cartItems: CartItemType[];
+  userName: string;
+  payfastEnabled: boolean;
 }
 
-function Checkout({ cartItems }: Props) {
+function Checkout({ cartItems, userName, payfastEnabled }: Props) {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedPaymentM, setSelectedPaymentM] = useState("cod");
+  const [addresses, setAddresses] = useState<AddressesData | null>(null);
 
   const total = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
 
+  // Display only: use shared PKR formatter
+
   const handleCheckout = async () => {
     try {
       setIsLoading(true);
+      const payload = {
+        products: cartItems.map((p) => ({
+          id: p.id,
+          title: p.title,
+          imageUrl: p.imageUrl,
+          price: p.price,
+          quantity: p.quantity,
+          sku: p.sku ?? null,
+        })),
+        addresses: addresses ?? undefined,
+        paymentMethod: selectedPaymentM,
+      };
+
       const response = await fetch("/api/checkout", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ products: cartItems }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
         cache: "no-store",
       });
 
-      const { url } = await response.json();
-      if (url) {
-        window.location.href = url;
+      const data = await response.json();
+      if (!response.ok) {
+        console.error("Checkout failed:", data);
+        return;
+      }
+
+      if (data?.gateway === "payfast" && data?.processUrl && data?.fields) {
+        // Create and submit a form POST to PayFast
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = data.processUrl;
+        Object.entries<string>(data.fields).forEach(([key, value]) => {
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = key;
+          input.value = value;
+          form.appendChild(input);
+        });
+        document.body.appendChild(form);
+        form.submit();
+        return;
+      }
+
+      // COD / Bank
+      if (data?.orderId) {
+        const method = selectedPaymentM === "bank" ? "bank" : "cod";
+        router.push(`/success?orderId=${data.orderId}&method=${method}`);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -73,34 +103,28 @@ function Checkout({ cartItems }: Props) {
         title="Checkout"
         // itemsOnPage={cartItems.reduce((sum, Product) => sum + Product.quantity, 0)}
       />
-      <section className="max-w-5xl mx-auto mt-12">
-        <section className="grid grid-cols-1 md:grid-cols-2 items-center gap-4 mt-6 border-y border-y-primary/20 pt-4 pb-6">
-          <h3 className="md:col-span-2 md:text-center">
-            Practice Project – Only test Payments Will Be Made (test card info)
-          </h3>
-          {cardData.map((card) => (
-            <div
-              key={card.content}
-              className="flex gap-2 items-center text-sm text-gray-600"
-            >
-              <CardItemCopy key={card.content} content={card.content} /> –
-              <h2>{card.label}</h2>
-            </div>
-          ))}
-        </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8 px-4">
+      <section className="grid grid-cols-1 min-[1100px]:grid-cols-3 gap-6 max-w-7xl mx-auto px-4 sm:px-[3%] mt-12 place-items-start">
+        <div className="col-span-1 min-[1100px]:col-span-2">
+          <Address userName={userName} onAddressesChange={setAddresses} />
+          <Payment
+            selectedPaymentM={selectedPaymentM}
+            setSelectedPaymentM={setSelectedPaymentM}
+            payfastEnabled={payfastEnabled}
+          />
+        </div>
+
+        <aside className="grid grid-cols-1 gap-4 mt-8">
           {cartItems.map((product) => (
             <CheckoutProduct key={product.id} product={product} />
           ))}
-        </div>
-
+        </aside>
         {cartItems.length > 0 && (
-          <footer className="mt-12 space-y-4 flex flex-col px-2">
+          <footer className="mt-12 space-y-4 flex flex-col px-2 col-span-1 min-[1100px]:col-span-3 w-full">
             <div className="flex justify-between w-full px-6">
               <p className="">Amount to Pay</p>
               <p className="font-semibold headingFont text-xl">
-                ${total.toFixed(2)}
+                {formatPKR(total)}
               </p>
             </div>
             <Button

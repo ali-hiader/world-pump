@@ -19,13 +19,24 @@ function Testimonials() {
         summary="Partnering with trusted brands to bring you quality and reliability."
       />
 
-      <div className="grid grid-cols-3 sm:flex sm:flex-nowrap gap-4 items-center mt-6">
-        {logos.map((logo) => (
-          <div key={logo}>
-            <Image src={logo} alt="Comapny's logo" width={200} height={100} />
-          </div>
-        ))}
-      </div>
+      <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6 items-center mt-6">
+        {logos.map((logo) => {
+          const name = logo.split("/").pop()?.replace(/\.[^.]+$/, "").replace(/[-_]/g, " ") || "Brand";
+          return (
+            <li key={logo} className="flex items-center justify-center">
+              <Image
+                src={logo}
+                alt={`${name} logo`}
+                width={200}
+                height={100}
+                className="object-contain opacity-90"
+                sizes="(max-width: 768px) 50vw, 16vw"
+                loading="lazy"
+              />
+            </li>
+          );
+        })}
+      </ul>
     </section>
   );
 }

@@ -28,7 +28,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${outfit.variable} ${cormorant.variable} antialiased bg-white max-w-[1500px] mx-auto`}
+        className={`${outfit.variable} ${cormorant.variable} antialiased bg-white `}
       >
         {children}
         <Toaster />

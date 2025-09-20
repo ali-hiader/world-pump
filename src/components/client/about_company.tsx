@@ -14,9 +14,9 @@ function AboutCompany() {
       <div className="grid md:grid-cols-2 gap-10 mt-8 items-center">
         {/* Left Content */}
         <div className="space-y-4">
-          <h4 className="text-xl font-semibold text-gray-800">
+          <h3 className="text-xl font-semibold text-gray-800">
             Welcome to World Pumps
-          </h4>
+          </h3>
           <p className="text-gray-600 leading-relaxed">
             We are your trusted partner in water pump solutions, providing
             reliable products and professional services tailored to meet both
@@ -37,7 +37,8 @@ function AboutCompany() {
 
           <Link
             href={"/about"}
-            className="py-2 max-w-3/5 mt-10 text-lg rounded-md bg-secondary text-white flex items-center justify-center"
+            aria-label="Learn more about World Pumps"
+            className="inline-flex items-center justify-center px-5 py-2 mt-6 text-base rounded-md bg-secondary text-white hover:bg-secondary/90"
           >
             Learn More
           </Link>
@@ -48,9 +49,11 @@ function AboutCompany() {
           <Image
             className="rounded-md w-full h-auto max-h-[500px] shadow-lg object-cover"
             src="/about.jpg"
-            width={500}
-            height={500}
-            alt="About World Pumps"
+            width={1200}
+            height={800}
+            sizes="(max-width: 768px) 100vw, 50vw"
+            alt="World Pumps team installing a water system"
+            loading="lazy"
           />
         </div>
       </div>
@@ -59,3 +62,4 @@ function AboutCompany() {
 }
 
 export default AboutCompany;
+

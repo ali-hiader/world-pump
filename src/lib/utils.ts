@@ -10,6 +10,15 @@ export function slugifyIt(text: string) {
   return slugify(text, { lower: true, trim: true });
 }
 
+// Format numbers as Pakistani Rupees with grouping, no decimals
+export function formatPKR(value: number) {
+  try {
+    return `Pkr ${Math.round(value).toLocaleString("en-PK")}`;
+  } catch {
+    return `Pkr ${value}`;
+  }
+}
+
 export const pumps = [
   {
     title: "2HP Submersible Pump",
@@ -212,4 +221,64 @@ export const carosalImages = [
   "/submersible-pump.webp",
   "/Vacuum-Pump.webp",
   "/water_pump.webp",
+];
+
+export const checkoutAddressFields = [
+  {
+    name: "fullName",
+    label: "Full Name",
+    type: "text",
+    required: true,
+    readonly: false,
+  },
+  {
+    name: "phone",
+    label: "Phone Number",
+    type: "tel",
+    required: true,
+    readonly: false,
+  },
+  {
+    name: "addressLine1",
+    label: "Street Address / House No.",
+    type: "text",
+    required: true,
+    readonly: false,
+  },
+  {
+    name: "addressLine2",
+    label: "Apartment / Suite / Floor",
+    type: "text",
+    required: false,
+    readonly: false,
+  },
+  {
+    name: "city",
+    label: "City",
+    type: "text",
+    required: true,
+    readonly: false,
+  },
+  {
+    name: "state",
+    label: "State / Province / Region",
+    type: "text",
+    required: false,
+    readonly: false,
+  },
+  {
+    name: "postalCode",
+    label: "Postal / ZIP Code",
+    type: "text",
+    required: false,
+    readonly: false,
+  },
+  {
+    name: "country",
+    label: "Country",
+    type: "select", // dropdown
+    required: true,
+    readonly: true, // ✅ only country is readonly
+    defaultValue: "Pakistan",
+  },
 ];

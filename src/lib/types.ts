@@ -7,7 +7,7 @@ import {
 import { InferSelectModel } from "drizzle-orm";
 
 export type ProductType = InferSelectModel<typeof productTable> & {
-  categoryName: string;
+  categorySlug: string;
 };
 
 // export type CartItemType = InferSelectModel<typeof cartTable>;

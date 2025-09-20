@@ -174,9 +174,11 @@ export const addressTypeEnum = pgEnum("address_type", ["shipping", "billing"]);
 
 export const addressTable = pgTable("address", {
   id: uuid("id").defaultRandom().primaryKey(),
+
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+
   type: addressTypeEnum("type").default("shipping").notNull(),
 
   fullName: text("full_name").notNull(),
@@ -189,6 +191,7 @@ export const addressTable = pgTable("address", {
   country: text("country").default("Pakistan").notNull(),
 
   isDefault: boolean("is_default").default(false).notNull(),
+
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
