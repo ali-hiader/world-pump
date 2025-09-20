@@ -1,24 +1,24 @@
-// import SignOutBtn from "@/components/sign_out";
-// import { auth } from "@/lib/auth";
-// import { headers } from "next/headers";
+import SignOutBtn from "@/components/client/sign_out";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import Link from "next/link";
-// import { redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import React from "react";
 
 async function UserAccountPage() {
-  // const session = await auth.api.getSession({
-  //   headers: await headers(),
-  // });
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  // if (!session) {
-  //   redirect("/sign-in");
-  // }
+  if (!session) {
+    redirect("/sign-in");
+  }
 
-  // const joinedDate = new Date(session.user.createdAt);
+  const joinedDate = new Date(session.user.createdAt);
 
   return (
     <main className="px-4 sm:px-[5%] mt-8">
-      {/* <hgroup className="flex items-center justify-between">
+      <hgroup className="flex items-center justify-between">
         <h1 className="relative w-fit headingFont text-4xl md:text-7xl text-gray-900 font-bold">
           Account
         </h1>
@@ -38,7 +38,7 @@ async function UserAccountPage() {
           <h3 className="text-lg font-medium ">Joined On -</h3>
           <p>{`${joinedDate.getDate()}/${joinedDate.getMonth()}/${joinedDate.getFullYear()} `}</p>
         </hgroup>
-      </section> */}
+      </section>
 
       <Link
         href={"/orders"}

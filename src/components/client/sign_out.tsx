@@ -18,7 +18,7 @@ function SignOutBtn() {
     <form action={signout}>
       <button
         type="submit"
-        className="rounded-full px-5 py-2.5 bg-primary/10 text-gray-700 cursor-pointer "
+        className="rounded-md px-5 py-2.5 bg-primary/20 text-gray-700 font-medium cursor-pointer "
       >
         <span className="button-label">Sign out</span>
       </button>

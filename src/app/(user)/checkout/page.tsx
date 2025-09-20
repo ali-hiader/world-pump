@@ -34,6 +34,8 @@ async function CheckoutPage() {
     process.env.PAYFAST_MERCHANT_ID && process.env.PAYFAST_MERCHANT_KEY
   );
 
+  console.log(payfastEnabled);
+
   return (
     <Checkout
       cartItems={cartItems}

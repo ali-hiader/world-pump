@@ -1,10 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
+
 import Heading from "@/components/client/heading";
 import DisplayAlert from "@/components/client/display_alert";
 import ProductCard from "@/components/client/product_card";
 import FiltersSheet from "@/components/client/filters_sheet";
 import CategorySelect from "@/components/client/category_select";
+
 import {
   getCategoryBySlug,
   getCategoryPumpTypes,

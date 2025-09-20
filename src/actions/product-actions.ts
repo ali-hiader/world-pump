@@ -2,12 +2,23 @@
 import * as z from "zod";
 import { db } from "..";
 import { cartTable, categoryTable, productTable, user } from "@/db/schema";
-import { eq, getTableColumns, asc, like, sql, desc, and, gte, lte } from "drizzle-orm";
+import {
+  eq,
+  getTableColumns,
+  asc,
+  like,
+  sql,
+  desc,
+  and,
+  gte,
+  lte,
+} from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { slugifyIt } from "@/lib/utils";
 import { uploadImage, deleteImage } from "@/lib/cloudinary";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { ProductType } from "@/lib/types";
 
 const schema = z.object({
   image: z.instanceof(File, { message: "Invalid file format" }),
@@ -16,7 +27,10 @@ const schema = z.object({
 
   price: z.string().min(1, "Price cannot be empty"),
 
-  category: z.string().min(1, "Category cannot be empty"),
+  categoryId: z
+    .string()
+    .min(1, "Category ID cannot be empty")
+    .regex(/^\d+$/, "Category ID must be a number"),
 
   description: z.string().min(1, "Description cannot be empty"),
 
@@ -41,33 +55,17 @@ const schema = z.object({
     .array(z.string().url({ message: "Gallery images must be valid URLs" }))
     .optional()
     .default([]),
+
+  // extra fields in productTable
+  stock: z.string().optional().default("0"), // form sends strings
+  brand: z.string().optional().default(""),
+  sku: z.string().optional().default(""),
+  status: z.enum(["active", "inactive"]).optional().default("active"),
+  isFeatured: z.union([z.string(), z.boolean()]).optional().default("false"),
 });
 
-export interface NewProductState {
-  success: boolean;
-
-  imageError?: string[];
-  titleError?: string[];
-  priceError?: string[];
-  categoryError?: string[];
-  descriptionError?: string[];
-  messageError?: string[];
-
-  // new fields from productTable
-  discountPriceError?: string[];
-  pumpTypeError?: string[];
-  horsepowerError?: string[];
-  flowRateError?: string[];
-  headError?: string[];
-  voltageError?: string[];
-  warrantyError?: string[];
-  galleryError?: string[];
-
-  generalError?: string;
-}
-
 export async function addNewProduct(
-  state: NewProductState | null,
+  state: ProductType | null,
   formdata: FormData
 ) {
   const session = await auth.api.getSession({
@@ -87,7 +85,7 @@ export async function addNewProduct(
       imageError: fieldErrors.image,
       titleError: fieldErrors.title,
       priceError: fieldErrors.price,
-      categoryError: fieldErrors.category,
+      categoryIdError: fieldErrors.categoryId,
       descriptionError: fieldErrors.description,
       messageError: fieldErrors.message,
 
@@ -100,12 +98,16 @@ export async function addNewProduct(
       voltageError: fieldErrors.voltage,
       warrantyError: fieldErrors.warranty,
       galleryError: fieldErrors.gallery,
+      brandError: fieldErrors.brand,
+      skuError: fieldErrors.sku,
+      stockError: fieldErrors.stock,
     };
   }
 
   const product = parsedData.data;
   const arrayBuffer = await product.image.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
+
   await uploadImage(buffer, async (result: { url: string } | undefined) => {
     if (!result) {
       throw redirect("/add-product");
@@ -113,30 +115,37 @@ export async function addNewProduct(
 
     const imageUrl =
       result.url.split("/upload")[0] +
-      "/upload" +
-      "/q_auto/f_auto" +
+      "/upload/q_auto/f_auto" +
       result.url.split("/upload")[1];
 
-    // await db.insert(productTable).values({
-    //   title: product.title,
-    //   slug: slugifyIt(product.title),
-    //   category: product.category,
-    //   description: product.description,
-    //   imageUrl: imageUrl,
-    //   gallery: product.gallery ?? [], // optional
-    //   price: Number(product.price),
-    //   discountPrice: product.discountPrice
-    //     ? Number(product.discountPrice)
-    //     : null,
-    //   pumpType: product.pumpType,
-    //   horsepower: product.horsepower ?? null,
-    //   flowRate: product.flowRate ?? null,
-    //   head: product.head ?? null,
-    //   voltage: product.voltage ?? null,
-    //   warranty: product.warranty ?? null,
-    //   message: product.message,
-    //   createdBy: session.user.id,
-    // });
+    const isFeatured =
+      product.isFeatured === true || product.isFeatured === "true";
+
+    await db.insert(productTable).values({
+      title: product.title,
+      slug: slugifyIt(product.title),
+      categoryId: Number(product.categoryId),
+      description: product.description,
+      imageUrl: imageUrl,
+      gallery: product.gallery ?? [],
+      price: Number(product.price),
+      discountPrice: product.discountPrice
+        ? Number(product.discountPrice)
+        : null,
+      stock: product.stock ? Number(product.stock) : 0,
+      brand: product.brand ?? null,
+      sku: product.sku ?? null,
+      status: product.status ?? "active",
+      isFeatured: isFeatured,
+      pumpType: product.pumpType,
+      horsepower: product.horsepower ?? null,
+      flowRate: product.flowRate ?? null,
+      head: product.head ?? null,
+      voltage: product.voltage ?? null,
+      warranty: product.warranty ?? null,
+      message: product.message,
+      createdBy: +session.user.id,
+    });
 
     throw redirect("/seller-dashboard");
   });
@@ -180,7 +189,9 @@ export async function fetchFeaturedProducts(limit = 8) {
     })
     .from(productTable)
     .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id))
-    .where(and(eq(productTable.isFeatured, true), eq(productTable.status, "active")))
+    .where(
+      and(eq(productTable.isFeatured, true), eq(productTable.status, "active"))
+    )
     .orderBy(desc(productTable.createdAt))
     .limit(limit);
   return products;
@@ -328,12 +339,13 @@ export async function fetchProductsByCategorySlug(
     filters.sort === "price_asc"
       ? asc(productTable.price)
       : filters.sort === "price_desc"
-      ? desc(productTable.price)
-      : desc(productTable.createdAt);
+        ? desc(productTable.price)
+        : desc(productTable.createdAt);
 
   const whereClauses = [
     eq(categoryTable.slug, categorySlug),
     eq(productTable.status, "active"),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ] as any[];
 
   if (typeof filters.minPrice === "number") {
@@ -343,13 +355,22 @@ export async function fetchProductsByCategorySlug(
     whereClauses.push(lte(productTable.price, filters.maxPrice));
   }
   if (filters.pumpType && filters.pumpType.trim().length > 0) {
-    whereClauses.push(eq(sql`LOWER(${productTable.pumpType})`, filters.pumpType.toLowerCase()));
+    whereClauses.push(
+      eq(sql`LOWER(${productTable.pumpType})`, filters.pumpType.toLowerCase())
+    );
   }
   if (filters.brand && filters.brand.trim().length > 0) {
-    whereClauses.push(eq(sql`LOWER(${productTable.brand})`, filters.brand.toLowerCase()));
+    whereClauses.push(
+      eq(sql`LOWER(${productTable.brand})`, filters.brand.toLowerCase())
+    );
   }
   if (filters.horsepower && filters.horsepower.trim().length > 0) {
-    whereClauses.push(eq(sql`LOWER(${productTable.horsepower})`, filters.horsepower.toLowerCase()));
+    whereClauses.push(
+      eq(
+        sql`LOWER(${productTable.horsepower})`,
+        filters.horsepower.toLowerCase()
+      )
+    );
   }
 
   const products = await db
@@ -383,7 +404,9 @@ export async function getCategoryPumpTypes(slug: string) {
   const rows =
     slug === "all"
       ? await base.where(eq(productTable.status, "active"))
-      : await base.where(and(eq(categoryTable.slug, slug), eq(productTable.status, "active")));
+      : await base.where(
+          and(eq(categoryTable.slug, slug), eq(productTable.status, "active"))
+        );
   const set = new Set(rows.map((r) => r.pumpType).filter(Boolean));
   return Array.from(set).sort((a, b) => a.localeCompare(b));
 }
@@ -396,8 +419,12 @@ export async function getCategoryBrands(slug: string) {
   const rows =
     slug === "all"
       ? await base.where(eq(productTable.status, "active"))
-      : await base.where(and(eq(categoryTable.slug, slug), eq(productTable.status, "active")));
-  const set = new Set(rows.map((r) => r.brand).filter((b): b is string => Boolean(b)));
+      : await base.where(
+          and(eq(categoryTable.slug, slug), eq(productTable.status, "active"))
+        );
+  const set = new Set(
+    rows.map((r) => r.brand).filter((b): b is string => Boolean(b))
+  );
   return Array.from(set).sort((a, b) => a.localeCompare(b));
 }
 
@@ -409,8 +436,12 @@ export async function getCategoryHorsepowers(slug: string) {
   const rows =
     slug === "all"
       ? await base.where(eq(productTable.status, "active"))
-      : await base.where(and(eq(categoryTable.slug, slug), eq(productTable.status, "active")));
-  const set = new Set(rows.map((r) => r.hp).filter((h): h is string => Boolean(h)));
+      : await base.where(
+          and(eq(categoryTable.slug, slug), eq(productTable.status, "active"))
+        );
+  const set = new Set(
+    rows.map((r) => r.hp).filter((h): h is string => Boolean(h))
+  );
   return Array.from(set).sort((a, b) => a.localeCompare(b));
 }
 
@@ -432,9 +463,10 @@ export async function fetchProductsByCategoryPaginated(
     filters.sort === "price_asc"
       ? asc(productTable.price)
       : filters.sort === "price_desc"
-      ? desc(productTable.price)
-      : desc(productTable.createdAt);
+        ? desc(productTable.price)
+        : desc(productTable.createdAt);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const whereClauses = [eq(productTable.status, "active")] as any[];
   if (categorySlug !== "all") {
     whereClauses.push(eq(categoryTable.slug, categorySlug));

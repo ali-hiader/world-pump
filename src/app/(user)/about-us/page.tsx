@@ -5,22 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import Testimonials from "@/components/client/testimonials";
 
-const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "World Pumps";
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
-
 export const metadata: Metadata = {
-  title: `About Us | ${siteName}`,
+  title: `About Us | World Pumps`,
   description:
     "World Pumps provides reliable pumping, filtration, irrigation, and pool solutions for homes and businesses across Pakistan.",
-  alternates: { canonical: "/about-us" },
-  openGraph: {
-    title: `About Us | ${siteName}`,
-    description:
-      "Learn about our mission, expertise, and the brands we work with.",
-    url: baseUrl ? `${baseUrl}/about-us` : undefined,
-    siteName,
-    type: "website",
-  },
 };
 
 export default function AboutUsPage() {
@@ -28,7 +16,7 @@ export default function AboutUsPage() {
     <main className="px-4 sm:px-[5%] mb-16 mt-8">
       <section className="max-w-7xl mx-auto">
         <Heading
-          title="About World Pumps"
+          title="About Us"
           summary="Reliable water solutions for homes, communities, and businesses"
         />
 
@@ -36,16 +24,17 @@ export default function AboutUsPage() {
           <div className="space-y-4">
             <p className="text-gray-700 leading-relaxed">
               Founded with a simple mission — to keep water flowing where it
-              matters most — {siteName} has grown into a trusted provider of
+              matters most — World Pumps has grown into a trusted provider of
               pumping and water management solutions. From pressure pumps and
               submersibles to filtration systems and pool equipment, we deliver
               products designed for performance and built to last.
             </p>
             <p className="text-gray-700 leading-relaxed">
               Our team partners with reputable global brands and combines
-              high-quality equipment with dependable installation and after-sales
-              support. Whether it’s a single home, a residential building, or a
-              commercial facility, we tailor each solution to your needs.
+              high-quality equipment with dependable installation and
+              after-sales support. Whether it’s a single home, a residential
+              building, or a commercial facility, we tailor each solution to
+              your needs.
             </p>
             <ul className="grid grid-cols-2 gap-4 text-sm">
               <li className="rounded-md border border-primary/20 p-3">
@@ -58,7 +47,9 @@ export default function AboutUsPage() {
               </li>
               <li className="rounded-md border border-primary/20 p-3">
                 <div className="text-2xl font-semibold">1000+ projects</div>
-                <div className="text-muted-foreground">Delivered successfully</div>
+                <div className="text-muted-foreground">
+                  Delivered successfully
+                </div>
               </li>
               <li className="rounded-md border border-primary/20 p-3">
                 <div className="text-2xl font-semibold">4.8/5</div>
@@ -127,4 +118,3 @@ export default function AboutUsPage() {
     </main>
   );
 }
-

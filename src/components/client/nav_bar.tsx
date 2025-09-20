@@ -23,7 +23,11 @@ const navLinks = [
   { href: "/contact", label: "Contact" },
 ];
 
-export default function NavBar({ categories }: { categories?: CategoryType[] }) {
+export default function NavBar({
+  categories,
+}: {
+  categories?: CategoryType[];
+}) {
   const pathName = usePathname();
   const session = useAuthStore((state) => state.userIdAuthS);
   const [open, setOpen] = useState(false);
@@ -36,26 +40,25 @@ export default function NavBar({ categories }: { categories?: CategoryType[] }) 
   }, [categories, setCategories]);
 
   return (
-    <nav aria-label="Main" className="sticky top-0 z-50 bg-white shadow-md">
-      <section className="max-w-[1600px] mx-auto flex justify-between items-center py-4 px-4 sm:px-[2%] ">
-        <hgroup className="space-y-1">
-          <Link
-            href={"/"}
-            className="headingFont text-2xl sm:text-3xl font-extrabold cursor-pointer"
-          >
-            World Pumps
-          </Link>
-        </hgroup>
+    <nav aria-label="Main Nav" className="sticky top-0 z-50 bg-white shadow-md">
+      <section className="max-w-[1600px] mx-auto flex justify-between items-center p-4 sm:px-[2%] ">
+        {/* Logo */}
+        <Link
+          href={"/"}
+          className="headingFont text-2xl sm:text-3xl font-extrabold cursor-pointer"
+        >
+          World Pumps
+        </Link>
 
         {/* Desktop Nav */}
-        <ul className="hidden md:flex items-center justify-between gap-6">
+        <ul className="hidden md:flex items-center gap-6">
           {navLinks.map((link, index) => (
             <React.Fragment key={link.href}>
               <NavLink href={link.href} pathName={pathName}>
                 {link.label}
               </NavLink>
               {index === 0 && (
-                <li key="pumps-menu" className="list-none">
+                <li key="pumps-menu">
                   <PumpsCategories />
                 </li>
               )}

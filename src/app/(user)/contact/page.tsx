@@ -2,38 +2,21 @@ import React from "react";
 import type { Metadata } from "next";
 import Heading from "@/components/client/heading";
 import ContactForm from "@/components/client/contact_form";
-import ContactNavBar from "@/components/client/contact-nav";
 
 export const dynamic = "force-dynamic";
 
-const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "World Pumps";
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
-const metaTitle = `Contact | ${siteName}`;
+const metaTitle = "Contact | sWorld Pumps";
 const metaDescription =
   "Get in touch with World Pumps for inquiries about swimming pools, filtration systems, water pumps, irrigation solutions, and premium fixtures.";
 
 export const metadata: Metadata = {
   title: metaTitle,
   description: metaDescription,
-  alternates: { canonical: "/contact" },
-  openGraph: {
-    title: metaTitle,
-    description: metaDescription,
-    url: baseUrl ? `${baseUrl}/contact` : undefined,
-    siteName,
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: metaTitle,
-    description: metaDescription,
-  },
 };
 
 export default function ContactPage() {
   return (
     <main className="">
-      <ContactNavBar />
       <section className="px-4 sm:px-[5%] mb-12 mt-8 max-w-7xl mx-auto">
         <Heading title="Contact" summary="We’d love to hear from you" />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">

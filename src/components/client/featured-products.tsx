@@ -21,7 +21,7 @@ async function FeaturedProducts() {
 
       <Link
         href={"/pumps/all"}
-        className="py-2 max-w-60 sm:max-w-sm mx-auto mt-12 text-lg rounded-md bg-secondary text-white flex items-center justify-center"
+        className="py-2 max-w-60 sm:max-w-72 mx-auto mt-12 text-lg rounded-md bg-secondary text-white flex items-center justify-center"
       >
         View All Pumps
       </Link>
