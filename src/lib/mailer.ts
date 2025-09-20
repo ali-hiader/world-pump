@@ -1,3 +1,5 @@
+import nodemailer from "nodemailer";
+
 export type MailOptions = {
   to: string;
   subject: string;
@@ -6,14 +8,6 @@ export type MailOptions = {
 
 export async function sendEmail(options: MailOptions): Promise<boolean> {
   try {
-    // Dynamically import nodemailer if available; otherwise no-op
-    const nodemailer = await import("nodemailer").catch(() => null as any);
-    if (!nodemailer) {
-      console.warn("Mailer: nodemailer not installed. Logging email to console.");
-      console.info(`[MAIL] To: ${options.to} | Subject: ${options.subject}`);
-      return false;
-    }
-
     const host = process.env.SMTP_HOST;
     const port = Number(process.env.SMTP_PORT || 587);
     const user = process.env.SMTP_USER;
@@ -29,8 +23,11 @@ export async function sendEmail(options: MailOptions): Promise<boolean> {
     const transporter = nodemailer.createTransport({
       host,
       port,
-      secure: port === 465,
-      auth: { user, pass },
+      secure: port === 465, // true for port 465, false for others
+      auth: {
+        user,
+        pass,
+      },
     });
 
     await transporter.sendMail({
@@ -39,10 +36,10 @@ export async function sendEmail(options: MailOptions): Promise<boolean> {
       subject: options.subject,
       html: options.html,
     });
+
     return true;
   } catch (err) {
     console.error("Mailer error:", err);
     return false;
   }
 }
-

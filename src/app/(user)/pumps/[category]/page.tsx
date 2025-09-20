@@ -88,32 +88,28 @@ export default async function CategoryPage({
         />
 
         {/* Category selector & Filter */}
-        <section className="flex justify-between items-center max-w-[1600px] mx-auto">
-          <div className="mt-2">
-            <CategorySelect
-              categories={[{ slug: "all", name: "All Pumps" }, ...categories]}
-              current={categorySlug}
-            />
-          </div>
+        <section className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mt-4 max-w-[1600px] mx-auto">
+          <CategorySelect
+            categories={[{ slug: "all", name: "All Pumps" }, ...categories]}
+            current={categorySlug}
+          />
 
-          <div className="mt-4 flex items-center justify-between">
-            <FiltersSheet
-              categorySlug={categorySlug}
-              categories={[{ slug: "all", name: "All Pumps" }, ...categories]}
-              pumpTypes={pumpTypes}
-              brands={brands}
-              horsepowers={horsepowers}
-              current={{
-                category: categorySlug,
-                minPrice: sp.minPrice,
-                maxPrice: sp.maxPrice,
-                pumpType: sp.pumpType,
-                brand: sp.brand,
-                horsepower: sp.horsepower,
-                sort: sp.sort,
-              }}
-            />
-          </div>
+          <FiltersSheet
+            categorySlug={categorySlug}
+            categories={[{ slug: "all", name: "All Pumps" }, ...categories]}
+            pumpTypes={pumpTypes}
+            brands={brands}
+            horsepowers={horsepowers}
+            current={{
+              category: categorySlug,
+              minPrice: sp.minPrice,
+              maxPrice: sp.maxPrice,
+              pumpType: sp.pumpType,
+              brand: sp.brand,
+              horsepower: sp.horsepower,
+              sort: sp.sort,
+            }}
+          />
         </section>
 
         {/* Active filters + results summary */}
@@ -288,15 +284,17 @@ function ActiveFilters({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2 mt-2">
       {entries.map(([k, label]) => (
         <Link
           key={k}
           href={buildUrlWithout(k)}
-          className="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-sm hover:bg-muted"
+          className="inline-flex items-center gap-2 rounded-md border px-3 py-1 text-sm hover:bg-muted "
         >
           <span>{label}</span>
-          <span aria-hidden>✕</span>
+          <span aria-hidden className="text-rose-600">
+            ✕
+          </span>
         </Link>
       ))}
       <Link
