@@ -90,9 +90,9 @@ function CartItem({ product }: Props) {
       </div>
 
       <section className="flex-1">
-        <div className="flex justify-between">
+        <div className="flex justify-between items-center">
           <h3 className="font-medium">{product.title}</h3>
-          <p className="font-medium headingFont text-emerald-700">
+          <p className="font-bold headingFont text-emerald-700 text-lg leading-1">
             {formatPKR(product.price)}
           </p>
         </div>

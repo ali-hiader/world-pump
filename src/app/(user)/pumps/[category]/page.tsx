@@ -42,7 +42,7 @@ export default async function CategoryPage({
   const categorySlug = params.category;
   const category = await getCategoryBySlug(categorySlug);
 
-  const sp: SearchParams = searchParams;
+  const sp: SearchParams = await searchParams;
   const filters: ProductFilters = {
     minPrice: sp.minPrice ? Number(sp.minPrice) : undefined,
     maxPrice: sp.maxPrice ? Number(sp.maxPrice) : undefined,
@@ -76,7 +76,7 @@ export default async function CategoryPage({
         />
       </header>
 
-      <main className="px-4 sm:p-[3%] lg:mt-12 mt-8">
+      <main className="px-4 sm:p-[3%] lg:mt-12 mt-8  max-w-[1600px] mx-auto">
         <Heading
           title={
             categorySlug === "all"
@@ -88,7 +88,7 @@ export default async function CategoryPage({
         />
 
         {/* Category selector & Filter */}
-        <section className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mt-4 max-w-[1600px] mx-auto">
+        <section className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mt-4">
           <CategorySelect
             categories={[{ slug: "all", name: "All Pumps" }, ...categories]}
             current={categorySlug}
@@ -113,7 +113,7 @@ export default async function CategoryPage({
         </section>
 
         {/* Active filters + results summary */}
-        <section className="mt-3 flex flex-col gap-2 max-w-[1600px] mx-auto">
+        <section className="mt-3 flex flex-col gap-2">
           <ResultsSummaryFixed total={total} page={page} limit={limit} />
           <ActiveFilters
             categorySlug={categorySlug}
@@ -260,10 +260,10 @@ function ActiveFilters({
   searchParams: Record<string, string | string[] | undefined>;
 }) {
   const entries: Array<[string, string]> = [];
-  const add = (k: string, label?: string) => {
-    const v = searchParams[k];
+  const add = (filter: string, label?: string) => {
+    const v = searchParams[filter];
     if (typeof v === "string" && v.trim() !== "")
-      entries.push([k, label ? `${label}: ${v}` : `${k}=${v}`]);
+      entries.push([filter, label ? `${label}: ${v}` : `${filter}=${v}`]);
   };
   add("minPrice", "Min");
   add("maxPrice", "Max");

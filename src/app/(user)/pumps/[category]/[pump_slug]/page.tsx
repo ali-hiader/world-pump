@@ -31,7 +31,7 @@ async function PumpDetailsPage({ params }: Props) {
   const relatedProducts = await fetchRelatedProducts(product.categoryId);
 
   return (
-    <main className="w-full mb-20 mt-10">
+    <main className="w-full mb-20 mt-10 max-w-[1600px] mx-auto">
       {/* Product Section */}
       <section className="grid lg:grid-cols-2 gap-12 w-full px-4 sm:px-[10%] max-w-6xl min-h-80 mx-auto">
         {/* Image */}
@@ -48,15 +48,12 @@ async function PumpDetailsPage({ params }: Props) {
         {/* Product Info */}
         <section className="w-full flex flex-col justify-center">
           <div className="flex flex-col">
-            {/* Title */}
             <h1 className="text-2xl font-medium text-gray-900">
               {product.brand} {product.pumpType} {product.horsepower}
             </h1>
 
-            {/* Category */}
             <span className="text-gray-500 mt-2"> ({product.sku})</span>
 
-            {/* Price */}
             <div className="flex items-baseline gap-3 mt-4">
               {product.discountPrice ? (
                 <>
@@ -74,7 +71,6 @@ async function PumpDetailsPage({ params }: Props) {
               )}
             </div>
 
-            {/* Add to Cart */}
             <div className="mt-6">
               <AddToCartBtn productId={product.id} />
             </div>

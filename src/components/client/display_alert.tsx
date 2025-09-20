@@ -7,7 +7,7 @@ interface Props {
 
 function DisplayAlert({ children, showBtn }: PropsWithChildren & Props) {
   return (
-    <hgroup className="flex flex-col items-center gap-4 mt-12 w-full">
+    <hgroup className="flex flex-col items-center gap-4 mt-12 pb-24 w-full">
       <h3 className="w-full text-xl italic font-medium text-gray-600 text-center">
         {children}
       </h3>

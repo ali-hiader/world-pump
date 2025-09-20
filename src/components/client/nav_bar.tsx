@@ -15,6 +15,8 @@ import { useAuthStore } from "@/stores/auth_store";
 import PumpsCategories from "./pumps_categories";
 import useProductsStore from "@/stores/pump_store";
 import { CategoryType } from "@/lib/types";
+import { Badge } from "../ui/badge";
+import useCartStore from "@/stores/cart_store";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -29,9 +31,11 @@ export default function NavBar({
   categories?: CategoryType[];
 }) {
   const pathName = usePathname();
-  const session = useAuthStore((state) => state.userIdAuthS);
   const [open, setOpen] = useState(false);
   const { setCategories } = useProductsStore();
+
+  const session = useAuthStore((state) => state.userIdAuthS);
+  const { cartProducts_S } = useCartStore();
 
   useEffect(() => {
     if (categories && categories.length > 0) {
@@ -79,6 +83,11 @@ export default function NavBar({
           )}
           <NavLink pathName={pathName} href={"/cart"}>
             Cart
+            {cartProducts_S.length !== 0 && (
+              <Badge className="absolute size-5 top-3 right-4 bg-secondary rounded-full text-white">
+                {cartProducts_S.reduce((sum, p) => p.quantity + sum, 0)}
+              </Badge>
+            )}
           </NavLink>
         </ul>
 

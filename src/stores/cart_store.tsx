@@ -18,7 +18,7 @@ const useCartStore = create<CartStore>((set) => ({
   addCartProduct_S: (product, userId) =>
     set((state) => {
       const exsistingProductIdx = state.cartProducts_S.findIndex(
-        (p) => p.id !== product.id && p.addedBy === userId
+        (p) => p.id === product.id && p.addedBy === userId
       );
       if (exsistingProductIdx !== -1) {
         return {

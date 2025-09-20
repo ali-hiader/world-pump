@@ -395,8 +395,8 @@ export async function getCategoryBySlug(slug: string) {
   return rows[0] || null;
 }
 
+// Fetch distinct pumpType values for a category (or all)
 export async function getCategoryPumpTypes(slug: string) {
-  // Fetch distinct pumpType values for a category (or all)
   const base = db
     .select({ pumpType: productTable.pumpType })
     .from(productTable)
