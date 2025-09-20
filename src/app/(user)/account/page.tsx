@@ -17,7 +17,7 @@ async function UserAccountPage() {
   const joinedDate = new Date(session.user.createdAt);
 
   return (
-    <main className="px-4 sm:px-[5%] mt-8">
+    <main className="px-4 sm:px-[5%] mt-8 max-w-[1600px] mx-auto">
       <hgroup className="flex items-center justify-between">
         <h1 className="relative w-fit headingFont text-4xl md:text-7xl text-gray-900 font-bold">
           Account

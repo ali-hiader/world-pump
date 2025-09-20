@@ -46,7 +46,7 @@ async function Analytics() {
   }
 
   return (
-    <main className="px-4 sm:px-[5%] pb-12 mt-8">
+    <main className="px-4 sm:px-[5%] pb-12 mt-8 min-h-96 max-w-[1600px] mx-auto">
       <Heading title="Orders" />
       <ul className="w-full">
         {orderItems.length === 0 ? (

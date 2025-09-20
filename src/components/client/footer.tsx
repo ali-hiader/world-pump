@@ -13,7 +13,7 @@ export default function Footer() {
           >
             World Pumps
           </Link>{" "}
-          <p className="text-sm leading-relaxed max-w-3/4 mt-3 text-gray-200">
+          <p className="text-sm leading-relaxed sm:max-w-3/4 mt-3 text-gray-200">
             Providing reliable water pumps, filtration systems, swimming pool
             solutions, and premium brands to keep your water flowing and
             lifestyle comfortable.
