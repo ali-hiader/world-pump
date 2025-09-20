@@ -1,6 +1,6 @@
 "use client";
 
-import Form from "next/form";
+// import Form from "next/form";
 import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
@@ -16,20 +16,20 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import { ChangeEvent, useActionState, useRef, useState } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 import { ImageIcon } from "lucide-react";
 
-import Spinner from "@/icons/spinner";
-import { addNewProduct } from "@/actions/product-actions";
+// import Spinner from "@/icons/spinner";
+// import { addNewProduct } from "@/actions/product-actions";
 import Heading from "@/components/client/heading";
 
 function AddProduct() {
-  const [state, formAction, pending] = useActionState(addNewProduct, null);
+  // const [state, formAction, pending] = useActionState(addNewProduct, null);
   const imageRef = useRef<HTMLInputElement | null>(null);
   const [imageName, setImageName] = useState<string | undefined>(undefined);
   const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
 
-  console.log(state);
+  // console.log(state);
 
   function displaySelectedImage(e: ChangeEvent<HTMLInputElement>) {
     setImageName(e.currentTarget.files![0].name);
@@ -45,7 +45,10 @@ function AddProduct() {
     <main className="container py-8 px-4 max-w-[80%] mx-auto">
       <Heading title="Add new product" />
       <Card className="p-6 mt-8">
-        <Form action={formAction} className="space-y-6">
+        <form
+          // action={formAction}
+          className="space-y-6"
+        >
           <div className="space-y-2">
             <label className="block text-sm font-medium">
               Upload Product Image
@@ -151,12 +154,12 @@ function AddProduct() {
           </div>
 
           <Button
-            disabled={pending}
+            // disabled={pending}
             className="w-full bg-secondary hover:bg-secondary text-gray-50"
           >
-            {pending ? <Spinner className="animate-spin" /> : "Add"}
+            {/* {pending ? <Spinner className="animate-spin" /> : "Add"} */}
           </Button>
-        </Form>
+        </form>
       </Card>
     </main>
   );
