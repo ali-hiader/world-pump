@@ -1,6 +1,6 @@
 "use client";
 
-import { Product } from "@/lib/types";
+import { ProductType } from "@/lib/types";
 import Image from "next/image";
 import Link from "next/link";
 import AddToCartBtn from "../client/add_to_cart";
@@ -12,8 +12,8 @@ export default function AdminProductCard({
   slug,
   imageUrl,
   price,
-  category,
-}: Product) {
+  // category,
+}: ProductType) {
   return (
     <div className="w-full grid grid-rows-[4fr_auto] rounded-md h-96 gap-3 border border-secondary/40 px-2 py-4 shadow">
       <Link href={`/pumps/${slug}`} className="block relative overflow-hidden">
@@ -33,7 +33,7 @@ export default function AdminProductCard({
 
         {/* Product Type */}
         <div>
-          <h2 className="text-sm text-slate-600">{category}</h2>
+          {/* <h2 className="text-sm text-slate-600">{category}</h2> */}
         </div>
 
         {/* Price + Color Options */}
