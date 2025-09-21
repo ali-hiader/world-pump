@@ -35,7 +35,7 @@ async function PumpDetailsPage({ params }: Props) {
       {/* Product Section */}
       <section className="grid lg:grid-cols-2 gap-12 w-full px-4 sm:px-[10%] max-w-6xl min-h-80 mx-auto">
         {/* Image */}
-        <div className="relative w-full max-w-md mx-auto  shadow rounded-md border border-border p-8">
+        <div className="relative w-full max-w-md mx-auto shadow rounded-md border border-gray-200 p-8">
           <Image
             src={product.imageUrl}
             alt={product.title}

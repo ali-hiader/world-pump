@@ -13,9 +13,11 @@ import {
 } from "@/components/ui/dialog";
 
 const navLinks = [
+  { href: "/admin", label: "Dashboard" },
   { href: "/admin/products", label: "Products" },
-  { href: "/admin/manage-orders", label: "Orders" },
-  { href: "/admin/my-profile", label: "My Profile" },
+  { href: "/admin/orders", label: "Orders" },
+  { href: "/admin/users", label: "Users" },
+  { href: "/admin/add-product", label: "Add Product" },
 ];
 
 export default function AdminNavBar() {

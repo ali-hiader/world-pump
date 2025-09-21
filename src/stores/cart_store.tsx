@@ -54,7 +54,7 @@ const useCartStore = create<CartStore>((set) => ({
       if (exsistingProduct.quantity === 1) {
         return {
           cartProducts_S: state.cartProducts_S.filter(
-            (p) => p.id !== productId && p.addedBy === userId
+            (p) => !(p.id === productId && p.addedBy === userId)
           ),
         };
       } else {

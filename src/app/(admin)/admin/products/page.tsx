@@ -1,21 +1,23 @@
-// import AdminProductCard from "@/components/admin/admin_product_card";
 import Heading from "@/components/client/heading";
-// import { productTable } from "@/db/schema";
-// import { db } from "@/index";
-import React from "react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Plus } from "lucide-react";
+import ProductsTable from "@/components/admin/products-table";
 
-async function AdminDashboard() {
-  // const products = await db.select({}).from(productTable);
+export default function AdminProductsPage() {
   return (
-    <main className="py-4 px-4 sm:px-[3%]">
-      <Heading title="View all products" />
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-12">
-        {/* {products.map((product) => (
-          <AdminProductCard key={product.slug} {...product} />
-        ))} */}
-      </section>
+    <main className="py-6 px-4 sm:px-[3%] space-y-6">
+      <div className="flex justify-between items-center">
+        <Heading title="Manage Products" />
+        <Link href="/admin/add-product">
+          <Button className="bg-primary hover:bg-primary/90">
+            <Plus className="mr-2 h-4 w-4" />
+            Add Product
+          </Button>
+        </Link>
+      </div>
+
+      <ProductsTable />
     </main>
   );
 }
-
-export default AdminDashboard;
