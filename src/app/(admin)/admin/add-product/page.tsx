@@ -94,9 +94,9 @@ function AddProduct() {
   };
 
   return (
-    <main className="container py-8 px-4 max-w-[80%] mx-auto">
+    <main className="container py-4 sm:py-8 px-2 sm:px-4 max-w-[95%] sm:max-w-[80%] mx-auto">
       <Heading title="Add new product" />
-      <Card className="p-6 mt-8">
+      <Card className="p-3 sm:p-6 mt-4 sm:mt-8">
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
             {error}
@@ -304,11 +304,11 @@ function AddProduct() {
             <label className="block text-sm font-medium">
               Upload Product Image
             </label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50/50">
-              <div className="flex items-start gap-6">
-                {/* Image Preview - Left Side */}
-                <div className="flex-shrink-0">
-                  <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden transition-colors hover:border-gray-400">
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-3 sm:p-6 bg-gray-50/50">
+              <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+                {/* Image Preview */}
+                <div className="flex-shrink-0 w-full sm:w-auto">
+                  <div className="w-full h-40 sm:w-32 sm:h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden transition-colors hover:border-gray-400">
                     {!imageUrl ? (
                       <div className="text-center">
                         <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-1" />
@@ -326,18 +326,18 @@ function AddProduct() {
                   </div>
                 </div>
 
-                {/* Controls - Right Side */}
-                <div className="flex-1 space-y-4">
-                  <div className="space-y-2">
-                    <h4 className="font-medium text-gray-900">
+                {/* Controls */}
+                <div className="flex-1 w-full space-y-3 sm:space-y-4">
+                  <div className="space-y-1 sm:space-y-2">
+                    <h4 className="font-medium text-gray-900 text-sm sm:text-base">
                       {imageUrl ? "Selected Image" : "Choose Product Image"}
                     </h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-xs sm:text-sm text-gray-600 truncate">
                       {imageName ? imageName : "No file chosen"}
                     </p>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
                     <Input
                       type="file"
                       className="hidden"
@@ -349,7 +349,7 @@ function AddProduct() {
                     />
                     <Label
                       htmlFor="product-image"
-                      className="inline-flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-md cursor-pointer hover:bg-primary/90 transition-colors"
+                      className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-primary text-primary-foreground text-xs sm:text-sm font-medium rounded-md cursor-pointer hover:bg-primary/90 transition-colors text-center"
                     >
                       {imageUrl ? "Change Image" : "Choose Image"}
                     </Label>
@@ -363,7 +363,7 @@ function AddProduct() {
                             imageRef.current.value = "";
                           }
                         }}
-                        className="inline-flex items-center justify-center px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200 transition-colors"
+                        className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-gray-100 text-gray-700 text-xs sm:text-sm font-medium rounded-md hover:bg-gray-200 transition-colors"
                       >
                         Remove
                       </button>
@@ -371,7 +371,7 @@ function AddProduct() {
                   </div>
 
                   <p className="text-xs text-gray-500">
-                    Recommended: JPG, PNG or WEBP. Max file size: 5MB
+                    JPG, PNG or WEBP. Max: 5MB
                   </p>
                 </div>
               </div>

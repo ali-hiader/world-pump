@@ -78,26 +78,28 @@ function CartItem({ product }: Props) {
   return (
     <Card
       key={product.cartId}
-      className="h-fit grid grid-cols-[auto_1fr] lg:grid-cols-[1fr_3fr] min-h-36 gap-5 overflow-hidden rounded-md  px-6 py-4"
+      className="h-fit flex flex-col md:grid md:grid-cols-[200px_1fr] min-h-36 gap-5 overflow-hidden rounded-md px-6 py-4"
     >
-      <div className="relative overflow-hidden min-h-30 max-w-1/3 lg:max-w-full lg:min-h-full min-w-20 lg:min-w-full">
+      <div className="relative overflow-hidden h-56 md:h-40 w-full">
         <Image
           src={product.imageUrl}
           alt={product.title}
           fill
-          className="object-cover"
+          className="object-contain rounded-md"
         />
       </div>
 
-      <section className="flex-1">
-        <div className="flex justify-between items-center">
-          <h3 className="font-medium">{product.title}</h3>
-          <p className="font-bold headingFont text-emerald-700 text-lg leading-1">
+      <section className="flex-1 min-w-0">
+        <div className="flex justify-between items-center gap-4">
+          <h3 className="font-medium truncate flex-1 min-w-0">
+            {product.title}
+          </h3>
+          <p className="font-bold headingFont text-emerald-700 text-lg leading-1 whitespace-nowrap flex-shrink-0">
             {formatPKR(product.price)}
           </p>
         </div>
 
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="text-sm text-muted-foreground mt-1 truncate">
           <span className="sm:inline hidden">Category:</span>{" "}
           {product.categoryId}
         </p>

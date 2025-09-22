@@ -29,7 +29,7 @@ function CartList() {
       {cartProducts_S.length === 0 ? (
         <DisplayAlert showBtn> No products in the cart!</DisplayAlert>
       ) : (
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-12 px-4 max-w-5xl mx-auto">
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-12 px-4 max-w-7xl mx-auto">
           {cartProducts_S.map((product) => (
             <CartItem key={product.id} product={product} />
           ))}
@@ -37,7 +37,7 @@ function CartList() {
       )}
 
       {cartProducts_S.length > 0 && (
-        <footer className="mt-12 space-y-4 flex flex-col max-w-5xl mx-auto">
+        <footer className="mt-12 space-y-4 flex flex-col max-w-7xl mx-auto">
           <div className="flex justify-between w-full px-6 text-gray-700">
             <p className="font-medium">Amount to Pay</p>
             <p className="font-bold headingFont ">{formatPKR(totalPrice)}</p>

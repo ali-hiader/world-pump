@@ -147,7 +147,7 @@ export default function EditProductPage() {
 
   if (loading) {
     return (
-      <main className="container py-8 px-4 max-w-[80%] mx-auto">
+      <main className="container py-4 sm:py-8 px-2 sm:px-4 max-w-[95%] sm:max-w-[80%] mx-auto">
         <div className="flex items-center justify-center py-12">
           <Spinner className="animate-spin h-8 w-8" />
         </div>
@@ -157,7 +157,7 @@ export default function EditProductPage() {
 
   if (!product) {
     return (
-      <main className="container py-8 px-4 max-w-[80%] mx-auto">
+      <main className="container py-4 sm:py-8 px-2 sm:px-4 max-w-[95%] sm:max-w-[80%] mx-auto">
         <div className="text-center py-12">
           <p className="text-red-600">Product not found</p>
           <Link href="/admin/products">
@@ -169,18 +169,18 @@ export default function EditProductPage() {
   }
 
   return (
-    <main className="container py-8 px-4 max-w-[80%] mx-auto">
-      <div className="flex items-center gap-4 mb-6">
+    <main className="container py-4 sm:py-8 px-2 sm:px-4 max-w-[95%] sm:max-w-[80%] mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-4 sm:mb-6">
         <Link href="/admin/products">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Products
+            Back
           </Button>
         </Link>
         <Heading title={`Edit: ${product.title}`} />
       </div>
 
-      <Card className="p-6">
+      <Card className="p-3 sm:p-6">
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
             {error}
@@ -390,11 +390,11 @@ export default function EditProductPage() {
           {/* Image Upload */}
           <div className="space-y-2">
             <label className="block text-sm font-medium">Product Image</label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50/50">
-              <div className="flex items-start gap-6">
-                {/* Image Preview - Left Side */}
-                <div className="flex-shrink-0">
-                  <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden transition-colors hover:border-gray-400">
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-3 sm:p-6 bg-gray-50/50">
+              <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+                {/* Image Preview */}
+                <div className="flex-shrink-0 w-full sm:w-auto">
+                  <div className="w-full h-40 sm:w-32 sm:h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden transition-colors hover:border-gray-400">
                     {imageUrl ? (
                       <Image
                         className="w-full h-full object-cover"
@@ -412,22 +412,22 @@ export default function EditProductPage() {
                   </div>
                 </div>
 
-                {/* Controls - Right Side */}
-                <div className="flex-1 space-y-4">
-                  <div className="space-y-2">
-                    <h4 className="font-medium text-gray-900">
+                {/* Controls */}
+                <div className="flex-1 w-full space-y-3 sm:space-y-4">
+                  <div className="space-y-1 sm:space-y-2">
+                    <h4 className="font-medium text-gray-900 text-sm sm:text-base">
                       {imageName
                         ? "New Image Selected"
                         : "Current Product Image"}
                     </h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-xs sm:text-sm text-gray-600 truncate">
                       {imageName
                         ? imageName
                         : "Click 'Choose New Image' to replace current image"}
                     </p>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
                     <Input
                       type="file"
                       className="hidden"
@@ -438,7 +438,7 @@ export default function EditProductPage() {
                     />
                     <Label
                       htmlFor="product-image"
-                      className="inline-flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-md cursor-pointer hover:bg-primary/90 transition-colors"
+                      className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-primary text-primary-foreground text-xs sm:text-sm font-medium rounded-md cursor-pointer hover:bg-primary/90 transition-colors text-center"
                     >
                       Choose New Image
                     </Label>
@@ -449,7 +449,7 @@ export default function EditProductPage() {
                           setImageUrl(product.imageUrl);
                           setImageName(undefined);
                         }}
-                        className="inline-flex items-center justify-center px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200 transition-colors"
+                        className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-gray-100 text-gray-700 text-xs sm:text-sm font-medium rounded-md hover:bg-gray-200 transition-colors"
                       >
                         Cancel
                       </button>
@@ -457,8 +457,8 @@ export default function EditProductPage() {
                   </div>
 
                   <p className="text-xs text-gray-500">
-                    Recommended: JPG, PNG or WEBP. Max file size: 5MB. Leave
-                    unchanged to keep current image.
+                    JPG, PNG or WEBP. Max: 5MB. Leave unchanged to keep current
+                    image.
                   </p>
                 </div>
               </div>
