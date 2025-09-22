@@ -85,14 +85,14 @@ async function AdminUsersPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-4 lg:grid-cols-2">
           {usersWithStats.map((userData) => (
             <Card
               key={userData.id}
               className="hover:shadow-md transition-shadow"
             >
               <CardContent className="p-6">
-                <div className="flex items-center justify-between">
+                <div className="space-y-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
@@ -143,20 +143,15 @@ async function AdminUsersPage() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-2">
-                    {userData.orderCount > 0 && (
+                  {userData.orderCount > 0 && (
+                    <div className="flex justify-end">
                       <Link href={`/admin/users/${userData.id}/orders`}>
-                        <Button variant="outline" size="sm" className="w-full">
-                          View Orders
+                        <Button variant="outline" size="sm">
+                          View Orders ({userData.orderCount})
                         </Button>
                       </Link>
-                    )}
-                    <Link href={`/admin/users/${userData.id}`}>
-                      <Button variant="ghost" size="sm" className="w-full">
-                        View Profile
-                      </Button>
-                    </Link>
-                  </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

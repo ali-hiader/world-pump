@@ -134,7 +134,7 @@ export default function NavBar({
                           className={`block w-full px-4 py-2 rounded-md text-lg ${
                             active
                               ? "bg-secondary text-white"
-                              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                              : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                           }`}
                         >
                           {link.label}
@@ -159,7 +159,7 @@ export default function NavBar({
                     className={`block w-full px-4 py-2 rounded-md text-lg ${
                       pathName === (session ? "/account" : "/sign-in")
                         ? "bg-secondary text-white"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                     }`}
                   >
                     {session ? "Account" : "Login"}
@@ -172,7 +172,7 @@ export default function NavBar({
                     className={`block w-full px-4 py-2 rounded-md text-lg ${
                       pathName === "/cart"
                         ? "bg-secondary text-white"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                     }`}
                   >
                     Cart

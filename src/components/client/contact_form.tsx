@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import TextField from "@mui/material/TextField";
+import ContactInput from "@/components/ui/contact-input";
+import CustomTextarea from "@/components/ui/custom-textarea";
 
 const fields = [
   { name: "name", placeholder: "Your Name", type: "text", required: true },
@@ -87,13 +87,13 @@ export default function ContactForm() {
       <div className="flex items-center gap-3">
         <Button
           type="submit"
-          className="bg-secondary hover:bg-secondary/90"
+          className="bg-secondary hover:bg-secondary/90 text-white"
           disabled={submitting}
         >
           {submitting ? "Sending..." : "Send Message"}
         </Button>
         {success && <span className="text-emerald-600 text-sm">{success}</span>}
-        {error && <span className="text-rose-600 text-sm">{error}</span>}
+        {error && <span className="text-destructive text-sm">{error}</span>}
       </div>
     </form>
   );
@@ -108,69 +108,4 @@ export interface InputProps {
   onChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
-}
-
-function ContactInput({
-  name,
-  type = "text",
-  required = false,
-  value,
-  onChange,
-  placeholder,
-}: InputProps) {
-  return (
-    <TextField
-      id={name}
-      name={name}
-      variant="standard"
-      fullWidth
-      size="small"
-      slotProps={{
-        input: {
-          sx: { fontSize: 14 }, // dY`^ input text font size
-        },
-        inputLabel: {
-          sx: { fontSize: 14 }, // dY`^ label font size
-        },
-      }}
-      required={required}
-      placeholder={placeholder}
-      type={type}
-      value={value}
-      onChange={(e) => onChange(e)}
-    />
-  );
-}
-
-interface Props {
-  name: string;
-  required?: boolean;
-  placeholder?: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-}
-
-function CustomTextarea({
-  name,
-  required = false,
-  placeholder = "Your message...",
-  value,
-  onChange,
-}: Props) {
-  return (
-    <div className="w-full">
-      <Textarea
-        id={name}
-        name={name}
-        required={required}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        rows={1} // single line height
-        className="w-full border-0 border-b transition-all border-gray-400 p-0 h-fit
-                 rounded-none focus-visible:ring-0 focus:border-black
-                 text-sm placeholder:text-gray-400 hover:border-b-2 hover:border-b-black"
-      />
-    </div>
-  );
 }

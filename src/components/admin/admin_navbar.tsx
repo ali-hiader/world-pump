@@ -87,7 +87,7 @@ export default function AdminNavBar() {
                         onClick={() => setOpen(false)}
                         className={`block w-full px-4 py-2 rounded-md text-lg ${
                           active
-                            ? "bg-secondary text-white"
+                            ? "bg-secondary text-secondary-foreground"
                             : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                         }`}
                       >

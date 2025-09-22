@@ -6,6 +6,7 @@ import { useAuthStore } from "@/stores/auth_store";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import ContactInput from "@/components/ui/contact-input";
 
 interface ErrorState {
   emailError: string | undefined;
@@ -23,6 +24,17 @@ export default function SignInPage() {
     generalError: undefined,
   });
 
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
+  const updateField =
+    (field: string) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setForm((prev) => ({ ...prev, [field]: e.target.value }));
+    };
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
@@ -35,9 +47,7 @@ export default function SignInPage() {
     const previousPage = document.referrer;
     const nextPath = previousPage ? new URL(previousPage).pathname : "/";
 
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+    const { email, password } = form;
 
     try {
       const res = await fetch("/api/sign-in", {
@@ -77,7 +87,7 @@ export default function SignInPage() {
         Sign In
       </h1>
       {error.generalError && (
-        <p className="text-rose-600 text-sm text-start mb-2">
+        <p className="text-destructive text-sm text-start mb-2">
           {error.generalError}
         </p>
       )}
@@ -85,40 +95,51 @@ export default function SignInPage() {
         onSubmit={handleSubmit}
         className="flex flex-col min-w-full sm:min-w-lg md:min-w-xl px-4"
       >
-        <input
-          type="email"
-          className=" placeholder:text-gray-700 text-gray-800 border border-gray-400 px-4 py-2 rounded"
-          placeholder="Email"
-          name="email"
-        />
-        {error.emailError && (
-          <p className="text-rose-600 text-sm text-start mt-1">
-            {error.emailError}
-          </p>
-        )}
-        <input
-          type="password"
-          className="mt-4 placeholder:text-gray-700 text-gray-800 border border-gray-400 px-4 py-2 rounded"
-          placeholder="Password"
-          name="password"
-        />
+        <div className="mb-4">
+          <ContactInput
+            name="email"
+            type="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={updateField("email")}
+            required
+          />
+          {error.emailError && (
+            <p className="text-destructive text-sm text-start mt-1">
+              {error.emailError}
+            </p>
+          )}
+        </div>
+        <div className="mb-4">
+          <ContactInput
+            name="password"
+            type="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={updateField("password")}
+            required
+          />
+        </div>
         {error.passwordError && (
-          <p className="text-rose-600 text-sm text-start mt-1">
+          <p className="text-destructive text-sm text-start mt-1">
             {error.passwordError}
           </p>
         )}
         <p className="mt-4">
           Don&apos;t have an account?{" "}
-          <Link className="text-sky-600 underline" href="/sign-up">
+          <Link
+            className="text-primary underline hover:text-primary/90"
+            href="/sign-up"
+          >
             Sign up
           </Link>
         </p>
         <button
-          className="rounded-full px-4 py-2 bg-secondary-foreground mt-6 hover:bg-secondary transition-all hover:text-white cursor-pointer group relative disabled:cursor-not-allowed"
+          className="rounded-full px-4 py-2 bg-primary text-primary-foreground mt-6 hover:bg-primary/90 transition-all cursor-pointer group relative disabled:cursor-not-allowed disabled:opacity-50"
           disabled={loading}
         >
           {loading && (
-            <Spinner className="absolute top-2.5 left-2.5 animate-spin size-5 stroke-black group-hover:stroke-white " />
+            <Spinner className="absolute top-2.5 left-2.5 animate-spin size-5 stroke-white " />
           )}{" "}
           Sign In
         </button>

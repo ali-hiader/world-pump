@@ -5,7 +5,6 @@ import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -16,6 +15,8 @@ import {
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import ContactInput from "@/components/ui/contact-input";
+import CustomTextarea from "@/components/ui/custom-textarea";
 import { ImageIcon, ArrowLeft } from "lucide-react";
 import Spinner from "@/icons/spinner";
 import Heading from "@/components/client/heading";
@@ -187,59 +188,27 @@ export default function EditProductPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Image Upload */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">Product Image</label>
-            <div className="border-2 border-dashed rounded-lg p-8 text-center">
-              {imageUrl && (
-                <Image
-                  className="w-60 h-auto mx-auto object-cover mb-4 rounded-xl"
-                  src={imageUrl}
-                  alt={product.title}
-                  width={240}
-                  height={240}
-                />
-              )}
-              {!imageUrl && (
-                <ImageIcon className="mx-auto w-32 h-32 text-gray-400 mb-4" />
-              )}
-
-              <Input
-                type="file"
-                className="hidden"
-                id="product-image"
-                name="image"
-                accept="image/*"
-                onChange={displaySelectedImage}
-              />
-              <Label
-                htmlFor="product-image"
-                className="px-4 py-2 shadow text-gray-700 transition-all cursor-pointer hover:bg-slate-50 rounded-md"
-              >
-                Choose New Image
-              </Label>
-              <p className="text-sm text-gray-500 mt-4">
-                {imageName ? imageName : "No new image selected"}
-              </p>
-            </div>
-          </div>
-
           {/* Basic Information */}
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <label className="block text-sm font-medium">
                 Product Title *
               </label>
-              <Input name="title" defaultValue={product.title} required />
+              <ContactInput
+                name="title"
+                defaultValue={product.title}
+                required
+                placeholder="Product title"
+              />
             </div>
             <div className="space-y-2">
               <label className="block text-sm font-medium">Price (PKR) *</label>
-              <Input
+              <ContactInput
                 type="number"
                 name="price"
-                defaultValue={product.price}
-                min="0"
+                defaultValue={product.price.toString()}
                 required
+                placeholder="Price"
               />
             </div>
           </div>
@@ -268,17 +237,22 @@ export default function EditProductPage() {
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <label className="block text-sm font-medium">Pump Type *</label>
-              <Input name="pumpType" defaultValue={product.pumpType} required />
+              <ContactInput
+                name="pumpType"
+                defaultValue={product.pumpType}
+                placeholder="e.g., Centrifugal, Submersible"
+                required
+              />
             </div>
             <div className="space-y-2">
               <label className="block text-sm font-medium">
                 Discount Price (PKR)
               </label>
-              <Input
+              <ContactInput
                 type="number"
                 name="discountPrice"
-                defaultValue={product.discountPrice || ""}
-                min="0"
+                placeholder="0"
+                defaultValue={product.discountPrice?.toString() || ""}
               />
             </div>
           </div>
@@ -288,20 +262,28 @@ export default function EditProductPage() {
               <label className="block text-sm font-medium">
                 Stock Quantity
               </label>
-              <Input
+              <ContactInput
                 type="number"
                 name="stock"
-                defaultValue={product.stock}
-                min="0"
+                placeholder="0"
+                defaultValue={product.stock.toString()}
               />
             </div>
             <div className="space-y-2">
               <label className="block text-sm font-medium">Brand</label>
-              <Input name="brand" defaultValue={product.brand || ""} />
+              <ContactInput
+                name="brand"
+                placeholder="Enter brand name"
+                defaultValue={product.brand || ""}
+              />
             </div>
             <div className="space-y-2">
               <label className="block text-sm font-medium">SKU</label>
-              <Input name="sku" defaultValue={product.sku || ""} />
+              <ContactInput
+                name="sku"
+                placeholder="Enter SKU"
+                defaultValue={product.sku || ""}
+              />
             </div>
           </div>
 
@@ -309,29 +291,46 @@ export default function EditProductPage() {
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <label className="block text-sm font-medium">Horsepower</label>
-              <Input
+              <ContactInput
                 name="horsepower"
+                placeholder="e.g., 1 HP, 2 HP"
                 defaultValue={product.horsepower || ""}
               />
             </div>
             <div className="space-y-2">
               <label className="block text-sm font-medium">Flow Rate</label>
-              <Input name="flowRate" defaultValue={product.flowRate || ""} />
+              <ContactInput
+                name="flowRate"
+                placeholder="e.g., 100 GPM"
+                defaultValue={product.flowRate || ""}
+              />
             </div>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
             <div className="space-y-2">
               <label className="block text-sm font-medium">Head</label>
-              <Input name="head" defaultValue={product.head || ""} />
+              <ContactInput
+                name="head"
+                placeholder="e.g., 50 ft"
+                defaultValue={product.head || ""}
+              />
             </div>
             <div className="space-y-2">
               <label className="block text-sm font-medium">Voltage</label>
-              <Input name="voltage" defaultValue={product.voltage || ""} />
+              <ContactInput
+                name="voltage"
+                placeholder="e.g., 220V, 440V"
+                defaultValue={product.voltage || ""}
+              />
             </div>
             <div className="space-y-2">
               <label className="block text-sm font-medium">Warranty</label>
-              <Input name="warranty" defaultValue={product.warranty || ""} />
+              <ContactInput
+                name="warranty"
+                placeholder="e.g., 1 Year"
+                defaultValue={product.warranty || ""}
+              />
             </div>
           </div>
 
@@ -366,11 +365,12 @@ export default function EditProductPage() {
           {/* Descriptions */}
           <div className="space-y-2">
             <label className="block text-sm font-medium">Description *</label>
-            <Textarea
+            <CustomTextarea
               name="description"
               defaultValue={product.description}
               required
               rows={4}
+              placeholder="Enter detailed product description"
             />
           </div>
 
@@ -378,12 +378,91 @@ export default function EditProductPage() {
             <label className="block text-sm font-medium">
               Message to User *
             </label>
-            <Textarea
+            <CustomTextarea
               name="message"
               defaultValue={product.message}
               required
               rows={3}
+              placeholder="Enter message for buyers"
             />
+          </div>
+
+          {/* Image Upload */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">Product Image</label>
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50/50">
+              <div className="flex items-start gap-6">
+                {/* Image Preview - Left Side */}
+                <div className="flex-shrink-0">
+                  <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden transition-colors hover:border-gray-400">
+                    {imageUrl ? (
+                      <Image
+                        className="w-full h-full object-cover"
+                        src={imageUrl}
+                        alt={product.title}
+                        width={128}
+                        height={128}
+                      />
+                    ) : (
+                      <div className="text-center">
+                        <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-1" />
+                        <span className="text-xs text-gray-500">Preview</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Controls - Right Side */}
+                <div className="flex-1 space-y-4">
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-gray-900">
+                      {imageName
+                        ? "New Image Selected"
+                        : "Current Product Image"}
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      {imageName
+                        ? imageName
+                        : "Click 'Choose New Image' to replace current image"}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Input
+                      type="file"
+                      className="hidden"
+                      id="product-image"
+                      name="image"
+                      accept="image/*"
+                      onChange={displaySelectedImage}
+                    />
+                    <Label
+                      htmlFor="product-image"
+                      className="inline-flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-md cursor-pointer hover:bg-primary/90 transition-colors"
+                    >
+                      Choose New Image
+                    </Label>
+                    {imageName && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setImageUrl(product.imageUrl);
+                          setImageName(undefined);
+                        }}
+                        className="inline-flex items-center justify-center px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+
+                  <p className="text-xs text-gray-500">
+                    Recommended: JPG, PNG or WEBP. Max file size: 5MB. Leave
+                    unchanged to keep current image.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Submit Button */}
@@ -399,7 +478,7 @@ export default function EditProductPage() {
             <Button
               type="submit"
               disabled={submitting}
-              className="flex-1 bg-primary hover:bg-primary/90 text-white"
+              className="flex-1 bg-primary hover:bg-primary/90"
             >
               {submitting ? (
                 <>

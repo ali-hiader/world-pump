@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -14,6 +13,8 @@ import {
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import ContactInput from "@/components/ui/contact-input";
+import CustomTextarea from "@/components/ui/custom-textarea";
 
 import { ChangeEvent, useRef, useState, useEffect } from "react";
 import { ImageIcon } from "lucide-react";
@@ -102,61 +103,27 @@ function AddProduct() {
           </div>
         )}
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">
-              Upload Product Image
-            </label>
-            <div className="border-2 border-dashed rounded-lg p-8 text-center">
-              {!imageUrl && (
-                <ImageIcon className="mx-auto w-32 h-32 text-gray-400 mb-4" />
-              )}
-              {imageUrl && (
-                <Image
-                  className="w-60 h-auto mx-auto object-cover mb-4 rounded-xl"
-                  src={imageUrl ?? ""}
-                  alt={imageName ?? ""}
-                  width={100}
-                  height={100}
-                />
-              )}
-
-              <Input
-                type="file"
-                className="hidden"
-                id="product-image"
-                name="image"
-                accept="image/*"
-                ref={imageRef}
-                onChange={displaySelectedImage}
-              />
-              <Label
-                htmlFor="product-image"
-                className="px-4 py-2 shadow text-gray-700 transition-all cursor-pointer hover:bg-slate-50 rounded-md"
-              >
-                Choose File
-              </Label>
-              <p className="text-sm text-gray-500 mt-4">
-                {imageName ? imageName : "No file chosen"}
-              </p>
-            </div>
-          </div>
-
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <label className="block text-sm font-medium">
                 Product Title *
               </label>
-              <Input placeholder="Enter product title" name="title" required />
+              <ContactInput
+                placeholder="Enter product title"
+                name="title"
+                required
+                defaultValue="High-Efficiency Water Pump"
+              />
             </div>
 
             <div className="space-y-2">
               <label className="block text-sm font-medium">Price (PKR) *</label>
-              <Input
+              <ContactInput
                 type="number"
                 placeholder="0"
                 name="price"
-                min="0"
                 required
+                defaultValue="15000"
               />
             </div>
           </div>
@@ -164,10 +131,11 @@ function AddProduct() {
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <label className="block text-sm font-medium">Pump Type *</label>
-              <Input
+              <ContactInput
                 placeholder="e.g., Centrifugal, Submersible"
                 name="pumpType"
                 required
+                defaultValue="Centrifugal"
               />
             </div>
 
@@ -175,11 +143,11 @@ function AddProduct() {
               <label className="block text-sm font-medium">
                 Discount Price (PKR)
               </label>
-              <Input
+              <ContactInput
                 type="number"
                 placeholder="0"
                 name="discountPrice"
-                min="0"
+                defaultValue="12500"
               />
             </div>
           </div>
@@ -189,52 +157,79 @@ function AddProduct() {
               <label className="block text-sm font-medium">
                 Stock Quantity
               </label>
-              <Input
+              <ContactInput
                 type="number"
                 placeholder="0"
                 name="stock"
-                min="0"
-                defaultValue="0"
+                defaultValue="25"
               />
             </div>
 
             <div className="space-y-2">
               <label className="block text-sm font-medium">Brand</label>
-              <Input placeholder="Enter brand name" name="brand" />
+              <ContactInput
+                placeholder="Enter brand name"
+                name="brand"
+                defaultValue="AquaFlow"
+              />
             </div>
 
             <div className="space-y-2">
               <label className="block text-sm font-medium">SKU</label>
-              <Input placeholder="Enter SKU" name="sku" />
+              <ContactInput
+                placeholder="Enter SKU"
+                name="sku"
+                defaultValue="AF-CF-001"
+              />
             </div>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <label className="block text-sm font-medium">Horsepower</label>
-              <Input placeholder="e.g., 1 HP, 2 HP" name="horsepower" />
+              <ContactInput
+                placeholder="e.g., 1 HP, 2 HP"
+                name="horsepower"
+                defaultValue="1.5 HP"
+              />
             </div>
 
             <div className="space-y-2">
               <label className="block text-sm font-medium">Flow Rate</label>
-              <Input placeholder="e.g., 100 GPM" name="flowRate" />
+              <ContactInput
+                placeholder="e.g., 100 GPM"
+                name="flowRate"
+                defaultValue="150 GPM"
+              />
             </div>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
             <div className="space-y-2">
               <label className="block text-sm font-medium">Head</label>
-              <Input placeholder="e.g., 50 ft" name="head" />
+              <ContactInput
+                placeholder="e.g., 50 ft"
+                name="head"
+                defaultValue="75 ft"
+              />
             </div>
 
             <div className="space-y-2">
               <label className="block text-sm font-medium">Voltage</label>
-              <Input placeholder="e.g., 220V, 440V" name="voltage" />
+              <ContactInput
+                placeholder="e.g., 220V, 440V"
+                name="voltage"
+                defaultValue="220V"
+              />
             </div>
 
             <div className="space-y-2">
               <label className="block text-sm font-medium">Warranty</label>
-              <Input placeholder="e.g., 1 Year" name="warranty" />
+              <ContactInput
+                placeholder="e.g., 1 Year"
+                name="warranty"
+                defaultValue="2 Years"
+              />
             </div>
           </div>
 
@@ -283,11 +278,12 @@ function AddProduct() {
 
           <div className="space-y-2">
             <label className="block text-sm font-medium">Description *</label>
-            <Textarea
+            <CustomTextarea
               placeholder="Enter detailed product description"
               name="description"
               required
               rows={4}
+              defaultValue="High-performance centrifugal water pump designed for residential and commercial applications. Features corrosion-resistant materials, efficient motor design, and reliable operation. Suitable for water supply systems, irrigation, and general pumping applications."
             />
           </div>
 
@@ -295,18 +291,97 @@ function AddProduct() {
             <label className="block text-sm font-medium">
               Message to User *
             </label>
-            <Textarea
+            <CustomTextarea
               placeholder="Enter message for buyers"
               name="message"
               required
               rows={3}
+              defaultValue="Thank you for choosing our premium water pump! This product comes with professional installation support and comprehensive warranty coverage. For any technical assistance, please contact our support team."
             />
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">
+              Upload Product Image
+            </label>
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50/50">
+              <div className="flex items-start gap-6">
+                {/* Image Preview - Left Side */}
+                <div className="flex-shrink-0">
+                  <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden transition-colors hover:border-gray-400">
+                    {!imageUrl ? (
+                      <div className="text-center">
+                        <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-1" />
+                        <span className="text-xs text-gray-500">Preview</span>
+                      </div>
+                    ) : (
+                      <Image
+                        className="w-full h-full object-cover"
+                        src={imageUrl}
+                        alt={imageName ?? "Product image"}
+                        width={128}
+                        height={128}
+                      />
+                    )}
+                  </div>
+                </div>
+
+                {/* Controls - Right Side */}
+                <div className="flex-1 space-y-4">
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-gray-900">
+                      {imageUrl ? "Selected Image" : "Choose Product Image"}
+                    </h4>
+                    <p className="text-sm text-gray-600">
+                      {imageName ? imageName : "No file chosen"}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Input
+                      type="file"
+                      className="hidden"
+                      id="product-image"
+                      name="image"
+                      accept="image/*"
+                      ref={imageRef}
+                      onChange={displaySelectedImage}
+                    />
+                    <Label
+                      htmlFor="product-image"
+                      className="inline-flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-md cursor-pointer hover:bg-primary/90 transition-colors"
+                    >
+                      {imageUrl ? "Change Image" : "Choose Image"}
+                    </Label>
+                    {imageUrl && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setImageUrl(undefined);
+                          setImageName(undefined);
+                          if (imageRef.current) {
+                            imageRef.current.value = "";
+                          }
+                        }}
+                        className="inline-flex items-center justify-center px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200 transition-colors"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+
+                  <p className="text-xs text-gray-500">
+                    Recommended: JPG, PNG or WEBP. Max file size: 5MB
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
           <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary hover:bg-primary/90 text-white"
+            className="w-full bg-primary hover:bg-primary/90"
           >
             {loading ? (
               <>

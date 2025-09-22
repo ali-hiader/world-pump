@@ -30,57 +30,82 @@ export default async function AdminDashboard() {
         </Link>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Suspense fallback={<StatsCardSkeleton />}>
-          <ProductStatsCard />
-        </Suspense>
-        <Suspense fallback={<StatsCardSkeleton />}>
-          <OrderStatsCard />
-        </Suspense>
-        <Suspense fallback={<StatsCardSkeleton />}>
-          <UserStatsCard />
-        </Suspense>
-        <Suspense fallback={<StatsCardSkeleton />}>
-          <RevenueStatsCard />
-        </Suspense>
-      </div>
+      {/* Main Dashboard Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left Column - Quick Actions */}
+        <div className="space-y-6">
+          {/* Quick Actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Quick Actions</CardTitle>
+              <CardDescription>Manage your store efficiently</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Link href="/admin/products">
+                  <Button
+                    variant="outline"
+                    className="w-full h-20 flex flex-col"
+                  >
+                    <Package className="h-6 w-6 mb-2" />
+                    Manage Products
+                  </Button>
+                </Link>
+                <Link href="/admin/orders">
+                  <Button
+                    variant="outline"
+                    className="w-full h-20 flex flex-col"
+                  >
+                    <ShoppingCart className="h-6 w-6 mb-2" />
+                    View Orders
+                  </Button>
+                </Link>
+                <Link href="/admin/users">
+                  <Button
+                    variant="outline"
+                    className="w-full h-20 flex flex-col"
+                  >
+                    <Users className="h-6 w-6 mb-2" />
+                    View Users
+                  </Button>
+                </Link>
+                <Link href="/admin/add-product">
+                  <Button
+                    variant="outline"
+                    className="w-full h-20 flex flex-col"
+                  >
+                    <Plus className="h-6 w-6 mb-2" />
+                    Add New Product
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-          <CardDescription>Manage your store efficiently</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            <Link href="/admin/products">
-              <Button variant="outline" className="w-full h-20 flex flex-col">
-                <Package className="h-6 w-6 mb-2" />
-                Manage Products
-              </Button>
-            </Link>
-            <Link href="/admin/orders">
-              <Button variant="outline" className="w-full h-20 flex flex-col">
-                <ShoppingCart className="h-6 w-6 mb-2" />
-                View Orders
-              </Button>
-            </Link>
-            <Link href="/admin/users">
-              <Button variant="outline" className="w-full h-20 flex flex-col">
-                <Users className="h-6 w-6 mb-2" />
-                View Users
-              </Button>
-            </Link>
-            <Link href="/admin/add-product">
-              <Button variant="outline" className="w-full h-20 flex flex-col">
-                <Plus className="h-6 w-6 mb-2" />
-                Add New Product
-              </Button>
-            </Link>
+        {/* Right Column - All Stats */}
+        <div className="space-y-6">
+          {/* Products & Orders Stats */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Suspense fallback={<StatsCardSkeleton />}>
+              <ProductStatsCard />
+            </Suspense>
+            <Suspense fallback={<StatsCardSkeleton />}>
+              <OrderStatsCard />
+            </Suspense>
           </div>
-        </CardContent>
-      </Card>
+
+          {/* Revenue & Users Stats */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Suspense fallback={<StatsCardSkeleton />}>
+              <UserStatsCard />
+            </Suspense>
+            <Suspense fallback={<StatsCardSkeleton />}>
+              <RevenueStatsCard />
+            </Suspense>
+          </div>
+        </div>
+      </div>
     </main>
   );
 }

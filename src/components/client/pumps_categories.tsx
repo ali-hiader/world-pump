@@ -37,7 +37,7 @@ export default function PumpsCategories({
             className={`w-full px-4 py-2 rounded-md text-left text-base transition ${
               pathName.startsWith("/pumps")
                 ? "bg-secondary text-white"
-                : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             }`}
           >
             Pumps
@@ -56,7 +56,7 @@ export default function PumpsCategories({
                       className={`block w-full px-6 py-2 rounded-md text-left text-sm transition ${
                         active
                           ? "bg-secondary text-white"
-                          : "bg-gray-50 text-gray-700 hover:bg-gray-200"
+                          : "bg-muted/50 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                       }`}
                     >
                       {category.name}
@@ -86,10 +86,10 @@ export default function PumpsCategories({
               <MenubarItem key={category.slug} className="p-0">
                 <Link
                   href={`/pumps/${category.slug}`}
-                  className={`block w-full px-3 py-2 text-base focus:outline-none border border-gray-200 ${
+                  className={`block w-full px-3 py-2 text-base focus:outline-none border border-border ${
                     active
-                      ? "bg-primary text-white"
-                      : "bg-gray-100 hover:bg-gray-200 text-black"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted hover:bg-accent hover:text-accent-foreground text-foreground"
                   }`}
                 >
                   {category.name}

@@ -43,8 +43,7 @@ export default function AdminLogInPage() {
         return;
       }
 
-      // ✅ JWT is now in cookies automatically
-      router.push("/admin/dashboard");
+      router.push("/admin/products");
     } catch (err) {
       console.error(err);
       setError({
@@ -62,7 +61,7 @@ export default function AdminLogInPage() {
       </h1>
 
       {error.generalError && (
-        <p className="text-rose-600 text-sm text-start mb-2">
+        <p className="text-destructive text-sm text-start mb-2">
           {error.generalError}
         </p>
       )}
@@ -73,32 +72,32 @@ export default function AdminLogInPage() {
       >
         <input
           type="email"
-          className=" placeholder:text-gray-700 text-gray-800 border border-gray-400 px-4 py-2 rounded"
+          className="placeholder:text-muted-foreground text-foreground border border-input px-4 py-2 rounded focus:border-ring focus:outline-none"
           placeholder="Admin Email"
           defaultValue="superAdmin@worldPumps.hi"
           name="email"
         />
         {error.emailError && (
-          <p className="text-rose-600 text-sm text-start mt-1">
+          <p className="text-destructive text-sm text-start mt-1">
             {error.emailError}
           </p>
         )}
 
         <input
           type="password"
-          className="mt-4 placeholder:text-gray-700 text-gray-800 border border-gray-400 px-4 py-2 rounded"
+          className="mt-4 placeholder:text-muted-foreground text-foreground border border-input px-4 py-2 rounded focus:border-ring focus:outline-none"
           placeholder="Password"
           defaultValue="opentheadminpanel"
           name="password"
         />
         {error.passwordError && (
-          <p className="text-rose-600 text-sm text-start mt-1">
+          <p className="text-destructive text-sm text-start mt-1">
             {error.passwordError}
           </p>
         )}
 
         <button
-          className="rounded-full px-4 py-2 bg-secondary-foreground mt-6 hover:bg-secondary transition-all hover:text-white cursor-pointer group relative disabled:cursor-not-allowed"
+          className="rounded-full px-4 py-2 bg-primary text-primary-foreground mt-6 hover:bg-primary/90 transition-all cursor-pointer group relative disabled:cursor-not-allowed disabled:opacity-50"
           disabled={loading}
         >
           {loading && (

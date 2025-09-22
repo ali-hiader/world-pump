@@ -57,6 +57,7 @@ async function PumpDetailsPage({ params }: Props) {
           </div>
           <div className="flex gap-2">
             {product.isFeatured && <Badge>Featured</Badge>}
+            <Badge variant="outline">{product.status}</Badge>
           </div>
         </div>
       </div>
@@ -66,7 +67,10 @@ async function PumpDetailsPage({ params }: Props) {
         <div className="space-y-6">
           {/* Product Image */}
           <Card>
-            <CardContent className="p-6">
+            <CardHeader>
+              <CardTitle>Product Image</CardTitle>
+            </CardHeader>
+            <CardContent>
               <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
                 <Image
                   src={product.imageUrl}
@@ -81,7 +85,10 @@ async function PumpDetailsPage({ params }: Props) {
 
           {/* Pricing Information */}
           <Card>
-            <CardContent className="space-y-4 p-6">
+            <CardHeader>
+              <CardTitle>Pricing Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="grid grid-cols-1 gap-4">
                 <div>
                   <p className="text-sm font-medium text-gray-500">
@@ -122,6 +129,12 @@ async function PumpDetailsPage({ params }: Props) {
               <CardTitle>Product Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Product Title
+                </p>
+                <p className="text-lg">{product.title}</p>
+              </div>
               {product.sku && (
                 <div>
                   <p className="text-sm font-medium text-gray-500">SKU</p>
@@ -140,6 +153,18 @@ async function PumpDetailsPage({ params }: Props) {
                 <p className="text-sm font-medium text-gray-500">Pump Type</p>
                 <Badge variant="outline">{product.pumpType}</Badge>
               </div>
+              {product.stock !== undefined && (
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Stock</p>
+                  <p
+                    className={`text-sm ${product.stock > 0 ? "text-green-600" : "text-red-600"}`}
+                  >
+                    {product.stock > 0
+                      ? `${product.stock} available`
+                      : "Out of stock"}
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -274,7 +299,7 @@ async function PumpDetailsPage({ params }: Props) {
 
               {/* Refund & Returns Policy */}
               <div>
-                <h3 className="text-xl font-medium  mb-2 text-gray-950">
+                <h3 className="text-xl font-medium mb-2 text-gray-950">
                   Refund & Returns Policy
                 </h3>
                 <p className="text-gray-600">
@@ -292,12 +317,13 @@ async function PumpDetailsPage({ params }: Props) {
                     Returns or exchanges are{" "}
                     <span className="font-medium">not applicable</span> if the
                     product is damaged due to misuse, mishandling, installation
-                    errors, or alterations (unless it’s a manufacturing fault).
+                    errors, or alterations (unless it&apos;s a manufacturing
+                    fault).
                   </li>
                 </ul>
 
-                <p className="mt-3">Refund Method:</p>
-                <ul className="list-disc pl-5 mt-1 space-y-1">
+                <p className="mt-3 text-gray-600">Refund Method:</p>
+                <ul className="list-disc pl-5 mt-1 space-y-1 text-gray-600">
                   <li>Bank transfers → refunded in full.</li>
                   <li>
                     Debit/Credit card → refunded with a{" "}
@@ -306,7 +332,7 @@ async function PumpDetailsPage({ params }: Props) {
                   </li>
                 </ul>
 
-                <p className="mt-3">
+                <p className="mt-3 text-gray-600">
                   <span className="font-medium">Important:</span> Any refund or
                   exchange request must be reported within
                   <span className="font-medium"> 48 hours of delivery</span>.
@@ -321,7 +347,7 @@ async function PumpDetailsPage({ params }: Props) {
                   , and our customer care team will assist you.
                 </p>
 
-                <p className="mt-3">
+                <p className="mt-3 text-gray-600">
                   Processing refunds or exchanges may take up to{" "}
                   <span className="font-medium">10 business days</span>. Return
                   shipping costs for faulty or defective items will be covered
@@ -347,12 +373,13 @@ async function PumpDetailsPage({ params }: Props) {
           </Tabs>
         </CardContent>
       </Card>
+
       {/* Related Products */}
-      <section className="mt-10 px-4 sm:px-[3%]">
-        <h2 className="text-xl sm:text-2xl font-medium text-foreground text-center">
+      <section className="mt-10">
+        <h2 className="text-2xl font-bold text-center mb-8">
           Related Products
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {relatedProducts.map((item) => (
             <ProductCard key={item.id} product={item} />
           ))}

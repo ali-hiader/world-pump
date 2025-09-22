@@ -108,7 +108,7 @@ async function SuccessPage({ searchParams }: SuccessPageProps) {
 
       <Link
         href={"/orders"}
-        className="mt-6 bg-secondary hover:bg-secondary/90 px-4 py-2 min-w-72 rounded-full text-center "
+        className="mt-6 bg-secondary hover:bg-secondary/90 px-4 py-2 min-w-72 rounded-full text-center text-white"
       >
         Order Dashboard
       </Link>

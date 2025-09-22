@@ -61,16 +61,6 @@ const config: Config = {
           ring: "hsl(var(--sidebar-ring))",
         },
       },
-      borderColor: {
-        DEFAULT: "hsl(var(--border))",
-        border: "hsl(var(--border))",
-      },
-      backgroundColor: {
-        background: "hsl(var(--background))",
-      },
-      textColor: {
-        foreground: "hsl(var(--foreground))",
-      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

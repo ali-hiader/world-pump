@@ -15,7 +15,7 @@ function Newsletter() {
           <input
             type="email"
             placeholder="Enter your email"
-            className="w-full sm:w-2/3 px-4 py-3 text-gray-900 focus:outline-none border border-secondary rounded-md"
+            className="w-full sm:w-2/3 px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none border border-input focus:border-ring rounded-md"
             required
           />
           <button

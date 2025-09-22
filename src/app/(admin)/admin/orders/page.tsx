@@ -123,7 +123,7 @@ async function AdminOrdersPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
           {ordersWithItemCount.map((order) => (
             <Card key={order.id} className="hover:shadow-md transition-shadow">
               <CardHeader>
@@ -131,13 +131,15 @@ async function AdminOrdersPage() {
                   <CardTitle className="text-lg">Order #{order.id}</CardTitle>
                   <div className="flex gap-2">
                     <Badge variant={getStatusBadgeVariant(order.status)}>
-                      {order.status}
+                      Order: {order.status}
                     </Badge>
-                    <Badge
-                      variant={getPaymentBadgeVariant(order.paymentStatus)}
-                    >
-                      {order.paymentStatus}
-                    </Badge>
+                    {order.status !== order.paymentStatus && (
+                      <Badge
+                        variant={getPaymentBadgeVariant(order.paymentStatus)}
+                      >
+                        Payment: {order.paymentStatus}
+                      </Badge>
+                    )}
                   </div>
                 </div>
               </CardHeader>

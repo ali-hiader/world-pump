@@ -1,48 +1,113 @@
-import { eq } from "drizzle-orm";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { OrderType } from "@/lib/types";
 import { OrderItem as OrderItemI } from "@/lib/types";
-import { auth } from "@/lib/auth";
-import { db } from "@/index";
-import { orderItemTable, orderTable } from "@/db/schema";
 
 import Heading from "@/components/client/heading";
 import DisplayAlert from "@/components/client/display_alert";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Spinner from "@/icons/spinner";
 
-export const dynamic = "force-dynamic";
+interface OrderWithItems {
+  order: OrderType;
+  items: OrderItemI[];
+}
 
-async function Analytics() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+function Analytics() {
+  const router = useRouter();
+  const [orderItems, setOrderItems] = useState<OrderWithItems[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>("");
 
-  if (!session) {
-    return redirect("/signup");
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch("/api/orders");
+        const data = await response.json();
+
+        if (response.ok) {
+          setOrderItems(data.orderItems || []);
+        } else if (response.status === 401) {
+          router.push("/signup");
+        } else {
+          setError(data.error || "Failed to fetch orders");
+        }
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        setError("Failed to fetch orders");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, [router]);
+
+  const handleStatusUpdate = (orderId: number, newStatus: string) => {
+    setOrderItems((prev) =>
+      prev.map((orderData) =>
+        orderData.order.id === orderId
+          ? {
+              ...orderData,
+              order: {
+                ...orderData.order,
+                status: newStatus as
+                  | "pending"
+                  | "paid"
+                  | "shipped"
+                  | "completed"
+                  | "cancelled",
+              },
+            }
+          : orderData
+      )
+    );
+  };
+
+  if (loading) {
+    return (
+      <main className="px-4 sm:px-[5%] pb-12 mt-8 min-h-96 max-w-[1600px] mx-auto">
+        <div className="flex items-center justify-center py-12">
+          <Spinner className="animate-spin h-8 w-8" />
+        </div>
+      </main>
+    );
   }
 
-  const orders = await db
-    .select()
-    .from(orderTable)
-    .where(eq(orderTable.userEmail, session.user.email));
-
-  const orderItems = await Promise.all(
-    orders.map(async (order) => {
-      const items = await db
-        .select()
-        .from(orderItemTable)
-        .where(eq(orderItemTable.orderId, order.id));
-      return {
-        order,
-        items,
-      };
-    })
-  );
+  if (error) {
+    return (
+      <main className="px-4 sm:px-[5%] pb-12 mt-8 min-h-96 max-w-[1600px] mx-auto">
+        <div className="text-center py-12">
+          <p className="text-red-600">{error}</p>
+        </div>
+      </main>
+    );
+  }
 
   function getTime(order: OrderType) {
-    return `${order.createdAt?.getHours()}:${order.createdAt?.getMinutes()}:${order.createdAt?.getSeconds()} - ${order.createdAt?.getDate()}/${order.createdAt?.getMonth()}/${order.createdAt?.getFullYear()}`;
+    if (!order.createdAt) return "N/A";
+
+    // Convert string to Date object if it's a string
+    const date =
+      typeof order.createdAt === "string"
+        ? new Date(order.createdAt)
+        : order.createdAt;
+
+    // Check if date is valid
+    if (isNaN(date.getTime())) return "Invalid Date";
+
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+    const day = date.getDate();
+    const month = date.getMonth() + 1; // getMonth() returns 0-11
+    const year = date.getFullYear();
+
+    return `${hours}:${minutes}:${seconds} - ${day}/${month}/${year}`;
   }
 
   return (
@@ -72,14 +137,20 @@ async function Analytics() {
                   total - ${orderData.order.totalAmount}
                 </span>
               </section>
-              <section className="flex items-center gap-2 text-sm">
-                <StatusBadge label="Order" value={orderData.order.status} />
-                <StatusBadge
-                  label="Payment"
-                  value={orderData.order.paymentStatus}
+              <section className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-2 text-sm">
+                  <StatusBadge label="Order" value={orderData.order.status} />
+                  <StatusBadge
+                    label="Payment"
+                    value={orderData.order.paymentStatus}
+                  />
+                </div>
+                <OrderActions
+                  order={orderData.order}
+                  onStatusUpdate={handleStatusUpdate}
                 />
               </section>
-              <section className="w-full grid grid-cols-1 gap-4 md:grid-cols-2 ">
+              <section className="w-full grid grid-cols-1 gap-4 lg:grid-cols-2">
                 {orderData.items.map((item) => (
                   <OrderItem key={item.id} item={item} />
                 ))}
@@ -120,6 +191,82 @@ function OrderItem({ item }: Props) {
 }
 
 export default Analytics;
+
+// Inline OrderActions component
+function OrderActions({
+  order,
+  onStatusUpdate,
+}: {
+  order: OrderType;
+  onStatusUpdate: (orderId: number, newStatus: string) => void;
+}) {
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [error, setError] = useState<string>("");
+
+  const handleMarkAsReceived = async () => {
+    if (!order.id) return;
+
+    setIsUpdating(true);
+    setError("");
+
+    try {
+      const response = await fetch(`/api/orders/${order.id}/status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          status: "completed",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        onStatusUpdate(order.id, "completed");
+      } else {
+        setError(data.error || "Failed to update order status");
+      }
+    } catch (error) {
+      console.error("Error updating order status:", error);
+      setError("Failed to update order status");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  // Show the button only if order is paid or shipped
+  const canMarkAsReceived = ["paid", "shipped"].includes(order.status || "");
+
+  return (
+    <div className="flex flex-col gap-2">
+      {error && (
+        <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-2 py-1">
+          {error}
+        </div>
+      )}
+
+      {canMarkAsReceived && (
+        <Button
+          onClick={handleMarkAsReceived}
+          disabled={isUpdating}
+          size="sm"
+          variant="outline"
+          className="w-fit"
+        >
+          {isUpdating ? (
+            <>
+              <Spinner className="animate-spin mr-1 h-3 w-3" />
+              Updating...
+            </>
+          ) : (
+            "Mark as Received"
+          )}
+        </Button>
+      )}
+    </div>
+  );
+}
 
 function StatusBadge({
   label,

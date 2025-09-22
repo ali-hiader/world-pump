@@ -243,7 +243,7 @@ function CarouselDots({ className }: { className?: string }) {
           key={index}
           className={cn(
             "h-3 w-3 rounded-full transition-colors",
-            selectedIndex === index ? "bg-primary" : "bg-gray-300"
+            selectedIndex === index ? "bg-primary" : "bg-muted"
           )}
           onClick={() => api.scrollTo(index)}
         />

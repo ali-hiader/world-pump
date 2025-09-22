@@ -21,7 +21,7 @@ function ImagesCarosal() {
           const blur = toBase64(shimmer(1200, 600));
           return (
             <CarouselItem key={image} className="overflow-hidden">
-              <div className="relative w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[500px]">
+              <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px]">
                 <Image
                   src={image}
                   alt={`Hero slide: ${filename.replace(/[-_]/g, " ")}`}

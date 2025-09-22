@@ -5,7 +5,7 @@
  * Run this script to populate the database with initial data
  */
 
-import { seedCategories, seedAdmin, seedPumps } from "../src/db/seed";
+import { seedCategories, seedAdmin, seedPumps } from "../src/db/seed.ts";
 
 async function main() {
   console.log("🌱 Starting database seeding...");

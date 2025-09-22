@@ -18,7 +18,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
+import ContactInput from "@/components/ui/contact-input";
 
 type FiltersState = {
   category: string;
@@ -81,7 +81,10 @@ export default function FiltersSheet(props: {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button className="inline-block min-w-24" variant="secondary">
+        <Button
+          className="inline-block min-w-24 text-white"
+          variant="secondary"
+        >
           Filters
         </Button>
       </SheetTrigger>
@@ -113,26 +116,26 @@ export default function FiltersSheet(props: {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
               <label className="text-xs text-muted-foreground">Min Price</label>
-              <Input
+              <ContactInput
                 type="number"
-                min={0}
                 value={state.minPrice}
                 onChange={(e) =>
                   setState((s) => ({ ...s, minPrice: e.target.value }))
                 }
                 placeholder="0"
+                name="minPrice"
               />
             </div>
             <div className="space-y-1">
               <label className="text-xs text-muted-foreground">Max Price</label>
-              <Input
+              <ContactInput
                 type="number"
-                min={0}
                 value={state.maxPrice}
                 onChange={(e) =>
                   setState((s) => ({ ...s, maxPrice: e.target.value }))
                 }
-                placeholder=""
+                placeholder="Enter max price"
+                name="maxPrice"
               />
             </div>
           </div>

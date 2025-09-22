@@ -183,8 +183,8 @@ export default function ProductsTable() {
                   </Badge>
                 </div>
                 <div className="col-span-2 flex items-center justify-end space-x-2">
-                  <Link href={`/pumps/${product.slug}`}>
-                    <Button variant="ghost" size="sm" title="View Product">
+                  <Link href={`/admin/products/${product.id}`}>
+                    <Button variant="ghost" size="sm" title="View Details">
                       <Eye className="h-4 w-4" />
                     </Button>
                   </Link>

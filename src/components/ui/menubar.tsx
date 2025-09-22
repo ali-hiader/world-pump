@@ -53,7 +53,7 @@ function MenubarTrigger({
     <MenubarPrimitive.Trigger
       data-slot="menubar-trigger"
       className={cn(
-        "data-[state=open]:text-gray-600 flex items-center text-lg",
+        "data-[state=open]:text-muted-foreground flex items-center text-lg",
         className
       )}
       {...props}

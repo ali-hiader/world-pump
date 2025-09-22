@@ -1,5 +1,5 @@
 import React from "react";
-import TextField from "@mui/material/TextField";
+import ContactInput from "@/components/ui/contact-input";
 import { checkoutAddressFields } from "@/lib/utils";
 import {
   Accordion,
@@ -117,7 +117,10 @@ function Address({ userName, onAddressesChange }: Props) {
             >
               <form className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {billingAddressFields.map((field) => {
-                  const baseName = field.name.replace(/^billing_/, "") as keyof AddressValues;
+                  const baseName = field.name.replace(
+                    /^billing_/,
+                    ""
+                  ) as keyof AddressValues;
                   const value = billing[baseName] ?? "";
                   return (
                     <AddressInput
@@ -146,7 +149,6 @@ export interface InputProps {
   label: string;
   type?: string;
   required?: boolean;
-  readonly: boolean;
   defaultValue?: string;
   userName?: string;
   value?: string;
@@ -159,38 +161,31 @@ function AddressInput({
   type = "text",
   required = false,
   defaultValue = "",
-  readonly = false,
   userName,
   value,
   onChange,
 }: InputProps) {
+  const inputValue =
+    value !== undefined
+      ? value
+      : name === "fullName"
+        ? userName || ""
+        : defaultValue || "";
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    onChange?.(e.target.value);
+  };
+
   return (
-    <TextField
-      id={name}
+    <ContactInput
       name={name}
-      label={label}
-      variant="standard"
-      fullWidth
-      size="small"
-      slotProps={{
-        input: {
-          sx: { fontSize: 14 }, // dY`^ input text font size
-        },
-        inputLabel: {
-          sx: { fontSize: 14 }, // dY`^ label font size
-        },
-      }}
-      required={required}
+      placeholder={label}
       type={type}
-      value={
-        value !== undefined
-          ? value
-          : name === "fullName"
-          ? userName || ""
-          : defaultValue || ""
-      }
-      disabled={readonly}
-      onChange={(e) => onChange?.(e.target.value)}
+      required={required}
+      value={inputValue}
+      onChange={handleChange}
     />
   );
 }

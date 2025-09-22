@@ -43,7 +43,7 @@ export default function ProductCard({ product }: { product: ProductType }) {
               <span className="font-semibold text-emerald-600">
                 {formatPKR(product.discountPrice)}
               </span>
-              <span className="line-through text-sm text-rose-400">
+              <span className="line-through text-sm text-destructive/70">
                 {formatPKR(product.price)}
               </span>
             </>
@@ -56,7 +56,10 @@ export default function ProductCard({ product }: { product: ProductType }) {
       </div>
 
       {product.discountPrice && (
-        <Badge className="absolute top-2 right-2 bg-rose-500 text-white">
+        <Badge
+          variant="destructive"
+          className="absolute top-2 right-2 text-white"
+        >
           {Math.round(
             ((product.price - product.discountPrice) / product.price) * 100
           )}

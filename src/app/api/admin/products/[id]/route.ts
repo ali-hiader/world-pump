@@ -6,6 +6,7 @@ import { eq, getTableColumns } from "drizzle-orm";
 import { uploadImage } from "@/lib/cloudinary";
 import { slugifyIt } from "@/lib/utils";
 import { UploadApiResponse } from "cloudinary";
+import { getCategorySlugById } from "@/lib/category-utils";
 
 // GET: Get single product for editing
 export async function GET(
@@ -24,17 +25,34 @@ export async function GET(
     const [product] = await db
       .select({
         categoryName: categoryTable.name,
+        categorySlug: categoryTable.slug,
         ...getTableColumns(productTable),
       })
       .from(productTable)
-      .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id))
+      .leftJoin(categoryTable, eq(productTable.categoryId, categoryTable.id))
       .where(eq(productTable.id, Number(productId)));
 
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ product });
+    // Ensure categorySlug is available, use fallback if needed
+    const productWithSlug = {
+      ...product,
+      categorySlug:
+        product.categorySlug || getCategorySlugById(product.categoryId),
+    };
+
+    console.log("API Response - Product:", {
+      id: productWithSlug.id,
+      title: productWithSlug.title,
+      slug: productWithSlug.slug,
+      categoryId: productWithSlug.categoryId,
+      categoryName: productWithSlug.categoryName,
+      categorySlug: productWithSlug.categorySlug,
+    });
+
+    return NextResponse.json({ product: productWithSlug });
   } catch (error) {
     console.error("Error fetching product:", error);
     return NextResponse.json(
