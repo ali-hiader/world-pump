@@ -40,7 +40,7 @@ export const productStatusEnum = pgEnum("product_status", [
 export const productTable = pgTable("product", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   title: varchar({ length: 255 }).notNull(),
-  slug: varchar({ length: 255 }).notNull().unique(),
+  slug: varchar({ length: 255 }).notNull(),
   categoryId: integer()
     .notNull()
     .references(() => categoryTable.id),
@@ -51,7 +51,7 @@ export const productTable = pgTable("product", {
   discountPrice: integer(),
   stock: integer().default(0).notNull(),
   brand: varchar({ length: 100 }),
-  sku: varchar({ length: 100 }).unique(),
+  sku: varchar({ length: 100 }),
   status: productStatusEnum("status").default("active").notNull(),
   isFeatured: boolean().default(false),
   pumpType: varchar({ length: 100 }).notNull(),

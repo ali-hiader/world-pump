@@ -8,13 +8,14 @@ cloudinary.config({
 
 export const uploadImage = async (
   file: Buffer,
-  cb: (result: UploadApiResponse | undefined) => Promise<never>
+  cb: (result: UploadApiResponse | undefined) => void
 ) => {
   cloudinary.uploader
     .upload_stream((error, uploadResult) => {
       if (error) {
         console.log("Image Upload Error: ", error);
         cb(undefined);
+        return;
       }
       cb(uploadResult);
     })

@@ -100,7 +100,7 @@ Fill in the required environment variables in `.env.local`:
 DATABASE_URL="postgresql://user:password@host:5432/database?sslmode=require"
 
 # JWT Secret for Admin Auth (REQUIRED)
-JWT_SECRET="your-secure-jwt-secret-minimum-32-characters"
+JWT_SECRET="your-secure-jwt-secret"
 
 # Cloudinary for Image Uploads (REQUIRED)
 CLOUDINARY_CLOUD_NAME="your-cloud-name"
@@ -115,7 +115,7 @@ SMTP_PASS="your-app-password"
 SMTP_FROM="no-reply@worldpumps.com"
 CONTACT_TO="info@worldpumps.com"
 
-# PayFast (Optional - for payments)
+# PayFast (for payments requries a merchant acc on payfast)
 PAYFAST_MODE="sandbox"
 PAYFAST_MERCHANT_ID="your-merchant-id"
 PAYFAST_MERCHANT_KEY="your-merchant-key"
@@ -165,15 +165,6 @@ src/
 └── icons/                # Custom icons
 ```
 
-## 🔑 Default Admin Credentials
-
-After running the seed script:
-
-- **Email**: `superAdmin@worldPumps.hi`
-- **Password**: `opentheadminpanel`
-
-⚠️ **Important**: Change these credentials in production!
-
 ## 📊 Available Scripts
 
 ```bash
@@ -215,12 +206,6 @@ pnpm run lint         # Run ESLint
 - Sandbox and production modes
 - Automated payment verification
 - Order status updates
-
-### Stripe (Alternative)
-
-- International payment processing
-- Credit card payments
-- Webhook integration
 
 ## 📧 Email System
 
@@ -302,7 +287,7 @@ Ensure all environment variables are set in your deployment platform:
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is not licensed under the MIT License
 
 ## 🆘 Support
 

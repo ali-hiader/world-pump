@@ -103,6 +103,7 @@ export async function decreaseQtyDB(productId: number, userId: string) {
       .returning();
   }
 }
+
 export async function removeFromCartDB(productId: number, userId: string) {
   revalidatePath("/cart");
   await db

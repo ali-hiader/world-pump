@@ -57,13 +57,12 @@ export async function POST(request: Request) {
 
     const result = await new Promise<UploadApiResponse | undefined>(
       (resolve) => {
-        uploadImage(buffer, async (uploadResult) => {
+        uploadImage(buffer, (uploadResult) => {
           resolve(uploadResult);
-          throw new Error(); // This satisfies the Promise<never> return type
         });
       }
     ).catch(() => {
-      // Handle the thrown error from the callback
+      // Handle any errors during upload
       return undefined;
     });
 
