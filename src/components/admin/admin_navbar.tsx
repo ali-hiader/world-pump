@@ -29,7 +29,7 @@ export default function AdminNavBar() {
       {/* Logo */}
       <hgroup className="space-y-1">
         <Link
-          href={"/"}
+          href={"/admin"}
           className="headingFont text-2xl sm:text-3xl font-extrabold cursor-pointer"
         >
           World Pumps - Admin

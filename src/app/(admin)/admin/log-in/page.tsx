@@ -43,7 +43,7 @@ export default function AdminLogInPage() {
         return;
       }
 
-      router.push("/admin/products");
+      router.push("/admin");
     } catch (err) {
       console.error(err);
       setError({

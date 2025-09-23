@@ -70,11 +70,6 @@ function ProductDetailsPage({ params }: Props) {
         const data = await response.json();
 
         if (response.ok) {
-          console.log("Product data received:", data.product);
-          console.log(
-            "Category slug specifically:",
-            data.product?.categorySlug
-          );
           setProduct(data.product);
         } else {
           setError(data.error || "Failed to fetch product");

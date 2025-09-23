@@ -39,7 +39,7 @@ export default async function CategoryPage({
   params,
   searchParams,
 }: PageProps) {
-  const categorySlug = params.category;
+  const categorySlug = (await params).category;
   const category = await getCategoryBySlug(categorySlug);
 
   const sp: SearchParams = await searchParams;
