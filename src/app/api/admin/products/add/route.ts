@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import { db } from "@/index";
+import { db } from "@/db";
 import { productTable, categoryTable } from "@/db/schema";
 import { verifyAdminToken } from "@/lib/auth-utils";
 import { uploadImage } from "@/lib/cloudinary";

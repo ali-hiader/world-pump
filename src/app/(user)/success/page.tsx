@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 
 import { auth } from "@/lib/auth";
 import { clearCartDB } from "@/actions/cart-actions";
-import { db } from "@/index";
+import { db } from "@/db";
 import { orderTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 

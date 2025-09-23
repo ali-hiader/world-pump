@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { NextRequest } from "next/server";
-import { db } from "@/index";
+import { db } from "@/db";
 import { adminTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 

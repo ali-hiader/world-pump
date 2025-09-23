@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { eq } from "drizzle-orm";
 
-import { db } from "..";
+import { db } from "@/db";
 import { categoryTable, productTable } from "@/db/schema";
 import { categories, pumps } from "@/lib/utils";
 import { adminTable } from "./schema";

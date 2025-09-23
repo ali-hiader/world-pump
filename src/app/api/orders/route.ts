@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { eq } from "drizzle-orm";
 
 import { auth } from "@/lib/auth";
-import { db } from "@/index";
+import { db } from "@/db";
 import { orderItemTable, orderTable } from "@/db/schema";
 
 export async function GET() {

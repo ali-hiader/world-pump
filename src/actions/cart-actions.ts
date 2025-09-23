@@ -1,6 +1,6 @@
 "use server";
 
-import { db } from "..";
+import { db } from "@/db";
 import { cartTable, productTable } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { and, desc, eq, getTableColumns } from "drizzle-orm";

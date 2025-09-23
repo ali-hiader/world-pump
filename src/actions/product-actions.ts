@@ -1,5 +1,5 @@
 "use server";
-import { db } from "..";
+import { db } from "@/db";
 import { cartTable, categoryTable, productTable } from "@/db/schema";
 import {
   eq,

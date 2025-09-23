@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { eq, getTableColumns } from "drizzle-orm";
 import { cartTable, productTable } from "@/db/schema";
-import { db } from "@/index";
+import { db } from "@/db";
 import { auth } from "@/lib/auth";
 
 import Checkout from "@/components/client/checkout";

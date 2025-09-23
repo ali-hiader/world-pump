@@ -10,7 +10,7 @@ import { auth } from "@/lib/auth";
 import { CartItemType } from "@/lib/types";
 
 import { getCartDB } from "@/actions/cart-actions";
-import { db } from "@/index";
+import { db } from "@/db";
 import { categoryTable } from "@/db/schema";
 import { fetchAllProducts } from "@/actions/product-actions";
 

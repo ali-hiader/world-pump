@@ -33,7 +33,7 @@ function AddToCartBtn({ productId }: Props) {
         style: {
           backgroundColor: "#6b7280",
           color: "#fff",
-          fontFamily: "cursive",
+          fontFamily: "serif",
           fontSize: "16px",
         },
         position: "top-right",

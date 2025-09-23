@@ -3,7 +3,7 @@
 // import { NextResponse } from "next/server";
 // import { headers as getHeaders } from "next/headers";
 // import { auth } from "@/lib/auth";
-// import { db } from "@/index";
+// import { db } from "@/db";
 // import {
 //   addressTable,
 //   orderItemTable,
@@ -18,8 +18,8 @@
 import { NextResponse } from "next/server";
 
 export async function POST() {
-//   _req: Request,
-//   { params }: { params: { id: string } }
+  //   _req: Request,
+  //   { params }: { params: { id: string } }
   //   try {
   //     // get headers (no `await` — headers() is synchronous)
   //     const headers = getHeaders();

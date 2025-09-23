@@ -1,6 +1,6 @@
 // import { NextResponse } from "next/server";
 // import { generatePayfastSignature, getPayfastConfig, payfastValidateUrl } from "@/lib/payfast";
-// import { db } from "@/index";
+// import { db } from "@/db";
 // import { orderTable, paymentTable, user as userTable } from "@/db/schema";
 // import { eq } from "drizzle-orm";
 // import { sendEmail } from "@/lib/mailer";

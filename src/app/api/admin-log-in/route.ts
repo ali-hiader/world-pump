@@ -1,5 +1,5 @@
 import { adminTable } from "@/db/schema";
-import { db } from "@/index";
+import { db } from "@/db";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 

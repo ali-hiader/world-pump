@@ -4,9 +4,15 @@ import { z } from "zod";
 // PayFast for online payments
 import { buildPayfastFields } from "@/lib/payfast";
 import { auth } from "@/lib/auth";
-import { addressTable, orderItemTable, orderTable, paymentTable, user as userTable } from "@/db/schema";
+import {
+  addressTable,
+  orderItemTable,
+  orderTable,
+  paymentTable,
+  user as userTable,
+} from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { db } from "@/index";
+import { db } from "@/db";
 
 const addressSchema = z.object({
   fullName: z.string().min(1),
@@ -46,8 +52,9 @@ function makeOrderNumber() {
   const now = new Date();
   return `ORD-${now.getFullYear()}${(now.getMonth() + 1)
     .toString()
-    .padStart(2, "0")}${now.getDate().toString().padStart(2, "0")}-${Math
-    .floor(Math.random() * 1_000_000)
+    .padStart(2, "0")}${now.getDate().toString().padStart(2, "0")}-${Math.floor(
+    Math.random() * 1_000_000
+  )
     .toString()
     .padStart(6, "0")}`;
 }
@@ -195,7 +202,12 @@ export async function POST(req: Request) {
         customerLastName: lastName,
       });
 
-      return NextResponse.json({ gateway: "payfast", processUrl, fields, orderId });
+      return NextResponse.json({
+        gateway: "payfast",
+        processUrl,
+        fields,
+        orderId,
+      });
     }
 
     // COD / Bank deposit flow (or PayFast disabled)
