@@ -10,7 +10,11 @@ import {
 } from "@/components/ui/carousel";
 import Image from "next/image";
 
-const images = ["/carosal_image.jpeg"];
+const images = [
+  "/carosal_image.png",
+  "/carosal_image-2.png",
+  "/carosal_image-2.jpeg",
+];
 
 function ImagesCarosal() {
   return (

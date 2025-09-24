@@ -34,7 +34,6 @@ const bodySchema = z.object({
         imageUrl: z.string().optional(),
         price: z.number().nonnegative(),
         quantity: z.number().int().positive(),
-        sku: z.string().optional().nullable(),
       })
     )
     .min(1),
@@ -166,7 +165,7 @@ export async function POST(req: Request) {
           orderId,
           productId: p.id,
           productName: p.title,
-          sku: p.sku ?? null,
+          sku: null,
           quantity: p.quantity,
           unitPrice: p.price,
         }))

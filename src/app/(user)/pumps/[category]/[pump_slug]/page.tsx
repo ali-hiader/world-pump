@@ -122,14 +122,6 @@ async function PumpDetailsPage({ params }: Props) {
               <CardTitle>Product Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {product.sku && (
-                <div>
-                  <p className="text-sm font-medium text-gray-500">SKU</p>
-                  <p className="text-sm font-mono text-gray-600">
-                    {product.sku}
-                  </p>
-                </div>
-              )}
               {product.brand && (
                 <div>
                   <p className="text-sm font-medium text-gray-500">Brand</p>
@@ -185,14 +177,6 @@ async function PumpDetailsPage({ params }: Props) {
                     </div>
                   )}
                 </div>
-                {product.warranty && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">
-                      Warranty
-                    </p>
-                    <p className="text-sm text-green-600">{product.warranty}</p>
-                  </div>
-                )}
               </CardContent>
             </Card>
           )}
@@ -226,7 +210,6 @@ async function PumpDetailsPage({ params }: Props) {
           <Tabs defaultValue="shipping" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="shipping">Shipping & Returns</TabsTrigger>
-              <TabsTrigger value="message">Special Notes</TabsTrigger>
             </TabsList>
 
             <TabsContent
@@ -328,21 +311,6 @@ async function PumpDetailsPage({ params }: Props) {
                   by us.
                 </p>
               </div>
-            </TabsContent>
-
-            <TabsContent value="message" className="mt-6">
-              {product.message ? (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h4 className="font-medium text-blue-900 mb-2">
-                    Special Information
-                  </h4>
-                  <p className="text-blue-800">{product.message}</p>
-                </div>
-              ) : (
-                <p className="text-gray-500 italic">
-                  No special notes available for this product.
-                </p>
-              )}
             </TabsContent>
           </Tabs>
         </CardContent>

@@ -84,7 +84,6 @@ export async function PUT(
     const discountPrice = formData.get("discountPrice") as string;
     const stock = formData.get("stock") as string;
     const brand = formData.get("brand") as string;
-    const sku = formData.get("sku") as string;
     const status = formData.get("status") as string;
     const isFeatured = formData.get("isFeatured") === "true";
     const pumpType = formData.get("pumpType") as string;
@@ -92,19 +91,10 @@ export async function PUT(
     const flowRate = formData.get("flowRate") as string;
     const head = formData.get("head") as string;
     const voltage = formData.get("voltage") as string;
-    const warranty = formData.get("warranty") as string;
-    const message = formData.get("message") as string;
     const image = formData.get("image") as File;
 
     // Validate required fields
-    if (
-      !title ||
-      !categoryId ||
-      !description ||
-      !price ||
-      !pumpType ||
-      !message
-    ) {
+    if (!title || !categoryId || !description || !price || !pumpType) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -147,7 +137,6 @@ export async function PUT(
       discountPrice: discountPrice ? Number(discountPrice) : null,
       stock: stock ? Number(stock) : 0,
       brand: brand || null,
-      sku: sku || null,
       status: status as "active" | "inactive" | "discontinued",
       isFeatured,
       pumpType,
@@ -155,8 +144,6 @@ export async function PUT(
       flowRate: flowRate || null,
       head: head || null,
       voltage: voltage || null,
-      warranty: warranty || null,
-      message,
       updatedAt: new Date(),
     };
 

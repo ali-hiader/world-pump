@@ -173,15 +173,6 @@ function AddProduct() {
                 defaultValue="AquaFlow"
               />
             </div>
-
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">SKU</label>
-              <ContactInput
-                placeholder="Enter SKU"
-                name="sku"
-                defaultValue="AF-CF-001"
-              />
-            </div>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
@@ -284,19 +275,6 @@ function AddProduct() {
               required
               rows={4}
               defaultValue="High-performance centrifugal water pump designed for residential and commercial applications. Features corrosion-resistant materials, efficient motor design, and reliable operation. Suitable for water supply systems, irrigation, and general pumping applications."
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">
-              Message to User *
-            </label>
-            <CustomTextarea
-              placeholder="Enter message for buyers"
-              name="message"
-              required
-              rows={3}
-              defaultValue="Thank you for choosing our premium water pump! This product comes with professional installation support and comprehensive warranty coverage. For any technical assistance, please contact our support team."
             />
           </div>
 

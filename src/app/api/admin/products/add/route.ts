@@ -23,7 +23,6 @@ export async function POST(request: Request) {
     const discountPrice = formData.get("discountPrice") as string;
     const stock = formData.get("stock") as string;
     const brand = formData.get("brand") as string;
-    const sku = formData.get("sku") as string;
     const status = formData.get("status") as string;
     const isFeatured = formData.get("isFeatured") === "true";
     const pumpType = formData.get("pumpType") as string;
@@ -31,8 +30,6 @@ export async function POST(request: Request) {
     const flowRate = formData.get("flowRate") as string;
     const head = formData.get("head") as string;
     const voltage = formData.get("voltage") as string;
-    const warranty = formData.get("warranty") as string;
-    const message = formData.get("message") as string;
     const image = formData.get("image") as File;
 
     // Validate required fields
@@ -42,7 +39,6 @@ export async function POST(request: Request) {
       !description ||
       !price ||
       !pumpType ||
-      !message ||
       !image
     ) {
       return NextResponse.json(
@@ -89,7 +85,6 @@ export async function POST(request: Request) {
       discountPrice: discountPrice ? Number(discountPrice) : null,
       stock: stock ? Number(stock) : 0,
       brand: brand || null,
-      sku: sku || null,
       status: (status as "active" | "inactive" | "discontinued") || "active",
       isFeatured,
       pumpType,
@@ -97,8 +92,6 @@ export async function POST(request: Request) {
       flowRate: flowRate || null,
       head: head || null,
       voltage: voltage || null,
-      warranty: warranty || null,
-      message,
       createdBy: admin.id,
     });
 

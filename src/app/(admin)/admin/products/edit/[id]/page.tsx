@@ -277,14 +277,6 @@ export default function EditProductPage() {
                 defaultValue={product.brand || ""}
               />
             </div>
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">SKU</label>
-              <ContactInput
-                name="sku"
-                placeholder="Enter SKU"
-                defaultValue={product.sku || ""}
-              />
-            </div>
           </div>
 
           {/* Technical Specifications */}
@@ -322,14 +314,6 @@ export default function EditProductPage() {
                 name="voltage"
                 placeholder="e.g., 220V, 440V"
                 defaultValue={product.voltage || ""}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">Warranty</label>
-              <ContactInput
-                name="warranty"
-                placeholder="e.g., 1 Year"
-                defaultValue={product.warranty || ""}
               />
             </div>
           </div>
@@ -371,19 +355,6 @@ export default function EditProductPage() {
               required
               rows={4}
               placeholder="Enter detailed product description"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">
-              Message to User *
-            </label>
-            <CustomTextarea
-              name="message"
-              defaultValue={product.message}
-              required
-              rows={3}
-              placeholder="Enter message for buyers"
             />
           </div>
 

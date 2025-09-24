@@ -41,7 +41,7 @@ function Checkout({ cartItems, userName, payfastEnabled }: Props) {
           imageUrl: p.imageUrl,
           price: p.price,
           quantity: p.quantity,
-          sku: p.sku ?? null,
+          sku: null,
         })),
         addresses: addresses ?? undefined,
         paymentMethod: selectedPaymentM,

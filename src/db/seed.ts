@@ -19,7 +19,6 @@ export async function seedPumps(userId: number) {
     discountPrice: pump.discountPrice ?? null,
     stock: pump.stock ?? 0, // ✅ added
     brand: pump.brand ?? null,
-    sku: pump.sku ?? null,
     status: (pump.status as unknown as ProductStatus) ?? "active",
     isFeatured: pump.isFeatured ?? false,
     pumpType: pump.pumpType,
@@ -27,8 +26,6 @@ export async function seedPumps(userId: number) {
     flowRate: pump.flowRate ?? null,
     head: pump.head ?? null,
     voltage: pump.voltage ?? null,
-    warranty: pump.warranty ?? null,
-    message: pump.message ?? null,
     createdBy: userId,
   }));
 

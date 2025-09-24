@@ -32,9 +32,7 @@ export default function ProductCard({ product }: { product: ProductType }) {
           <Link href={`/pumps/${product.categorySlug}/${product.slug}`}>
             {product.brand} {product.pumpType} {product.horsepower}
           </Link>
-          <span className="text-xs sm:text-sm text-muted-foreground">
-            ({product.sku})
-          </span>
+          <span className="text-xs sm:text-sm text-muted-foreground"></span>
         </h3>
 
         <div className="flex items-baseline gap-2 mb-4">

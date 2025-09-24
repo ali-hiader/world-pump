@@ -101,7 +101,6 @@ function ProductDetailsPage({ params }: Props) {
       formData.append("description", product.description);
       formData.append("price", product.price.toString());
       formData.append("pumpType", product.pumpType);
-      formData.append("message", product.message || "");
       formData.append("status", newStatus);
 
       // Add optional fields
@@ -109,13 +108,11 @@ function ProductDetailsPage({ params }: Props) {
         formData.append("discountPrice", product.discountPrice.toString());
       if (product.stock) formData.append("stock", product.stock.toString());
       if (product.brand) formData.append("brand", product.brand);
-      if (product.sku) formData.append("sku", product.sku);
       if (product.isFeatured) formData.append("isFeatured", "true");
       if (product.horsepower) formData.append("horsepower", product.horsepower);
       if (product.flowRate) formData.append("flowRate", product.flowRate);
       if (product.head) formData.append("head", product.head);
       if (product.voltage) formData.append("voltage", product.voltage);
-      if (product.warranty) formData.append("warranty", product.warranty);
 
       const response = await fetch(`/api/admin/products/${product.id}`, {
         method: "PUT",
