@@ -7,7 +7,7 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "next lint",
-    "db:seed": "node scripts/seed.js"
+    "db:seed": "tsx scripts/seed.js"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

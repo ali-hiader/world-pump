@@ -43,7 +43,7 @@ export const productTable = pgTable("product", {
   slug: varchar({ length: 255 }).notNull(),
   categoryId: integer()
     .notNull()
-    .references(() => categoryTable.id),
+    .references(() => categoryTable.id, { onDelete: "cascade" }),
   description: text().notNull(),
   imageUrl: varchar({ length: 255 }).notNull(),
   gallery: text().array(),
@@ -84,10 +84,10 @@ export const cartTable = pgTable("cart", {
   quantity: integer().notNull(),
   createdBy: text()
     .notNull()
-    .references(() => user.id),
+    .references(() => user.id, { onDelete: "cascade" }),
   productId: integer()
     .notNull()
-    .references(() => productTable.id),
+    .references(() => productTable.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

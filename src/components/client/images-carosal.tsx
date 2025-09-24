@@ -8,14 +8,15 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { carosalImages } from "@/lib/utils";
 import Image from "next/image";
+
+const images = ["/carosal_image.jpeg"];
 
 function ImagesCarosal() {
   return (
     <Carousel className="w-full">
       <CarouselContent>
-        {carosalImages.map((image, idx) => {
+        {images.map((image, idx) => {
           const filename = image.split("/").pop() || "slide";
           const isFirst = idx === 0;
           const blur = toBase64(shimmer(1200, 600));

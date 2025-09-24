@@ -23,7 +23,7 @@ export const pumps = [
   {
     title: "2HP Submersible Pump",
     slug: "submersible-pump-2hp",
-    categoryId: 1, // Residential (example)
+    categoryId: 4, // Submersible Pumps and Motors
     description:
       "Durable 2HP submersible pump designed for household water supply with high efficiency and long-lasting performance.",
     imageUrl: "/centrifugal/1.jpeg",
@@ -47,7 +47,7 @@ export const pumps = [
   {
     title: "1HP Centrifugal Pump",
     slug: "centrifugal-pump-1hp",
-    categoryId: 2, // Agricultural
+    categoryId: 1, // Centrifugal Pumps
     description:
       "Compact 1HP centrifugal pump suitable for irrigation and small-scale agricultural use.",
     imageUrl: "/centrifugal/2.jpg",
@@ -71,7 +71,7 @@ export const pumps = [
   {
     title: "0.5HP Booster Pump",
     slug: "booster-pump-0-5hp",
-    categoryId: 3, // Commercial
+    categoryId: 3, // Pressure Pumps
     description:
       "Compact booster pump ideal for apartments and offices to maintain constant water pressure.",
     imageUrl: "/centrifugal/3.jpg",
@@ -95,7 +95,7 @@ export const pumps = [
   {
     title: "5HP Industrial Pump",
     slug: "industrial-pump-5hp",
-    categoryId: 4, // Industrial
+    categoryId: 1, // Centrifugal Pumps
     description:
       "Heavy-duty 5HP industrial water pump suitable for factories, construction sites, and continuous operations.",
     imageUrl: "/centrifugal/4.webp",
@@ -134,14 +134,6 @@ export const categories = [
     imageUrl: "/categories/circulating.jpg",
     description:
       "Efficient circulating pumps for heating, cooling, and water systems.",
-  },
-  {
-    name: "Solar Pumps",
-    slug: "solar-pumps",
-    isFeatured: true,
-    imageUrl: "/categories/solar.jpg",
-    description:
-      "Eco-friendly solar-powered water pumps for sustainable water supply.",
   },
   {
     name: "Pressure Pumps",
@@ -205,14 +197,6 @@ export const categories = [
     imageUrl: "/categories/fountain.jpg",
     description:
       "Decorative fountain pumps for gardens, landscapes, and water features.",
-  },
-  {
-    name: "Gear Pumps",
-    slug: "gear-pumps",
-    isFeatured: false,
-    imageUrl: "/categories/gear.jpg",
-    description:
-      "High-efficiency gear pumps for oil, fuel, and industrial fluid transfer.",
   },
 ];
 

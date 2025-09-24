@@ -2,13 +2,14 @@
 export const categoryIdToSlugMap: Record<number, string> = {
   1: "centrifugal-pumps",
   2: "circulating-pumps",
-  3: "solar-pumps",
-  4: "pressure-pumps",
-  5: "submersible-pumps",
-  6: "vacuum-pumps",
-  7: "sump-pumps",
-  8: "jet-pumps",
-  9: "booster-pumps",
+  3: "pressure-pumps",
+  4: "submersible-pumps-and-motors",
+  5: "submersible-sewage-pumps",
+  6: "high-pressure-washers",
+  7: "swimming-pool-pumps",
+  8: "chemical-dosing-pumps",
+  9: "fountain-pumps",
+  10: "self-priming-pumps",
 };
 
 export function getCategorySlugById(categoryId: number): string | null {

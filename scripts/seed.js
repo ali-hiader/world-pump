@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { seedCategories, seedAdmin, seedPumps } from "../src/db/seed.ts";
 
 async function main() {
