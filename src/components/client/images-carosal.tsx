@@ -12,8 +12,9 @@ import Image from "next/image";
 
 const images = [
   "/carosal_image.png",
-  "/carosal_image-2.png",
+  // "/carosal_image-2.png",
   "/carosal_image-2.jpeg",
+  "/pumps.png",
 ];
 
 function ImagesCarosal() {
