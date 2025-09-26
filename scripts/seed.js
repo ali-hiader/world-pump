@@ -1,15 +1,19 @@
 import "dotenv/config";
-import { seedCategories, seedAdmin } from "../src/db/seed.ts";
+import { seedPumps } from "../src/db/seed.ts";
 
 async function main() {
-  console.log("🌱 Starting database seeding...");
-
   try {
-    await seedCategories();
-    await seedAdmin();
-    // await seedPumps(1);
+    console.log("🚀 Starting database seeding process...");
+    console.log("=".repeat(50));
 
-    console.log("✅ Database seeding completed successfully!");
+    await seedPumps(1);
+
+    console.log("=".repeat(50));
+    console.log("🎉 Seeding completed successfully!");
+    console.log("🔐 Admin login details:");
+    console.log("   📧 Email: superAdmin@worldPumps.hi");
+    console.log("   🔑 Password: opentheadminpanel");
+
     process.exit(0);
   } catch (error) {
     console.error("❌ Error during seeding:", error);

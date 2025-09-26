@@ -47,7 +47,6 @@ export const productTable = pgTable("product", {
     .references(() => categoryTable.id, { onDelete: "cascade" }),
   description: text().notNull(),
   imageUrl: varchar({ length: 255 }).notNull(),
-  gallery: text().array(),
   price: integer().notNull(),
   discountPrice: integer(),
   stock: integer().default(0).notNull(),
