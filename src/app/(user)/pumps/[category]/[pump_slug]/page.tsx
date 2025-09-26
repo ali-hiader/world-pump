@@ -74,6 +74,7 @@ async function PumpDetailsPage({ params }: Props) {
           </div>
           <div className="flex gap-2">
             {product.isFeatured && <Badge>Featured</Badge>}
+            <Badge variant="outline">{product.status}</Badge>
           </div>
         </div>
       </div>
@@ -83,7 +84,10 @@ async function PumpDetailsPage({ params }: Props) {
         <div className="space-y-6">
           {/* Product Image */}
           <Card>
-            <CardContent className="p-6">
+            <CardHeader>
+              <CardTitle>Product Image</CardTitle>
+            </CardHeader>
+            <CardContent>
               <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
                 <Image
                   src={product.imageUrl}
@@ -98,7 +102,10 @@ async function PumpDetailsPage({ params }: Props) {
 
           {/* Pricing Information */}
           <Card>
-            <CardContent className="space-y-4 p-6">
+            <CardHeader>
+              <CardTitle>Pricing Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="grid grid-cols-1 gap-4">
                 <div>
                   <p className="text-sm font-medium text-gray-500">
@@ -139,10 +146,29 @@ async function PumpDetailsPage({ params }: Props) {
               <CardTitle>Product Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Product Title
+                </p>
+                <p className="text-lg">{product.title}</p>
+              </div>
+
               {product.brand && (
                 <div>
                   <p className="text-sm font-medium text-gray-500">Brand</p>
                   <Badge variant="outline">{product.brand}</Badge>
+                </div>
+              )}
+              {product.stock !== undefined && (
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Stock</p>
+                  <p
+                    className={`text-sm ${product.stock > 0 ? "text-green-600" : "text-red-600"}`}
+                  >
+                    {product.stock > 0
+                      ? `${product.stock} available`
+                      : "Out of stock"}
+                  </p>
                 </div>
               )}
             </CardContent>
@@ -310,11 +336,11 @@ async function PumpDetailsPage({ params }: Props) {
         </CardContent>
       </Card>
       {/* Related Products */}
-      <section className="mt-10 px-4 sm:px-[3%]">
-        <h2 className="text-xl sm:text-2xl font-medium text-foreground text-center">
+      <section className="mt-10">
+        <h2 className="text-2xl font-bold text-center mb-8">
           Related Products
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {relatedProducts.map((item) => (
             <ProductCard key={item.id} product={item} />
           ))}

@@ -34,11 +34,7 @@ interface Product {
   sku: string | null;
   status: "active" | "inactive" | "discontinued";
   isFeatured: boolean | null;
-  pumpType: string;
-  horsepower: string | null;
-  flowRate: string | null;
-  head: string | null;
-  voltage: string | null;
+  specs: { field: string; value: string }[] | null;
   warranty: string | null;
   message: string | null;
   createdAt: Date | null;
@@ -100,7 +96,7 @@ function ProductDetailsPage({ params }: Props) {
       formData.append("categoryId", product.categoryId.toString());
       formData.append("description", product.description);
       formData.append("price", product.price.toString());
-      formData.append("pumpType", product.pumpType);
+
       formData.append("status", newStatus);
 
       // Add optional fields
@@ -109,10 +105,10 @@ function ProductDetailsPage({ params }: Props) {
       if (product.stock) formData.append("stock", product.stock.toString());
       if (product.brand) formData.append("brand", product.brand);
       if (product.isFeatured) formData.append("isFeatured", "true");
-      if (product.horsepower) formData.append("horsepower", product.horsepower);
-      if (product.flowRate) formData.append("flowRate", product.flowRate);
-      if (product.head) formData.append("head", product.head);
-      if (product.voltage) formData.append("voltage", product.voltage);
+      // Add specs data
+      if (product.specs) {
+        formData.append("specs", JSON.stringify(product.specs));
+      }
 
       const response = await fetch(`/api/admin/products/${product.id}`, {
         method: "PUT",
@@ -358,6 +354,52 @@ function ProductDetailsPage({ params }: Props) {
             </CardContent>
           </Card>
 
+          {/* Inventory and Additional Details */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Inventory & Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Stock</p>
+                  <p className="text-lg font-semibold">
+                    {product.stock || 0} units
+                  </p>
+                </div>
+                {product.sku && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">SKU</p>
+                    <p className="text-sm font-mono">{product.sku}</p>
+                  </div>
+                )}
+              </div>
+
+              {product.brand && (
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Brand</p>
+                  <Badge variant="outline">{product.brand}</Badge>
+                </div>
+              )}
+
+              {product.warranty && (
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Warranty</p>
+                  <p className="text-sm">{product.warranty}</p>
+                </div>
+              )}
+
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  Featured Product
+                </p>
+                <Badge variant={product.isFeatured ? "default" : "secondary"}>
+                  {product.isFeatured ? "Yes" : "No"}
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Product Description */}
           <Card>
             <CardHeader>
@@ -375,6 +417,40 @@ function ProductDetailsPage({ params }: Props) {
               )}
             </CardContent>
           </Card>
+
+          {/* Product Specifications */}
+          {product.specs && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Product Specifications</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {product.specs &&
+                  Array.isArray(product.specs) &&
+                  product.specs.length > 0 ? (
+                    product.specs.map((spec, index) => (
+                      <div
+                        key={index}
+                        className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0"
+                      >
+                        <span className="text-sm font-medium text-gray-600 capitalize">
+                          {spec.field.replace(/([A-Z])/g, " $1").trim()}
+                        </span>
+                        <span className="text-sm text-gray-900">
+                          {spec.value}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-500 italic">
+                      No specifications available
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Technical Information */}
           <Card>
