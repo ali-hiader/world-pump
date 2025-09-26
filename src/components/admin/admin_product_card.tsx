@@ -21,7 +21,7 @@ export default function AdminProductCard({
           src={imageUrl}
           alt={title}
           fill
-          className="object-contain w-10 h-auto transition-opacity duration-500"
+          className="object-contain transition-opacity duration-500"
           sizes="(max-width: 1024px) 640px, 30vw"
         />
       </Link>

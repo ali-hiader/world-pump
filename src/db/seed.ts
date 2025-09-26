@@ -26,7 +26,7 @@ export async function seedPumps(userId: number = 1) {
     return {
       title: pump.title,
       slug: pump.slug,
-      categoryId: 1, // Hardcoded category ID
+      categoryId: pump.categoryId, // Hardcoded category ID
       description: pump.description,
       imageUrl: pump.imageUrl,
       price: pump.price,
