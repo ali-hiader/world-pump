@@ -147,15 +147,6 @@ function AddProduct() {
               defaultValue="Pump"
             />
           </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">Model *</label>
-            <ContactInput
-              placeholder="Enter model name"
-              name="model"
-              required
-              defaultValue=""
-            />
-          </div>
 
           <div className="space-y-2">
             <label className="block text-sm font-medium">Brand</label>
