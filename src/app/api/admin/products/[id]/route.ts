@@ -86,12 +86,11 @@ export async function PUT(
     const brand = formData.get("brand") as string;
     const status = formData.get("status") as string;
     const isFeatured = formData.get("isFeatured") === "true";
-    const pumpType = formData.get("pumpType") as string;
     const specs = formData.get("specs") as string;
     const image = formData.get("image") as File;
 
     // Validate required fields
-    if (!title || !categoryId || !description || !price || !pumpType) {
+    if (!title || !categoryId || !description || !price) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -136,7 +135,6 @@ export async function PUT(
       brand: brand || null,
       status: status as "active" | "inactive" | "discontinued",
       isFeatured,
-      pumpType,
       specs: specs ? JSON.parse(specs) : null,
       updatedAt: new Date(),
     };

@@ -39,7 +39,7 @@ export default function ProductCard({ product }: { product: ProductType }) {
       <div className="flex mt-2 gap-2 flex-col px-2">
         <h3 className="my-0 font-medium text-sm flex flex-col sm:text-base">
           <Link href={`/pumps/${product.categorySlug}/${product.slug}`}>
-            {product.brand} {product.pumpType} {horsepower}
+            {product.brand} {horsepower}
           </Link>
           <span className="text-xs sm:text-sm text-muted-foreground"></span>
         </h3>

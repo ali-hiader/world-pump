@@ -83,7 +83,6 @@ export async function fetchRelatedProducts(categoryId: number) {
 export type ProductFilters = {
   minPrice?: number;
   maxPrice?: number;
-  pumpType?: string;
   brand?: string;
   horsepower?: string;
   sort?: "newest" | "price_asc" | "price_desc";
@@ -96,24 +95,6 @@ export async function getCategoryBySlug(slug: string) {
     .where(eq(categoryTable.slug, slug))
     .limit(1);
   return rows[0] || null;
-}
-
-// Fetch distinct pumpType values for a category (or all)
-export async function getCategoryPumpTypes(slug: string) {
-  const base = db
-    .select({ pumpType: productTable.pumpType })
-    .from(productTable)
-    .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id));
-  const rows =
-    slug === "all"
-      ? await base.where(eq(productTable.status, "active"))
-      : await base.where(
-          and(eq(categoryTable.slug, slug), eq(productTable.status, "active"))
-        );
-  const set = new Set(
-    rows.map((r) => r.pumpType).filter((p): p is string => Boolean(p))
-  );
-  return Array.from(set).sort((a, b) => a.localeCompare(b));
 }
 
 export async function getCategoryBrands(slug: string) {
@@ -195,11 +176,6 @@ export async function fetchProductsByCategoryPaginated(
   }
   if (typeof filters.maxPrice === "number") {
     whereClauses.push(lte(productTable.price, filters.maxPrice));
-  }
-  if (filters.pumpType && filters.pumpType.trim().length > 0) {
-    whereClauses.push(
-      eq(sql`LOWER(${productTable.pumpType})`, filters.pumpType.toLowerCase())
-    );
   }
   if (filters.brand && filters.brand.trim().length > 0) {
     whereClauses.push(

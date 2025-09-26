@@ -28,9 +28,6 @@ function CheckoutProduct({ product }: Props) {
           <h3 className="font-medium text-sm sm:text-base truncate">
             {product.title} ({product.quantity})
           </h3>
-          <p className="text-xs sm:text-sm text-muted-foreground truncate">
-            Pump: {product.pumpType}
-          </p>
         </div>
 
         <p className="font-medium headingFont text-emerald-700 text-sm sm:text-base">

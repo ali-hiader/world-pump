@@ -65,8 +65,7 @@ async function PumpDetailsPage({ params }: Props) {
               {product.title}
             </h1>
             <p className="text-gray-600 mt-1">
-              {product.brand && `${product.brand} - `}
-              {product.pumpType}
+              {product.brand && `${product.brand}`}
               {(() => {
                 const specs = parseSpecs(product.specs);
                 return specs.horsepower ? ` - ${specs.horsepower}` : "";
@@ -160,10 +159,6 @@ async function PumpDetailsPage({ params }: Props) {
                   <Badge variant="outline">{product.brand}</Badge>
                 </div>
               )}
-              <div>
-                <p className="text-sm font-medium text-gray-500">Pump Type</p>
-                <Badge variant="outline">{product.pumpType}</Badge>
-              </div>
               {product.stock !== undefined && (
                 <div>
                   <p className="text-sm font-medium text-gray-500">Stock</p>

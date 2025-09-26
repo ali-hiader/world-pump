@@ -9,7 +9,6 @@ import CategorySelect from "@/components/client/category_select";
 
 import {
   getCategoryBySlug,
-  getCategoryPumpTypes,
   getCategoryBrands,
   getCategoryHorsepowers,
   getAllCategories,
@@ -22,7 +21,6 @@ export const dynamic = "force-dynamic";
 type SearchParams = {
   minPrice?: string;
   maxPrice?: string;
-  pumpType?: string;
   brand?: string;
   horsepower?: string;
   sort?: "newest" | "price_asc" | "price_desc";
@@ -46,7 +44,6 @@ export default async function CategoryPage({
   const filters: ProductFilters = {
     minPrice: sp.minPrice ? Number(sp.minPrice) : undefined,
     maxPrice: sp.maxPrice ? Number(sp.maxPrice) : undefined,
-    pumpType: sp.pumpType || undefined,
     brand: sp.brand || undefined,
     horsepower: sp.horsepower || undefined,
     sort: sp.sort || "newest",
@@ -54,10 +51,9 @@ export default async function CategoryPage({
   const page = Math.max(1, Number(sp.page) || 1);
   const limit = Math.min(48, Math.max(6, Number(sp.limit) || 12));
 
-  const [{ products, total }, pumpTypes, brands, horsepowers, categories] =
+  const [{ products, total }, brands, horsepowers, categories] =
     await Promise.all([
       fetchProductsByCategoryPaginated(categorySlug, filters, page, limit),
-      getCategoryPumpTypes(categorySlug),
       getCategoryBrands(categorySlug),
       getCategoryHorsepowers(categorySlug),
       getAllCategories(),
@@ -97,14 +93,12 @@ export default async function CategoryPage({
           <FiltersSheet
             categorySlug={categorySlug}
             categories={[{ slug: "all", name: "All Pumps" }, ...categories]}
-            pumpTypes={pumpTypes}
             brands={brands}
             horsepowers={horsepowers}
             current={{
               category: categorySlug,
               minPrice: sp.minPrice,
               maxPrice: sp.maxPrice,
-              pumpType: sp.pumpType,
               brand: sp.brand,
               horsepower: sp.horsepower,
               sort: sp.sort,
@@ -167,8 +161,6 @@ function Pagination({
       params.set("minPrice", String(searchParams.minPrice));
     if (searchParams.maxPrice)
       params.set("maxPrice", String(searchParams.maxPrice));
-    if (searchParams.pumpType)
-      params.set("pumpType", String(searchParams.pumpType));
     if (searchParams.brand) params.set("brand", String(searchParams.brand));
     if (searchParams.horsepower)
       params.set("horsepower", String(searchParams.horsepower));
@@ -267,7 +259,6 @@ function ActiveFilters({
   };
   add("minPrice", "Min");
   add("maxPrice", "Max");
-  add("pumpType", "Type");
   add("brand", "Brand");
   add("horsepower", "HP");
   add("sort", "Sort");

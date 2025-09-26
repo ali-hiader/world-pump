@@ -23,7 +23,6 @@ export async function POST(request: Request) {
     const discountPrice = formData.get("discountPrice") as string;
     const stock = formData.get("stock") as string;
     const brand = formData.get("brand") as string;
-    const pumpType = formData.get("pumpType") as string;
     const status = formData.get("status") as string;
     const isFeatured = formData.get("isFeatured") === "true";
     const specs = formData.get("specs") as string;
@@ -88,7 +87,6 @@ export async function POST(request: Request) {
       discountPrice: discountPrice ? Number(discountPrice) : null,
       stock: stock ? Number(stock) : 0,
       brand: brand || null,
-      pumpType: pumpType || null,
       status: (status as "active" | "inactive" | "discontinued") || "active",
       isFeatured,
       specs: parsedSpecs,

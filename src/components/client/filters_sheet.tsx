@@ -24,7 +24,6 @@ type FiltersState = {
   category: string;
   minPrice?: string;
   maxPrice?: string;
-  pumpType?: string;
   brand?: string;
   horsepower?: string;
   sort?: string;
@@ -33,7 +32,6 @@ type FiltersState = {
 export default function FiltersSheet(props: {
   categorySlug: string;
   categories: { slug: string; name: string }[];
-  pumpTypes: string[];
   brands: string[];
   horsepowers: string[];
   current: FiltersState;
@@ -44,7 +42,6 @@ export default function FiltersSheet(props: {
     category: props.categorySlug,
     minPrice: props.current.minPrice || "",
     maxPrice: props.current.maxPrice || "",
-    pumpType: props.current.pumpType || "all",
     brand: props.current.brand || "all",
     horsepower: props.current.horsepower || "all",
     sort: props.current.sort || "newest",
@@ -54,8 +51,6 @@ export default function FiltersSheet(props: {
     const params = new URLSearchParams();
     if (state.minPrice) params.set("minPrice", state.minPrice);
     if (state.maxPrice) params.set("maxPrice", state.maxPrice);
-    if (state.pumpType && state.pumpType !== "all")
-      params.set("pumpType", state.pumpType);
     if (state.brand && state.brand !== "all") params.set("brand", state.brand);
     if (state.horsepower && state.horsepower !== "all")
       params.set("horsepower", state.horsepower);
@@ -71,7 +66,6 @@ export default function FiltersSheet(props: {
       ...s,
       minPrice: "",
       maxPrice: "",
-      pumpType: "all",
       brand: "all",
       horsepower: "all",
       sort: "newest",
@@ -138,26 +132,6 @@ export default function FiltersSheet(props: {
                 name="maxPrice"
               />
             </div>
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Pump Type</label>
-            <Select
-              value={state.pumpType}
-              onValueChange={(v) => setState((s) => ({ ...s, pumpType: v }))}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="All Types" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                {props.pumpTypes.map((pt) => (
-                  <SelectItem key={pt} value={pt}>
-                    {pt}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
 
           <div className="space-y-1">

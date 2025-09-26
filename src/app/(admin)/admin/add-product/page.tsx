@@ -156,14 +156,6 @@ function AddProduct() {
               defaultValue="AquaFlow"
             />
           </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">Pump Type</label>
-            <ContactInput
-              placeholder="e.g., Centrifugal, Submersible, Booster"
-              name="pumpType"
-              defaultValue="Centrifugal"
-            />
-          </div>
 
           {/* Dynamic Specifications Section */}
           <div className="col-span-2 space-y-4">
