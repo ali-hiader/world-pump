@@ -37,6 +37,9 @@ interface Product {
   specs: { field: string; value: string }[] | null;
   warranty: string | null;
   message: string | null;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  tags: string | null;
   createdAt: Date | null;
   updatedAt: Date | null;
 }
@@ -64,7 +67,7 @@ function ProductDetailsPage({ params }: Props) {
 
         const response = await fetch(`/api/admin/products/${productId}`);
         const data = await response.json();
-
+        console.log("API Response Data:", data);
         if (response.ok) {
           setProduct(data.product);
         } else {
@@ -229,6 +232,26 @@ function ProductDetailsPage({ params }: Props) {
           </Button>
         </Link>
 
+        {/* Breadcrumb */}
+        <div className="flex items-center space-x-2 text-sm text-gray-500 mb-4">
+          <Link href="/admin" className="hover:text-gray-700">
+            Admin
+          </Link>
+          <span>/</span>
+          <Link href="/admin/products" className="hover:text-gray-700">
+            Products
+          </Link>
+          <span>/</span>
+          <Link
+            href={`/admin/products?category=${product.categoryId}`}
+            className="hover:text-gray-700"
+          >
+            {product.categoryName}
+          </Link>
+          <span>/</span>
+          <span className="text-gray-900 font-medium">{product.title}</span>
+        </div>
+
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
@@ -252,26 +275,39 @@ function ProductDetailsPage({ params }: Props) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Product Image and Basic Info */}
         <div className="space-y-6">
-          {/* Product Image */}
+          {/* Product Image Gallery */}
           <Card>
             <CardHeader>
-              <CardTitle>Product Image</CardTitle>
+              <CardTitle className="flex items-center justify-between">
+                Product Images
+                <Badge variant="outline" className="text-xs">
+                  {product.imageUrl ? "1 image" : "No images"}
+                </Badge>
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                {product.imageUrl ? (
-                  <Image
-                    src={product.imageUrl}
-                    alt={product.title || "Product Image"}
-                    width={400}
-                    height={400}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    No Image Available
-                  </div>
-                )}
+              <div className="space-y-4">
+                {/* Main Image */}
+                <div className="bg-white rounded-lg overflow-hidden">
+                  {product.imageUrl ? (
+                    <Image
+                      src={product.imageUrl}
+                      alt={product.title || "Product Image"}
+                      width={400}
+                      height={400}
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                      <div className="text-center">
+                        <p className="text-sm">No Image Available</p>
+                        <p className="text-xs mt-1">
+                          Upload images when editing
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -335,21 +371,6 @@ function ProductDetailsPage({ params }: Props) {
               <div>
                 <p className="text-sm font-medium text-gray-500">Category</p>
                 <Badge variant="outline">{product.categoryName}</Badge>
-                {!product.categorySlug && (
-                  <p className="text-xs text-red-500 mt-1">
-                    Warning: Category slug missing
-                  </p>
-                )}
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Status</p>
-                <Badge
-                  variant={
-                    product.status === "active" ? "default" : "secondary"
-                  }
-                >
-                  {product.status}
-                </Badge>
               </div>
             </CardContent>
           </Card>
@@ -363,9 +384,24 @@ function ProductDetailsPage({ params }: Props) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm font-medium text-gray-500">Stock</p>
-                  <p className="text-lg font-semibold">
-                    {product.stock || 0} units
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-lg font-semibold">
+                      {product.stock || 0} units
+                    </p>
+                    {(product.stock || 0) <= 5 && (product.stock || 0) > 0 && (
+                      <Badge variant="destructive" className="text-xs">
+                        Low Stock
+                      </Badge>
+                    )}
+                    {(product.stock || 0) === 0 && (
+                      <Badge
+                        variant="outline"
+                        className="text-xs border-red-500 text-red-600"
+                      >
+                        Out of Stock
+                      </Badge>
+                    )}
+                  </div>
                 </div>
                 {product.sku && (
                   <div>
@@ -400,6 +436,74 @@ function ProductDetailsPage({ params }: Props) {
             </CardContent>
           </Card>
 
+          {/* Product Specifications */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Product Specifications</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {(() => {
+                const parseSpecs = (specs: unknown) => {
+                  if (!specs) return [];
+
+                  if (Array.isArray(specs)) {
+                    return specs.filter((spec) => spec?.field && spec?.value);
+                  }
+
+                  if (typeof specs === "object") {
+                    return Object.entries(specs).map(([field, value]) => ({
+                      field,
+                      value: String(value),
+                    }));
+                  }
+
+                  if (typeof specs === "string") {
+                    try {
+                      const parsed = JSON.parse(specs);
+                      return parseSpecs(parsed);
+                    } catch {
+                      return [];
+                    }
+                  }
+
+                  return [];
+                };
+
+                const specsArray = parseSpecs(product.specs);
+
+                return specsArray.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {specsArray.map((spec, index) => (
+                      <div key={index}>
+                        <p className="text-sm font-medium text-gray-500 capitalize">
+                          {spec.field.replace(/([A-Z])/g, " $1").trim()}
+                        </p>
+                        <p className="text-sm text-gray-900 font-semibold">
+                          {spec.value}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500 italic">
+                      No specifications available
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      Add specifications when editing this product
+                    </p>
+                    {product.specs && (
+                      <div className="mt-2 text-xs text-red-500">
+                        Debug: Specs data exists but couldn&apos;t be parsed:{" "}
+                        {JSON.stringify(product.specs)}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+            </CardContent>
+          </Card>
+
           {/* Product Description */}
           <Card>
             <CardHeader>
@@ -417,79 +521,6 @@ function ProductDetailsPage({ params }: Props) {
               )}
             </CardContent>
           </Card>
-
-          {/* Product Specifications */}
-          {product.specs && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Product Specifications</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {product.specs &&
-                  Array.isArray(product.specs) &&
-                  product.specs.length > 0 ? (
-                    product.specs.map((spec, index) => (
-                      <div
-                        key={index}
-                        className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0"
-                      >
-                        <span className="text-sm font-medium text-gray-600 capitalize">
-                          {spec.field.replace(/([A-Z])/g, " $1").trim()}
-                        </span>
-                        <span className="text-sm text-gray-900">
-                          {spec.value}
-                        </span>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-sm text-gray-500 italic">
-                      No specifications available
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Technical Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Technical Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Created</p>
-                  <p className="text-sm">
-                    {product.createdAt
-                      ? new Date(product.createdAt).toLocaleDateString()
-                      : "N/A"}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {product.createdAt
-                      ? new Date(product.createdAt).toLocaleTimeString()
-                      : ""}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">
-                    Last Updated
-                  </p>
-                  <p className="text-sm">
-                    {product.updatedAt
-                      ? new Date(product.updatedAt).toLocaleDateString()
-                      : "N/A"}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {product.updatedAt
-                      ? new Date(product.updatedAt).toLocaleTimeString()
-                      : ""}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
 
@@ -499,7 +530,7 @@ function ProductDetailsPage({ params }: Props) {
           <CardTitle>Quick Actions</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3 mb-4">
             <Link href={`/admin/products/edit/${product.id}`}>
               <Button disabled={updating || deleting}>Edit Product</Button>
             </Link>
@@ -539,6 +570,24 @@ function ProductDetailsPage({ params }: Props) {
                 "Delete Product"
               )}
             </Button>
+          </div>
+
+          {/* Metadata */}
+          <div className="pt-4 border-t border-gray-200">
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>
+                Created:{" "}
+                {product.createdAt
+                  ? new Date(product.createdAt).toLocaleString()
+                  : "N/A"}
+              </span>
+              <span>
+                Updated:{" "}
+                {product.updatedAt
+                  ? new Date(product.updatedAt).toLocaleString()
+                  : "N/A"}
+              </span>
+            </div>
           </div>
         </CardContent>
       </Card>

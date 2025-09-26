@@ -50,6 +50,9 @@ export async function GET(
       categoryId: productWithSlug.categoryId,
       categoryName: productWithSlug.categoryName,
       categorySlug: productWithSlug.categorySlug,
+      specs: productWithSlug.specs,
+      specsType: typeof productWithSlug.specs,
+      specsIsArray: Array.isArray(productWithSlug.specs),
     });
 
     return NextResponse.json({ product: productWithSlug });

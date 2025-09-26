@@ -11,14 +11,6 @@ import { formatPKR } from "@/lib/utils";
 export default function ProductCard({ product }: { product: ProductType }) {
   if (!product) return;
 
-  // Parse specs to get horsepower
-  const specs = product.specs
-    ? typeof product.specs === "string"
-      ? JSON.parse(product.specs)
-      : product.specs
-    : {};
-  const horsepower = specs.horsepower || "";
-
   return (
     <div className="min-w-72 max-w-96 w-full relative grid grid-rows-[4fr_auto] rounded-md h-96 gap-3 border border-secondary/40 px-2 py-4 shadow">
       {/* Image */}
@@ -39,7 +31,7 @@ export default function ProductCard({ product }: { product: ProductType }) {
       <div className="flex mt-2 gap-2 flex-col px-2">
         <h3 className="my-0 font-medium text-sm flex flex-col sm:text-base">
           <Link href={`/pumps/${product.categorySlug}/${product.slug}`}>
-            {product.brand} {horsepower}
+            {product.title}
           </Link>
           <span className="text-xs sm:text-sm text-muted-foreground"></span>
         </h3>

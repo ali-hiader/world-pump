@@ -22,9 +22,9 @@ interface Props {
 }
 
 async function PumpDetailsPage({ params }: Props) {
-  const { pump_slug } = params;
-
-  const product = await fetchSingleProduct(pump_slug);
+  const { pump_slug } = await params;
+  const decodedSlug = decodeURIComponent(pump_slug);
+  const product = await fetchSingleProduct(decodedSlug);
 
   // Helper function to parse specs
   const parseSpecs = (specs: unknown): Record<string, string> => {
@@ -88,13 +88,13 @@ async function PumpDetailsPage({ params }: Props) {
               <CardTitle>Product Image</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+              <div className="rounded-lg overflow-hidden">
                 <Image
                   src={product.imageUrl}
                   alt={product.title || "Product Image"}
                   width={400}
                   height={400}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
               </div>
             </CardContent>

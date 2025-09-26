@@ -20,7 +20,7 @@ export async function GET(request: Request) {
       .from(productTable)
       .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id))
       .orderBy(productTable.createdAt);
-
+    console.log(products);
     return NextResponse.json({ products });
   } catch (error) {
     console.error("Error fetching products:", error);
