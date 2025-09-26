@@ -23,28 +23,31 @@ export async function POST(request: Request) {
     const discountPrice = formData.get("discountPrice") as string;
     const stock = formData.get("stock") as string;
     const brand = formData.get("brand") as string;
+    const pumpType = formData.get("pumpType") as string;
     const status = formData.get("status") as string;
     const isFeatured = formData.get("isFeatured") === "true";
-    const pumpType = formData.get("pumpType") as string;
-    const horsepower = formData.get("horsepower") as string;
-    const flowRate = formData.get("flowRate") as string;
-    const head = formData.get("head") as string;
-    const voltage = formData.get("voltage") as string;
+    const specs = formData.get("specs") as string;
     const image = formData.get("image") as File;
 
     // Validate required fields
-    if (
-      !title ||
-      !categoryId ||
-      !description ||
-      !price ||
-      !pumpType ||
-      !image
-    ) {
+    if (!title || !categoryId || !description || !price || !image) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
       );
+    }
+
+    // Parse and validate specs if provided
+    let parsedSpecs = null;
+    if (specs) {
+      try {
+        parsedSpecs = JSON.parse(specs);
+      } catch {
+        return NextResponse.json(
+          { error: "Invalid specifications format" },
+          { status: 400 }
+        );
+      }
     }
 
     // Upload image
@@ -85,13 +88,10 @@ export async function POST(request: Request) {
       discountPrice: discountPrice ? Number(discountPrice) : null,
       stock: stock ? Number(stock) : 0,
       brand: brand || null,
+      pumpType: pumpType || null,
       status: (status as "active" | "inactive" | "discontinued") || "active",
       isFeatured,
-      pumpType,
-      horsepower: horsepower || null,
-      flowRate: flowRate || null,
-      head: head || null,
-      voltage: voltage || null,
+      specs: parsedSpecs,
       createdBy: admin.id,
     });
 

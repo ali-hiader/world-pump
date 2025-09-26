@@ -40,7 +40,7 @@ export default function PumpsCategories({
                 : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             }`}
           >
-            Pumps
+            Shop
           </AccordionTrigger>
 
           <AccordionContent className="pt-2 ">
@@ -75,7 +75,7 @@ export default function PumpsCategories({
   return (
     <Menubar className="focus:outline-none">
       <MenubarMenu>
-        <MenubarTrigger>Pumps</MenubarTrigger>
+        <MenubarTrigger>Shop</MenubarTrigger>
         <MenubarContent
           className="grid grid-cols-3 gap-1.5 px-2 py-2 focus:outline-none mt-3"
           align="center"

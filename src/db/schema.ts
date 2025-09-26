@@ -7,6 +7,7 @@ import {
   varchar,
   pgEnum,
   uuid,
+  jsonb,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -51,13 +52,11 @@ export const productTable = pgTable("product", {
   discountPrice: integer(),
   stock: integer().default(0).notNull(),
   brand: varchar({ length: 100 }),
+  pumpType: varchar({ length: 100 }),
   status: productStatusEnum("status").default("active").notNull(),
   isFeatured: boolean().default(false),
-  pumpType: varchar({ length: 100 }).notNull(),
-  horsepower: varchar({ length: 50 }),
-  flowRate: varchar({ length: 50 }),
-  head: varchar({ length: 50 }),
-  voltage: varchar({ length: 50 }),
+  specs: jsonb("specs"),
+
   createdBy: integer()
     .notNull()
     .references(() => adminTable.id),

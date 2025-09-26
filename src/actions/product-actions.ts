@@ -110,7 +110,9 @@ export async function getCategoryPumpTypes(slug: string) {
       : await base.where(
           and(eq(categoryTable.slug, slug), eq(productTable.status, "active"))
         );
-  const set = new Set(rows.map((r) => r.pumpType).filter(Boolean));
+  const set = new Set(
+    rows.map((r) => r.pumpType).filter((p): p is string => Boolean(p))
+  );
   return Array.from(set).sort((a, b) => a.localeCompare(b));
 }
 
@@ -133,7 +135,7 @@ export async function getCategoryBrands(slug: string) {
 
 export async function getCategoryHorsepowers(slug: string) {
   const base = db
-    .select({ hp: productTable.horsepower })
+    .select({ specs: productTable.specs })
     .from(productTable)
     .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id));
   const rows =
@@ -142,10 +144,23 @@ export async function getCategoryHorsepowers(slug: string) {
       : await base.where(
           and(eq(categoryTable.slug, slug), eq(productTable.status, "active"))
         );
-  const set = new Set(
-    rows.map((r) => r.hp).filter((h): h is string => Boolean(h))
-  );
-  return Array.from(set).sort((a, b) => a.localeCompare(b));
+
+  const horsepowers = new Set<string>();
+  rows.forEach((row) => {
+    if (row.specs) {
+      try {
+        const specs =
+          typeof row.specs === "string" ? JSON.parse(row.specs) : row.specs;
+        if (specs.horsepower && typeof specs.horsepower === "string") {
+          horsepowers.add(specs.horsepower);
+        }
+      } catch {
+        // Skip invalid JSON
+      }
+    }
+  });
+
+  return Array.from(horsepowers).sort((a, b) => a.localeCompare(b));
 }
 
 export async function getAllCategories() {
@@ -193,10 +208,7 @@ export async function fetchProductsByCategoryPaginated(
   }
   if (filters.horsepower && filters.horsepower.trim().length > 0) {
     whereClauses.push(
-      eq(
-        sql`LOWER(${productTable.horsepower})`,
-        filters.horsepower.toLowerCase()
-      )
+      sql`LOWER(${productTable.specs}->>'horsepower') = ${filters.horsepower.toLowerCase()}`
     );
   }
 

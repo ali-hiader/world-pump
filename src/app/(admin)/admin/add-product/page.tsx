@@ -17,7 +17,7 @@ import ContactInput from "@/components/ui/contact-input";
 import CustomTextarea from "@/components/ui/custom-textarea";
 
 import { ChangeEvent, useRef, useState, useEffect } from "react";
-import { ImageIcon } from "lucide-react";
+import { ImageIcon, Plus, X } from "lucide-react";
 import Spinner from "@/icons/spinner";
 import Heading from "@/components/client/heading";
 
@@ -25,6 +25,12 @@ interface Category {
   id: number;
   name: string;
   slug: string;
+}
+
+interface SpecField {
+  id: string;
+  field: string;
+  value: string;
 }
 
 function AddProduct() {
@@ -36,6 +42,9 @@ function AddProduct() {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
+  const [specs, setSpecs] = useState<SpecField[]>([
+    { id: "1", field: "", value: "" },
+  ]);
 
   useEffect(() => {
     fetchCategories();
@@ -65,6 +74,23 @@ function AddProduct() {
     fileReader.readAsDataURL(e.currentTarget.files[0]);
   }
 
+  const addSpecField = () => {
+    const newId = (specs.length + 1).toString();
+    setSpecs([...specs, { id: newId, field: "", value: "" }]);
+  };
+
+  const removeSpecField = (id: string) => {
+    if (specs.length > 1) {
+      setSpecs(specs.filter((spec) => spec.id !== id));
+    }
+  };
+
+  const updateSpecField = (id: string, field: string, value: string) => {
+    setSpecs(
+      specs.map((spec) => (spec.id === id ? { ...spec, field, value } : spec))
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -72,6 +98,15 @@ function AddProduct() {
 
     const formData = new FormData(e.currentTarget);
     formData.set("categoryId", selectedCategory);
+
+    // Create specs object from dynamic fields
+    const specsObject: Record<string, string> = {};
+    specs.forEach((spec) => {
+      if (spec.field.trim() && spec.value.trim()) {
+        specsObject[spec.field.trim()] = spec.value.trim();
+      }
+    });
+    formData.set("specs", JSON.stringify(specsObject));
 
     try {
       const response = await fetch("/api/admin/products/add", {
@@ -102,149 +137,150 @@ function AddProduct() {
             {error}
           </div>
         )}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="space-y-2">
+        <form onSubmit={handleSubmit} className="grid gap-6 md:grid-cols-2">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">Product Title *</label>
+            <ContactInput
+              placeholder="Enter product title"
+              name="title"
+              required
+              defaultValue="Pump"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">Model *</label>
+            <ContactInput
+              placeholder="Enter model name"
+              name="model"
+              required
+              defaultValue=""
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">Brand</label>
+            <ContactInput
+              placeholder="Enter brand name"
+              name="brand"
+              defaultValue="AquaFlow"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">Pump Type</label>
+            <ContactInput
+              placeholder="e.g., Centrifugal, Submersible, Booster"
+              name="pumpType"
+              defaultValue="Centrifugal"
+            />
+          </div>
+
+          {/* Dynamic Specifications Section */}
+          <div className="col-span-2 space-y-4">
+            <div className="flex items-center justify-between">
               <label className="block text-sm font-medium">
-                Product Title *
+                Product Specifications
               </label>
-              <ContactInput
-                placeholder="Enter product title"
-                name="title"
-                required
-                defaultValue="High-Efficiency Water Pump"
-              />
+              <Button
+                type="button"
+                onClick={addSpecField}
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 text-sm"
+              >
+                <Plus className="w-4 h-4" />
+                Add Field
+              </Button>
             </div>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">Price (PKR) *</label>
-              <ContactInput
-                type="number"
-                placeholder="0"
-                name="price"
-                required
-                defaultValue="15000"
-              />
+            <div className="space-y-3">
+              {specs.map((spec) => (
+                <div
+                  key={spec.id}
+                  className="grid grid-cols-12 gap-3 items-end"
+                >
+                  <div className="col-span-5">
+                    <label className="block text-xs text-muted-foreground mb-1">
+                      Field
+                    </label>
+                    <ContactInput
+                      placeholder="e.g., Horsepower, Flow Rate"
+                      value={spec.field}
+                      name={`field-${spec.id}`}
+                      onChange={(e) =>
+                        updateSpecField(spec.id, e.target.value, spec.value)
+                      }
+                    />
+                  </div>
+                  <div className="col-span-5">
+                    <label className="block text-xs text-muted-foreground mb-1">
+                      Value
+                    </label>
+                    <ContactInput
+                      placeholder="e.g., 2 HP, 150 GPM"
+                      value={spec.value}
+                      name={`value-${spec.id}`}
+                      onChange={(e) =>
+                        updateSpecField(spec.id, spec.field, e.target.value)
+                      }
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <Button
+                      type="button"
+                      onClick={() => removeSpecField(spec.id)}
+                      disabled={specs.length === 1}
+                      className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-300 text-white px-2 py-1 text-sm"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">Pump Type *</label>
-              <ContactInput
-                placeholder="e.g., Centrifugal, Submersible"
-                name="pumpType"
-                required
-                defaultValue="Centrifugal"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">
-                Discount Price (PKR)
-              </label>
-              <ContactInput
-                type="number"
-                placeholder="0"
-                name="discountPrice"
-                defaultValue="12500"
-              />
-            </div>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">Price (PKR) *</label>
+            <ContactInput
+              type="number"
+              placeholder="0"
+              name="price"
+              required
+              defaultValue=""
+            />
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3">
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">
-                Stock Quantity
-              </label>
-              <ContactInput
-                type="number"
-                placeholder="0"
-                name="stock"
-                defaultValue="25"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">Brand</label>
-              <ContactInput
-                placeholder="Enter brand name"
-                name="brand"
-                defaultValue="AquaFlow"
-              />
-            </div>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">
+              Discount Price (PKR)
+            </label>
+            <ContactInput type="number" placeholder="0" name="discountPrice" />
           </div>
-
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">Horsepower</label>
-              <ContactInput
-                placeholder="e.g., 1 HP, 2 HP"
-                name="horsepower"
-                defaultValue="1.5 HP"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">Flow Rate</label>
-              <ContactInput
-                placeholder="e.g., 100 GPM"
-                name="flowRate"
-                defaultValue="150 GPM"
-              />
-            </div>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">Stock Quantity</label>
+            <ContactInput
+              type="number"
+              placeholder="0"
+              name="stock"
+              defaultValue="5"
+            />
           </div>
-
-          <div className="grid gap-6 md:grid-cols-3">
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">Head</label>
-              <ContactInput
-                placeholder="e.g., 50 ft"
-                name="head"
-                defaultValue="75 ft"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">Voltage</label>
-              <ContactInput
-                placeholder="e.g., 220V, 440V"
-                name="voltage"
-                defaultValue="220V"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">Warranty</label>
-              <ContactInput
-                placeholder="e.g., 1 Year"
-                name="warranty"
-                defaultValue="2 Years"
-              />
-            </div>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">Status</label>
+            <Select name="status" defaultValue="active">
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+                <SelectItem value="discontinued">Discontinued</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">Status</label>
-              <Select name="status" defaultValue="active">
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                  <SelectItem value="discontinued">Discontinued</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="flex items-center space-x-2">
-                <input type="checkbox" name="isFeatured" value="true" />
-                <span className="text-sm font-medium">Featured Product</span>
-              </label>
-            </div>
+          <div className="space-y-2">
+            <label className="flex items-center space-x-2">
+              <input type="checkbox" name="isFeatured" value="true" />
+              <span className="text-sm font-medium">Featured Product</span>
+            </label>
           </div>
 
           <div className="space-y-2">
@@ -266,8 +302,7 @@ function AddProduct() {
               </SelectContent>
             </Select>
           </div>
-
-          <div className="space-y-2">
+          <div className="space-y-2 col-span-2">
             <label className="block text-sm font-medium">Description *</label>
             <CustomTextarea
               placeholder="Enter detailed product description"
@@ -277,8 +312,7 @@ function AddProduct() {
               defaultValue="High-performance centrifugal water pump designed for residential and commercial applications. Features corrosion-resistant materials, efficient motor design, and reliable operation. Suitable for water supply systems, irrigation, and general pumping applications."
             />
           </div>
-
-          <div className="space-y-2">
+          <div className="space-y-2 col-span-2">
             <label className="block text-sm font-medium">
               Upload Product Image
             </label>
@@ -355,11 +389,10 @@ function AddProduct() {
               </div>
             </div>
           </div>
-
           <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary hover:bg-primary/90"
+            className="w-full bg-primary hover:bg-primary/90 col-span-2 max-w-md mx-auto"
           >
             {loading ? (
               <>

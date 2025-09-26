@@ -26,6 +26,21 @@ async function PumpDetailsPage({ params }: Props) {
 
   const product = await fetchSingleProduct(pump_slug);
 
+  // Helper function to parse specs
+  const parseSpecs = (specs: unknown): Record<string, string> => {
+    try {
+      if (specs && typeof specs === "object") {
+        return specs as Record<string, string>;
+      }
+      if (specs && typeof specs === "string") {
+        return JSON.parse(specs);
+      }
+      return {};
+    } catch {
+      return {};
+    }
+  };
+
   if (!product) {
     return (
       <DisplayAlert showBtn={false}>No Product found by this ID!</DisplayAlert>
@@ -52,7 +67,10 @@ async function PumpDetailsPage({ params }: Props) {
             <p className="text-gray-600 mt-1">
               {product.brand && `${product.brand} - `}
               {product.pumpType}
-              {product.horsepower && ` - ${product.horsepower}`}
+              {(() => {
+                const specs = parseSpecs(product.specs);
+                return specs.horsepower ? ` - ${specs.horsepower}` : "";
+              })()}
             </p>
           </div>
           <div className="flex gap-2">
@@ -162,50 +180,31 @@ async function PumpDetailsPage({ params }: Props) {
           </Card>
 
           {/* Technical Specifications */}
-          {(product.horsepower ||
-            product.flowRate ||
-            product.head ||
-            product.voltage) && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Technical Specifications</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {product.horsepower && (
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">
-                        Horsepower
-                      </p>
-                      <p className="text-sm">{product.horsepower}</p>
+          {(() => {
+            const specs = parseSpecs(product.specs);
+            const specsEntries = Object.entries(specs);
+            return (
+              specsEntries.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Technical Specifications</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {specsEntries.map(([field, value]) => (
+                        <div key={field}>
+                          <p className="text-sm font-medium text-gray-500 capitalize">
+                            {field.replace(/([A-Z])/g, " $1").trim()}
+                          </p>
+                          <p className="text-sm">{value}</p>
+                        </div>
+                      ))}
                     </div>
-                  )}
-                  {product.flowRate && (
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">
-                        Flow Rate
-                      </p>
-                      <p className="text-sm">{product.flowRate}</p>
-                    </div>
-                  )}
-                  {product.head && (
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">Head</p>
-                      <p className="text-sm">{product.head}</p>
-                    </div>
-                  )}
-                  {product.voltage && (
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">
-                        Voltage
-                      </p>
-                      <p className="text-sm">{product.voltage}</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                  </CardContent>
+                </Card>
+              )
+            );
+          })()}
 
           {/* Product Description */}
           <Card>

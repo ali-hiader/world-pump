@@ -22,10 +22,7 @@ export async function seedPumps(userId: number) {
     status: (pump.status as unknown as ProductStatus) ?? "active",
     isFeatured: pump.isFeatured ?? false,
     pumpType: pump.pumpType,
-    horsepower: pump.horsepower ?? null,
-    flowRate: pump.flowRate ?? null,
-    head: pump.head ?? null,
-    voltage: pump.voltage ?? null,
+    specs: pump.specs,
     createdBy: userId,
   }));
 

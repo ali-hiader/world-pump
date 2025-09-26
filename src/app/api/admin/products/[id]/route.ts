@@ -87,10 +87,7 @@ export async function PUT(
     const status = formData.get("status") as string;
     const isFeatured = formData.get("isFeatured") === "true";
     const pumpType = formData.get("pumpType") as string;
-    const horsepower = formData.get("horsepower") as string;
-    const flowRate = formData.get("flowRate") as string;
-    const head = formData.get("head") as string;
-    const voltage = formData.get("voltage") as string;
+    const specs = formData.get("specs") as string;
     const image = formData.get("image") as File;
 
     // Validate required fields
@@ -140,10 +137,7 @@ export async function PUT(
       status: status as "active" | "inactive" | "discontinued",
       isFeatured,
       pumpType,
-      horsepower: horsepower || null,
-      flowRate: flowRate || null,
-      head: head || null,
-      voltage: voltage || null,
+      specs: specs ? JSON.parse(specs) : null,
       updatedAt: new Date(),
     };
 
