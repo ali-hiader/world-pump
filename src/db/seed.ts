@@ -35,8 +35,8 @@ export async function seedPumps(userId: number = 1) {
       brand: pump.brand ?? null,
       status: (pump.status as ProductStatus) ?? "active",
       isFeatured: pump.isFeatured ?? false,
-      specs: specsArray, // Store as array of {field, value} objects
-      createdBy: userId, // Use provided userId or default to 1
+      specs: specsArray,
+      createdBy: userId,
     };
   });
 
@@ -46,13 +46,33 @@ export async function seedPumps(userId: number = 1) {
       `📦 Preparing ${formattedPumps.length} products for seeding...`
     );
 
-    // Clear existing products
-    await db.delete(productTable);
+    // Check which products already exist by slug
+    const existingSlugs = await db
+      .select({ slug: productTable.slug })
+      .from(productTable);
 
-    // Insert new products
+    const existingSlugSet = new Set(existingSlugs.map((p) => p.slug));
+
+    // Filter out products that already exist
+    const newPumps = formattedPumps.filter(
+      (pump) => !existingSlugSet.has(pump.slug)
+    );
+
+    if (newPumps.length === 0) {
+      console.log(
+        "ℹ️  All products already exist in database. No new products to insert."
+      );
+      return [];
+    }
+
+    console.log(
+      `📦 Found ${newPumps.length} new products to insert (${formattedPumps.length - newPumps.length} already exist)`
+    );
+
+    // Insert only new products
     const insertedProducts = await db
       .insert(productTable)
-      .values(formattedPumps)
+      .values(newPumps)
       .returning({
         id: productTable.id,
         title: productTable.title,
@@ -60,12 +80,14 @@ export async function seedPumps(userId: number = 1) {
       });
 
     console.log("✅ Products seeded successfully!");
-    console.log(`📈 Inserted ${insertedProducts.length} products:`);
+    console.log(`📈 Inserted ${insertedProducts.length} new products:`);
     insertedProducts.forEach((product, index) => {
       console.log(
         `   ${index + 1}. ${product.title} (ID: ${product.id}, Slug: ${product.slug})`
       );
     });
+
+    return insertedProducts;
   } catch (error) {
     console.error("❌ Error seeding products:", error);
     throw error;

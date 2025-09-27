@@ -58,7 +58,7 @@ export default async function CategoryPage({
       getCategoryHorsepowers(categorySlug),
       getAllCategories(),
     ]);
-
+  console.log(products.filter((product) => product.id === 20));
   return (
     <>
       <header className="relative w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[500px] overflow-hidden">
