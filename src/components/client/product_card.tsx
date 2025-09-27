@@ -7,12 +7,13 @@ import { ProductType } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import AddToCartBtn from "./add_to_cart";
 import { formatPKR } from "@/lib/utils";
+import { Separator } from "../ui/separator";
 
 export default function ProductCard({ product }: { product: ProductType }) {
   if (!product) return;
 
   return (
-    <div className="min-w-72 max-w-96 w-full relative grid grid-rows-[4fr_auto] rounded-md h-96 gap-3 border border-secondary/40 px-2 py-4 shadow">
+    <div className="min-w-72 max-w-96 w-full relative grid grid-rows-[4fr_auto] rounded-md  gap-3 px-2 py-4 shadow border border-secondary/10">
       {/* Image */}
       <Link
         href={`/pumps/${product.categorySlug}/${product.slug}`}
@@ -26,10 +27,10 @@ export default function ProductCard({ product }: { product: ProductType }) {
           sizes="(max-width: 1024px) 640px, 30vw"
         />
       </Link>
-
+      <Separator className="mt-2" />
       {/* Product Info */}
       <div className="flex mt-2 gap-2 flex-col px-2">
-        <h3 className="my-0 font-medium text-sm flex flex-col sm:text-base">
+        <h3 className="my-0 font-medium text-sm sm:text-base line-clamp-2">
           <Link href={`/pumps/${product.categorySlug}/${product.slug}`}>
             {product.title}
           </Link>
