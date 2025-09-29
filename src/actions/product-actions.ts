@@ -11,8 +11,6 @@ import {
   gte,
   lte,
 } from "drizzle-orm";
-import path from "node:path";
-import fs from "fs";
 
 export async function fetchAllProducts() {
   const products = await db
@@ -22,11 +20,6 @@ export async function fetchAllProducts() {
     })
     .from(productTable)
     .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id));
-
-  const data = JSON.stringify(products, null, 2);
-  const filePath = path.join(process.cwd(), "backups", "products.json");
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, data, "utf-8");
 
   return products;
 }
