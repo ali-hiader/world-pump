@@ -1,10 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,161 +10,113 @@ import { formatPKR } from "@/lib/utils";
 import Spinner from "@/icons/spinner";
 import { generateProductUrl } from "@/lib/category-utils";
 
-interface Props {
-  params: Promise<{
-    id: string;
-  }>;
-}
-
 interface Product {
   id: number;
   title: string;
   slug: string;
   categoryId: number;
   categoryName: string;
-  categorySlug: string;
+  categorySlug?: string;
   description: string;
   imageUrl: string;
   price: number;
-  discountPrice: number | null;
+  discountPrice?: number | null;
   stock: number;
-  brand: string | null;
-  sku: string | null;
+  brand?: string | null;
+  sku?: string | null;
   status: "active" | "inactive" | "discontinued";
-  isFeatured: boolean | null;
-  specs: { field: string; value: string }[] | null;
-  warranty: string | null;
-  message: string | null;
-  metaTitle: string | null;
-  metaDescription: string | null;
-  tags: string | null;
-  createdAt: Date | null;
-  updatedAt: Date | null;
+  isFeatured?: boolean | null;
+  specs?: { field: string; value: string }[] | Record<string, string> | null;
+  warranty?: string | null;
+  message?: string | null;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  tags?: string | null;
+  createdAt?: Date | string | null;
+  updatedAt?: Date | string | null;
+}
+
+interface Props {
+  params: Promise<{ id: string }>;
 }
 
 function ProductDetailsPage({ params }: Props) {
-  const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [error, setError] = useState<string>("");
-  const [successMessage, setSuccessMessage] = useState<string>("");
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    // Example fetch logic, replace with actual API call
+    async function fetchProduct() {
+      setLoading(true);
       try {
-        const resolvedParams = await params;
-        const productId = parseInt(resolvedParams.id);
-
-        if (isNaN(productId)) {
-          setError("Invalid product ID");
-          setLoading(false);
-          return;
-        }
-
-        const response = await fetch(`/api/admin/products/${productId}`);
-        const data = await response.json();
-        console.log("API Response Data:", data);
-        if (response.ok) {
-          setProduct(data.product);
+        // Replace with actual fetch logic
+        const id = (await params).id;
+        const res = await fetch(`/api/admin/products/${id}`);
+        if (!res.ok) throw new Error("Failed to fetch product");
+        const data = await res.json();
+        setProduct(data.product);
+        setError("");
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message || "Error fetching product");
         } else {
-          setError(data.error || "Failed to fetch product");
+          setError("Error fetching product");
         }
-      } catch (error) {
-        console.error("Error fetching product:", error);
-        setError("Failed to fetch product");
+        setProduct(null);
       } finally {
         setLoading(false);
       }
-    };
-
+    }
     fetchProduct();
   }, [params]);
-
+  // Toggle product status handler
   const toggleProductStatus = async () => {
     if (!product) return;
-
     setUpdating(true);
-    setError("");
-
     try {
-      const newStatus = product.status === "active" ? "inactive" : "active";
-      const formData = new FormData();
-
-      // Add all required fields to maintain existing data
-      formData.append("title", product.title);
-      formData.append("categoryId", product.categoryId.toString());
-      formData.append("description", product.description);
-      formData.append("price", product.price.toString());
-
-      formData.append("status", newStatus);
-
-      // Add optional fields
-      if (product.discountPrice)
-        formData.append("discountPrice", product.discountPrice.toString());
-      if (product.stock) formData.append("stock", product.stock.toString());
-      if (product.brand) formData.append("brand", product.brand);
-      if (product.isFeatured) formData.append("isFeatured", "true");
-      // Add specs data
-      if (product.specs) {
-        formData.append("specs", JSON.stringify(product.specs));
-      }
-
-      const response = await fetch(`/api/admin/products/${product.id}`, {
-        method: "PUT",
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setProduct({ ...product, status: newStatus });
-        setSuccessMessage(
-          `Product ${newStatus === "active" ? "activated" : "deactivated"} successfully!`
-        );
-        setTimeout(() => setSuccessMessage(""), 3000);
+      const res = await fetch(
+        `/api/admin/products/${product.id}/toggle-status`,
+        {
+          method: "PUT",
+        }
+      );
+      if (!res.ok) throw new Error("Failed to update status");
+      const updated = await res.json();
+      setProduct((prev) => (prev ? { ...prev, status: updated.status } : prev));
+      setSuccessMessage("Product status updated successfully.");
+      setError("");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || "Error updating status");
       } else {
-        setError(data.error || "Failed to update product status");
+        setError("Error updating status");
       }
-    } catch (error) {
-      console.error("Error updating product status:", error);
-      setError("Failed to update product status");
+      setSuccessMessage("");
     } finally {
       setUpdating(false);
     }
   };
 
+  // Delete product handler
   const deleteProduct = async () => {
     if (!product) return;
-
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this product? This action cannot be undone."
-    );
-
-    if (!confirmed) return;
-
     setDeleting(true);
-    setError("");
-
     try {
-      const response = await fetch(`/api/admin/products?id=${product.id}`, {
+      const res = await fetch(`/api/admin/products/${product.id}`, {
         method: "DELETE",
       });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setSuccessMessage("Product deleted successfully!");
-        setTimeout(() => {
-          router.push("/admin/products");
-        }, 1500);
+      if (!res.ok) throw new Error("Failed to delete product");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || "Error deleting product");
       } else {
-        setError(data.error || "Failed to delete product");
+        setError("Error deleting product");
       }
-    } catch (error) {
-      console.error("Error deleting product:", error);
-      setError("Failed to delete product");
+      setSuccessMessage("");
     } finally {
       setDeleting(false);
     }
@@ -216,14 +166,12 @@ function ProductDetailsPage({ params }: Props) {
           {error}
         </div>
       )}
-
       {/* Success Message */}
       {successMessage && (
         <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
           {successMessage}
         </div>
       )}
-
       {/* Header */}
       <div className="mb-6">
         <Link href="/admin/products">
@@ -231,7 +179,6 @@ function ProductDetailsPage({ params }: Props) {
             ← Back to Products
           </Button>
         </Link>
-
         {/* Breadcrumb */}
         <div className="flex items-center space-x-2 text-sm text-gray-500 mb-4">
           <Link href="/admin" className="hover:text-gray-700">
@@ -251,7 +198,6 @@ function ProductDetailsPage({ params }: Props) {
           <span>/</span>
           <span className="text-gray-900 font-medium">{product.title}</span>
         </div>
-
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
@@ -271,11 +217,10 @@ function ProductDetailsPage({ params }: Props) {
           </div>
         </div>
       </div>
-
+      {/* Main grid layout for image and info */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Product Image and Basic Info */}
-        <div className="space-y-6">
-          {/* Product Image Gallery */}
+        {/* Left: Product Image */}
+        <div>
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
@@ -286,32 +231,29 @@ function ProductDetailsPage({ params }: Props) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {/* Main Image */}
-                <div className="bg-white rounded-lg overflow-hidden">
-                  {product.imageUrl ? (
-                    <Image
-                      src={product.imageUrl}
-                      alt={product.title || "Product Image"}
-                      width={400}
-                      height={400}
-                      className="w-full h-full object-contain"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">
-                      <div className="text-center">
-                        <p className="text-sm">No Image Available</p>
-                        <p className="text-xs mt-1">
-                          Upload images when editing
-                        </p>
-                      </div>
+              <div className="bg-white rounded-lg overflow-hidden">
+                {product.imageUrl ? (
+                  <Image
+                    src={product.imageUrl}
+                    alt={product.title || "Product Image"}
+                    width={400}
+                    height={400}
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                    <div className="text-center">
+                      <p className="text-sm">No Image Available</p>
+                      <p className="text-xs mt-1">Upload images when editing</p>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
-
+        </div>
+        {/* Right: Product Info */}
+        <div className="space-y-6">
           {/* Pricing Information */}
           <Card>
             <CardHeader>
@@ -344,10 +286,6 @@ function ProductDetailsPage({ params }: Props) {
               </div>
             </CardContent>
           </Card>
-        </div>
-
-        {/* Product Details */}
-        <div className="space-y-6">
           {/* Basic Information */}
           <Card>
             <CardHeader>
@@ -374,7 +312,6 @@ function ProductDetailsPage({ params }: Props) {
               </div>
             </CardContent>
           </Card>
-
           {/* Inventory and Additional Details */}
           <Card>
             <CardHeader>
@@ -410,21 +347,18 @@ function ProductDetailsPage({ params }: Props) {
                   </div>
                 )}
               </div>
-
               {product.brand && (
                 <div>
                   <p className="text-sm font-medium text-gray-500">Brand</p>
                   <Badge variant="outline">{product.brand}</Badge>
                 </div>
               )}
-
               {product.warranty && (
                 <div>
                   <p className="text-sm font-medium text-gray-500">Warranty</p>
                   <p className="text-sm">{product.warranty}</p>
                 </div>
               )}
-
               <div>
                 <p className="text-sm font-medium text-gray-500">
                   Featured Product
@@ -435,7 +369,6 @@ function ProductDetailsPage({ params }: Props) {
               </div>
             </CardContent>
           </Card>
-
           {/* Product Specifications */}
           <Card>
             <CardHeader>
@@ -443,20 +376,17 @@ function ProductDetailsPage({ params }: Props) {
             </CardHeader>
             <CardContent>
               {(() => {
-                const parseSpecs = (specs: unknown) => {
+                const parseSpecs = (specs: Product["specs"]) => {
                   if (!specs) return [];
-
                   if (Array.isArray(specs)) {
                     return specs.filter((spec) => spec?.field && spec?.value);
                   }
-
                   if (typeof specs === "object") {
                     return Object.entries(specs).map(([field, value]) => ({
                       field,
                       value: String(value),
                     }));
                   }
-
                   if (typeof specs === "string") {
                     try {
                       const parsed = JSON.parse(specs);
@@ -465,12 +395,9 @@ function ProductDetailsPage({ params }: Props) {
                       return [];
                     }
                   }
-
                   return [];
                 };
-
                 const specsArray = parseSpecs(product.specs);
-
                 return specsArray.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {specsArray.map((spec, index) => (
@@ -503,7 +430,6 @@ function ProductDetailsPage({ params }: Props) {
               })()}
             </CardContent>
           </Card>
-
           {/* Product Description */}
           <Card>
             <CardHeader>
@@ -523,7 +449,6 @@ function ProductDetailsPage({ params }: Props) {
           </Card>
         </div>
       </div>
-
       {/* Quick Actions */}
       <Card className="mt-6">
         <CardHeader>
@@ -571,7 +496,6 @@ function ProductDetailsPage({ params }: Props) {
               )}
             </Button>
           </div>
-
           {/* Metadata */}
           <div className="pt-4 border-t border-gray-200">
             <div className="flex justify-between text-xs text-gray-500">

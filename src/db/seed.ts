@@ -1,9 +1,92 @@
+// Example accessories seed data
+
+export async function seedAccessories(userId: number = 1) {
+  try {
+    console.log("🌱 Seeding accessories...");
+
+    // Check which accessories already exist by slug
+    const existingSlugs = await db
+      .select({ slug: accessoryTable.slug })
+      .from(accessoryTable);
+    const existingSlugSet = new Set(existingSlugs.map((a) => a.slug));
+
+    // Filter out accessories that already exist
+    const newAccessories = accessoriesSeed.filter(
+      (acc) => !existingSlugSet.has(acc.slug)
+    );
+
+    if (newAccessories.length === 0) {
+      console.log(
+        "ℹ️  All accessories already exist. No new accessories to insert."
+      );
+      return [];
+    }
+
+    // Insert only new accessories
+    const insertedAccessories = await db
+      .insert(accessoryTable)
+      .values(
+        newAccessories.map((acc) => ({
+          title: acc.title,
+          slug: acc.slug,
+          description: acc.description,
+          imageUrl: typeof acc.imageUrl === "string" ? acc.imageUrl : null,
+          price: acc.price,
+          discountPrice: acc.discountPrice,
+          stock: acc.stock,
+          brand: acc.brand,
+          specs: acc.specs || {},
+          status: acc.status as "active" | "inactive" | "discontinued",
+          createdBy: userId,
+        }))
+      )
+      .returning({ id: accessoryTable.id, slug: accessoryTable.slug });
+
+    console.log(`✅ Inserted ${insertedAccessories.length} new accessories.`);
+
+    const relations: { productId: number; accessoryId: number }[] = [];
+    insertedAccessories.forEach((acc, idx) => {
+      const accessorySeed = newAccessories[idx];
+      const productIds = Object.prototype.hasOwnProperty.call(
+        accessorySeed,
+        "productIds"
+      )
+        ? (accessorySeed as { productIds?: number[] }).productIds
+        : undefined;
+      if (Array.isArray(productIds) && productIds.length > 0) {
+        productIds.forEach((productId) => {
+          relations.push({ productId, accessoryId: acc.id });
+        });
+      }
+    });
+    if (relations.length > 0) {
+      await db.insert(productAccessoryTable).values(relations);
+      console.log(
+        `🔗 Inserted ${relations.length} product-accessory relations.`
+      );
+    }
+    return insertedAccessories;
+  } catch (error) {
+    console.error("❌ Error seeding accessories:", error);
+    throw error;
+  }
+}
 import bcrypt from "bcrypt";
 import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { categoryTable, productTable, adminTable } from "@/db/schema";
-import { categories, pumps } from "@/lib/utils";
+import {
+  categoryTable,
+  productTable,
+  adminTable,
+  accessoryTable,
+  productAccessoryTable,
+} from "@/db/schema";
+import {
+  accessoriesSeed,
+  categories as categoriesSeed,
+  pumps,
+} from "@/lib/utils";
 
 // Type definitions matching the schema
 type ProductStatus = "active" | "inactive" | "discontinued";
@@ -52,41 +135,21 @@ export async function seedPumps(userId: number = 1) {
       .from(productTable);
 
     const existingSlugSet = new Set(existingSlugs.map((p) => p.slug));
-
-    // Filter out products that already exist
-    const newPumps = formattedPumps.filter(
+    const newProducts = formattedPumps.filter(
       (pump) => !existingSlugSet.has(pump.slug)
     );
 
-    if (newPumps.length === 0) {
-      console.log(
-        "ℹ️  All products already exist in database. No new products to insert."
-      );
+    if (newProducts.length === 0) {
+      console.log("ℹ️  All products already exist. No new products to insert.");
       return [];
     }
 
-    console.log(
-      `📦 Found ${newPumps.length} new products to insert (${formattedPumps.length - newPumps.length} already exist)`
-    );
-
-    // Insert only new products
     const insertedProducts = await db
       .insert(productTable)
-      .values(newPumps)
-      .returning({
-        id: productTable.id,
-        title: productTable.title,
-        slug: productTable.slug,
-      });
+      .values(newProducts)
+      .returning({ id: productTable.id, slug: productTable.slug });
 
-    console.log("✅ Products seeded successfully!");
-    console.log(`📈 Inserted ${insertedProducts.length} new products:`);
-    insertedProducts.forEach((product, index) => {
-      console.log(
-        `   ${index + 1}. ${product.title} (ID: ${product.id}, Slug: ${product.slug})`
-      );
-    });
-
+    console.log(`✅ Inserted ${insertedProducts.length} new products.`);
     return insertedProducts;
   } catch (error) {
     console.error("❌ Error seeding products:", error);
@@ -95,7 +158,7 @@ export async function seedPumps(userId: number = 1) {
 }
 
 export async function seedCategories() {
-  const formattedCategories = categories.map((category) => ({
+  const formattedCategories = categoriesSeed.map((category) => ({
     name: category.name,
     slug: category.slug,
     isFeatured: category.isFeatured ?? false,

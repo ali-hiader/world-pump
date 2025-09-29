@@ -10,16 +10,14 @@ import { auth } from "@/lib/auth";
 import { CartItemType } from "@/lib/types";
 
 import { getCartDB } from "@/actions/cart-actions";
-import { db } from "@/db";
-import { categoryTable } from "@/db/schema";
-import { fetchAllProducts } from "@/actions/product-actions";
+import { fetchAllProducts, getAllCategories } from "@/actions/product-actions";
 
 async function UserLayout({ children }: PropsWithChildren) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
-  const categories = await db.select().from(categoryTable);
+  const categories = await getAllCategories();
   const initialProducts = await fetchAllProducts();
 
   let cart: CartItemType[] = [];

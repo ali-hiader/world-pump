@@ -8,6 +8,7 @@ import {
   pgEnum,
   uuid,
   jsonb,
+  primaryKey,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -231,3 +232,41 @@ export const verification = pgTable("verification", {
   createdAt: timestamp("created_at").$defaultFn(() => new Date()),
   updatedAt: timestamp("updated_at").$defaultFn(() => new Date()),
 });
+// Accessories and Product-Accessory Many-to-Many
+
+export const accessoryTable = pgTable("accessory", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  title: varchar("title", { length: 255 }).notNull(),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  description: text("description"),
+  imageUrl: varchar("image_url", { length: 255 }),
+  price: integer("price").notNull(),
+  discountPrice: integer("discount_price"),
+  stock: integer("stock").default(0).notNull(),
+  brand: varchar("brand", { length: 100 }),
+  specs: jsonb("specs"),
+  status: productStatusEnum("status").default("active").notNull(),
+  createdBy: integer("created_by")
+    .notNull()
+    .references(() => adminTable.id)
+    .default(1),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const productAccessoryTable = pgTable(
+  "product_accessory",
+  {
+    productId: integer("product_id")
+      .notNull()
+      .references(() => productTable.id, { onDelete: "cascade" }),
+    accessoryId: integer("accessory_id")
+      .notNull()
+      .references(() => accessoryTable.id, { onDelete: "cascade" }),
+  },
+  (table) => {
+    return {
+      pk: primaryKey({ columns: [table.productId, table.accessoryId] }),
+    };
+  }
+);

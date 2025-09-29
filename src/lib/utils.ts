@@ -1,3 +1,29 @@
+// --- Accessories Seed Data ---
+export const accessoriesSeed = [
+  {
+    title: "ESPA Type Pressure Control PC-81 220V",
+    slug: "espa-type-pressure-control-pc-81-220v",
+    description:
+      "ESPA Type Pressure Control PC-81 automatic pressure control kit. Starts at 1.5 or 2.2 bar, suitable for 110V/220V systems.",
+    imageUrl: "/centrifugal/espa-pressure-kit.jpg", // you may replace with a direct image URL
+    price: 8498,
+    discountPrice: null,
+    stock: 0,
+    brand: "ESPA",
+    specs: {
+      startingPressure: ["1.5 bar", "2.2 bar"],
+      maxAllowablePressure: "10 bar",
+      maxRatedCurrent: "10 A",
+      voltage: ["110 V", "220 V"],
+      frequency: "50/60 Hz",
+      protectionDegree: "IP54",
+      ambientTemperatureMax: "40°C",
+      liquidTemperatureMax: "60°C",
+    },
+    status: "active",
+    createdBy: 1,
+  },
+];
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import slugify from "slugify";

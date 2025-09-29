@@ -1,12 +1,12 @@
 import "dotenv/config";
-import { seedPumps } from "../src/db/seed.ts";
+import { seedAccessories } from "../src/db/seed.ts";
 
 async function main() {
   try {
     console.log("🚀 Starting database seeding process...");
     console.log("=".repeat(50));
 
-    await seedPumps(1);
+    await seedAccessories(1);
 
     console.log("=".repeat(50));
     console.log("🎉 Seeding completed successfully!");

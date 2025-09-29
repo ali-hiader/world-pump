@@ -77,26 +77,62 @@ export default function PumpsCategories({
       <MenubarMenu>
         <MenubarTrigger>Shop</MenubarTrigger>
         <MenubarContent
-          className="grid grid-cols-3 gap-1.5 px-2 py-2 focus:outline-none mt-3"
+          className="px-2 py-2 focus:outline-none mt-3"
           align="center"
         >
-          {categories.map((category) => {
-            const active = pathName === `/pumps/${category.slug}`;
-            return (
-              <MenubarItem key={category.slug} className="p-0">
-                <Link
-                  href={`/pumps/${category.slug}`}
-                  className={`block w-full px-3 py-2 text-base focus:outline-none border border-border ${
-                    active
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted hover:bg-accent hover:text-accent-foreground text-foreground"
-                  }`}
-                >
-                  {category.name}
-                </Link>
-              </MenubarItem>
-            );
-          })}
+          <div className="grid grid-cols-3 gap-6 items-start">
+            <div className="col-span-2">
+              <div className="mb-2 font-semibold text-base">Pumps</div>
+              <div className="grid grid-cols-2 gap-2 mb-0">
+                {categories.map((category) => {
+                  const active = pathName === `/pumps/${category.slug}`;
+                  return (
+                    <MenubarItem key={category.slug} className="p-0">
+                      <Link
+                        href={`/pumps/${category.slug}`}
+                        className={`block w-full px-3 py-2 text-base focus:outline-none border border-border transition-all ${
+                          active
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted text-foreground hover:bg-secondary hover:text-white"
+                        }`}
+                      >
+                        {category.name}
+                      </Link>
+                    </MenubarItem>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="flex flex-col">
+              <div className="mb-2 font-semibold text-base">Others</div>
+              <div className="grid grid-cols-1 gap-2">
+                <MenubarItem className="p-0">
+                  <Link
+                    href={`/pumps/other-products`}
+                    className={`block w-full px-3 py-2 text-base focus:outline-none border border-border transition-all ${
+                      pathName === "/other-products"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-foreground hover:bg-secondary hover:text-white"
+                    }`}
+                  >
+                    Other Products
+                  </Link>
+                </MenubarItem>
+                <MenubarItem className="p-0">
+                  <Link
+                    href={`/pumps/other-products`}
+                    className={`block w-full px-3 py-2 text-base focus:outline-none border border-border transition-all ${
+                      pathName === "/other-products"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-foreground hover:bg-secondary hover:text-white"
+                    }`}
+                  >
+                    Accessories
+                  </Link>
+                </MenubarItem>
+              </div>
+            </div>
+          </div>
         </MenubarContent>
       </MenubarMenu>
     </Menubar>

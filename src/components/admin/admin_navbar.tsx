@@ -15,9 +15,11 @@ import {
 const navLinks = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/products", label: "Products" },
+  { href: "/admin/accessories", label: "Accessories" },
   { href: "/admin/orders", label: "Orders" },
   { href: "/admin/users", label: "Users" },
   { href: "/admin/add-product", label: "Add Product" },
+  { href: "/admin/add-accessory", label: "Add Accessory" },
 ];
 
 export default function AdminNavBar() {
