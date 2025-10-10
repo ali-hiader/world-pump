@@ -1,9 +1,9 @@
-import ImagesCarosal from "@/components/client/images-carosal";
-import FeaturedProducts from "@/components/client/featured-products";
-import AboutCompany from "@/components/client/about_company";
-import Services from "@/components/client/services";
-import Testimonials from "@/components/client/testimonials";
-import Newsletter from "@/components/client/newsletter_signup";
+import AboutCompany from '@/components/client/about_company'
+import FeaturedProducts from '@/components/client/featured-products'
+import ImagesCarosal from '@/components/client/images-carosal'
+import Newsletter from '@/components/client/newsletter_signup'
+import Services from '@/components/client/services'
+import Testimonials from '@/components/client/testimonials'
 
 async function HomePage() {
   return (
@@ -25,12 +25,12 @@ async function HomePage() {
             allowFullScreen
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
-          ></iframe>
+          />
         </div>
         <Newsletter />
       </main>
     </>
-  );
+  )
 }
 
-export default HomePage;
+export default HomePage

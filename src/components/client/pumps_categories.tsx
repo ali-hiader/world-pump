@@ -120,9 +120,9 @@ export default function PumpsCategories({
                 </MenubarItem>
                 <MenubarItem className="p-0">
                   <Link
-                    href={`/pumps/other-products`}
+                    href={`/accessories`}
                     className={`block w-full px-3 py-2 text-base focus:outline-none border border-border transition-all ${
-                      pathName === "/other-products"
+                      pathName === "/accessories"
                         ? "bg-primary text-primary-foreground"
                         : "bg-muted text-foreground hover:bg-secondary hover:text-white"
                     }`}

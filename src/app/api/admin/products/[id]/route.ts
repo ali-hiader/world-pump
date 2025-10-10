@@ -1,26 +1,20 @@
-import { NextResponse, NextRequest } from "next/server";
-import { db } from "@/db";
-import { productTable, categoryTable } from "@/db/schema";
-import { verifyAdminToken } from "@/lib/auth-utils";
-import { eq, getTableColumns } from "drizzle-orm";
-import { uploadImage } from "@/lib/cloudinary";
-import { slugifyIt } from "@/lib/utils";
-import { UploadApiResponse } from "cloudinary";
-import { getCategorySlugById } from "@/lib/category-utils";
+import { NextResponse } from 'next/server'
+
+import { UploadApiResponse } from 'cloudinary'
+import { eq, getTableColumns } from 'drizzle-orm'
+
+import { getCategorySlugById } from '@/lib/category-utils'
+import { uploadImage } from '@/lib/cloudinary'
+import { slugifyIt } from '@/lib/utils'
+import { checkAuth } from '@/actions/auth'
+import { db } from '@/db'
+import { categoryTable, productTable } from '@/db/schema'
 
 // GET: Get single product for editing
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const admin = await verifyAdminToken(request as unknown as NextRequest);
-    if (!admin) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { id } = await params;
-    const productId = id;
+    const { id } = await params
+    const productId = id
 
     const [product] = await db
       .select({
@@ -30,20 +24,19 @@ export async function GET(
       })
       .from(productTable)
       .leftJoin(categoryTable, eq(productTable.categoryId, categoryTable.id))
-      .where(eq(productTable.id, Number(productId)));
+      .where(eq(productTable.id, Number(productId)))
 
     if (!product) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 })
     }
 
     // Ensure categorySlug is available, use fallback if needed
     const productWithSlug = {
       ...product,
-      categorySlug:
-        product.categorySlug || getCategorySlugById(product.categoryId),
-    };
+      categorySlug: product.categorySlug || getCategorySlugById(product.categoryId),
+    }
 
-    console.log("API Response - Product:", {
+    console.log('API Response - Product:', {
       id: productWithSlug.id,
       title: productWithSlug.title,
       slug: productWithSlug.slug,
@@ -53,76 +46,62 @@ export async function GET(
       specs: productWithSlug.specs,
       specsType: typeof productWithSlug.specs,
       specsIsArray: Array.isArray(productWithSlug.specs),
-    });
+    })
 
-    return NextResponse.json({ product: productWithSlug });
+    return NextResponse.json({ product: productWithSlug })
   } catch (error) {
-    console.error("Error fetching product:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('Error fetching product:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
 // PUT: Update product
-export async function PUT(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const admin = await verifyAdminToken(request as unknown as NextRequest);
+    const admin = await checkAuth()
     if (!admin) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = await params;
-    const productId = id;
-    const formData = await request.formData();
+    const { id } = await params
+    const productId = id
+    const formData = await request.formData()
 
-    const title = formData.get("title") as string;
-    const categoryId = formData.get("categoryId") as string;
-    const description = formData.get("description") as string;
-    const price = formData.get("price") as string;
-    const discountPrice = formData.get("discountPrice") as string;
-    const stock = formData.get("stock") as string;
-    const brand = formData.get("brand") as string;
-    const status = formData.get("status") as string;
-    const isFeatured = formData.get("isFeatured") === "true";
-    const specs = formData.get("specs") as string;
-    const image = formData.get("image") as File;
+    const title = formData.get('title') as string
+    const categoryId = formData.get('categoryId') as string
+    const description = formData.get('description') as string
+    const price = formData.get('price') as string
+    const discountPrice = formData.get('discountPrice') as string
+    const stock = formData.get('stock') as string
+    const brand = formData.get('brand') as string
+    const status = formData.get('status') as string
+    const isFeatured = formData.get('isFeatured') === 'true'
+    const specs = formData.get('specs') as string
+    const image = formData.get('image') as File
 
     // Validate required fields
     if (!title || !categoryId || !description || !price) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    let imageUrl: string | null = null;
+    let imageUrl: string | null = null
 
     // Handle image upload if provided
     if (image && image.size > 0) {
-      const arrayBuffer = await image.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
+      const arrayBuffer = await image.arrayBuffer()
+      const buffer = Buffer.from(arrayBuffer)
 
-      const result = await new Promise<UploadApiResponse | undefined>(
-        (resolve) => {
-          uploadImage(buffer, (uploadResult) => {
-            resolve(uploadResult);
-          });
-        }
-      ).catch(() => {
-        // Handle any errors during upload
-        return undefined;
-      });
+      const result = await new Promise<UploadApiResponse | undefined>((resolve) => {
+        uploadImage(buffer, (uploadResult) => {
+          resolve(uploadResult)
+        })
+      }).catch(() => {
+        return undefined
+      })
 
       if (result) {
         imageUrl =
-          result.url.split("/upload")[0] +
-          "/upload/q_auto/f_auto" +
-          result.url.split("/upload")[1];
+          result.url.split('/upload')[0] + '/upload/q_auto/f_auto' + result.url.split('/upload')[1]
       }
     }
 
@@ -136,28 +115,25 @@ export async function PUT(
       discountPrice: discountPrice ? Number(discountPrice) : null,
       stock: stock ? Number(stock) : 0,
       brand: brand || null,
-      status: status as "active" | "inactive" | "discontinued",
+      status: status as 'active' | 'inactive' | 'discontinued',
       isFeatured,
       specs: specs ? JSON.parse(specs) : null,
       updatedAt: new Date(),
-    };
+    }
 
     // Only update image if new one provided
     if (imageUrl) {
-      updateData.imageUrl = imageUrl;
+      updateData.imageUrl = imageUrl
     }
 
     await db
       .update(productTable)
       .set(updateData)
-      .where(eq(productTable.id, Number(productId)));
+      .where(eq(productTable.id, Number(productId)))
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("Error updating product:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error('Error updating product:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

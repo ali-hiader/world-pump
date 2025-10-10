@@ -1,8 +1,10 @@
-import Heading from "@/components/client/heading";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Plus } from "lucide-react";
-import AccessoriesTable from "@/components/admin/accessories-table";
+import Link from 'next/link'
+
+import { Plus } from 'lucide-react'
+
+import AccessoriesTable from '@/components/admin/accessories-table'
+import Heading from '@/components/client/heading'
+import { Button } from '@/components/ui/button'
 
 export default function AdminAccessoriesPage() {
   return (
@@ -18,5 +20,5 @@ export default function AdminAccessoriesPage() {
       </div>
       <AccessoriesTable />
     </main>
-  );
+  )
 }

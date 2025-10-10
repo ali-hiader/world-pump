@@ -1,11 +1,13 @@
-import React from "react";
-import ProductCard from "./product_card";
-import Heading from "./heading";
-import { fetchFeaturedProducts } from "@/actions/product-actions";
-import Link from "next/link";
+import Link from 'next/link'
+import React from 'react'
+
+import { fetchFeaturedProducts } from '@/actions/product'
+
+import Heading from './heading'
+import ProductCard from './product_card'
 
 async function FeaturedProducts() {
-  const products = await fetchFeaturedProducts(8);
+  const products = await fetchFeaturedProducts(8)
 
   return (
     <section className="mt-16 md:mt-24">
@@ -20,13 +22,13 @@ async function FeaturedProducts() {
       </div>
 
       <Link
-        href={"/pumps/all"}
+        href={'/pumps/all'}
         className="py-2 max-w-60 sm:max-w-72 mx-auto mt-12 text-lg rounded-md bg-secondary text-white flex items-center justify-center"
       >
         View All Pumps
       </Link>
     </section>
-  );
+  )
 }
 
-export default FeaturedProducts;
+export default FeaturedProducts

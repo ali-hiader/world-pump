@@ -1,226 +1,208 @@
-"use client";
+'use client'
 
-import { useState, useEffect, useRef } from "react";
-import { useRouter, useParams } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import Image from 'next/image'
+import Link from 'next/link'
+import { useParams, useRouter } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
+
+import { ArrowLeft, ImageIcon, Plus, X } from 'lucide-react'
+
+import { ProductType } from '@/lib/types'
+import Heading from '@/components/client/heading'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import ContactInput from '@/components/ui/contact-input'
+import CustomTextarea from '@/components/ui/custom-textarea'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import ContactInput from "@/components/ui/contact-input";
-import CustomTextarea from "@/components/ui/custom-textarea";
-import { ImageIcon, ArrowLeft, Plus, X } from "lucide-react";
-import Spinner from "@/icons/spinner";
-import Heading from "@/components/client/heading";
+} from '@/components/ui/select'
+import Spinner from '@/icons/spinner'
 
 interface Category {
-  id: number;
-  name: string;
-  slug: string;
+  id: number
+  name: string
+  slug: string
 }
 
 interface SpecField {
-  id: string;
-  field: string;
-  value: string;
+  id: string
+  field: string
+  value: string
 }
 
-interface Product {
-  id: number;
-  title: string;
-  slug: string;
-  imageUrl: string;
-  price: number;
-  discountPrice?: number | null;
-  stock: number;
-  status: "active" | "inactive" | "discontinued";
-  isFeatured: boolean;
-  specs: { field: string; value: string }[] | Record<string, string> | null;
-  brand?: string | null;
-  description: string;
-  categoryId: number;
-  categoryName: string;
+interface ProductI extends ProductType {
+  categoryName: string
 }
 
 export default function EditProductPage() {
-  const router = useRouter();
-  const params = useParams();
-  const productId = params.id as string;
-  const imageRef = useRef<HTMLInputElement | null>(null);
+  const router = useRouter()
+  const params = useParams()
+  const productId = params.id as string
+  const imageRef = useRef<HTMLInputElement | null>(null)
 
-  const [product, setProduct] = useState<Product | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string>("");
-  const [imageName, setImageName] = useState<string | undefined>(undefined);
-  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
-  const [specs, setSpecs] = useState<SpecField[]>([
-    { id: "1", field: "", value: "" },
-  ]);
+  const [product, setProduct] = useState<ProductI | null>(null)
+  const [categories, setCategories] = useState<Category[]>([])
+  const [selectedCategory, setSelectedCategory] = useState<string>('')
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string>('')
+  const [imageName, setImageName] = useState<string | undefined>(undefined)
+  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined)
+  const [specs, setSpecs] = useState<SpecField[]>([{ id: '1', field: '', value: '' }])
 
   useEffect(() => {
     if (productId) {
-      fetchProduct();
-      fetchCategories();
+      fetchProduct()
+      fetchCategories()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [productId]);
+  }, [productId])
 
   const fetchProduct = async () => {
     try {
-      const response = await fetch(`/api/admin/products/${productId}`);
-      const data = await response.json();
+      const response = await fetch(`/api/admin/products/${productId}`)
+      const data = await response.json()
 
       if (response.ok) {
-        setProduct(data.product);
-        setSelectedCategory(data.product.categoryId.toString());
-        setImageUrl(data.product.imageUrl);
+        setProduct(data.product)
+        setSelectedCategory(data.product.categoryId.toString())
+        setImageUrl(data.product.imageUrl)
 
         // Parse specs data
         if (data.product.specs) {
-          const parsedSpecs = parseSpecsToArray(data.product.specs);
-          setSpecs(
-            parsedSpecs.length > 0
-              ? parsedSpecs
-              : [{ id: "1", field: "", value: "" }]
-          );
+          const parsedSpecs = parseSpecsToArray(data.product.specs)
+          setSpecs(parsedSpecs.length > 0 ? parsedSpecs : [{ id: '1', field: '', value: '' }])
         }
       } else {
-        setError(data.error || "Failed to fetch product");
+        setError(data.error || 'Failed to fetch product')
       }
     } catch (error) {
-      console.error("Error fetching product:", error);
-      setError("Failed to fetch product");
+      console.error('Error fetching product:', error)
+      setError('Failed to fetch product')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   // Helper function to parse specs from different formats
   const parseSpecsToArray = (specs: unknown): SpecField[] => {
-    if (!specs) return [];
+    if (!specs) return []
 
     try {
       // If it's already an array of {field, value} objects
       if (Array.isArray(specs)) {
         return specs.map((spec, index) => ({
           id: (index + 1).toString(),
-          field: spec.field || "",
-          value: spec.value || "",
-        }));
+          field: spec.field || '',
+          value: spec.value || '',
+        }))
       }
 
       // If it's an object, convert to array format
-      if (typeof specs === "object") {
+      if (typeof specs === 'object') {
         return Object.entries(specs).map(([field, value], index) => ({
           id: (index + 1).toString(),
           field,
           value: String(value),
-        }));
+        }))
       }
 
       // If it's a string, try to parse as JSON
-      if (typeof specs === "string") {
-        const parsed = JSON.parse(specs);
-        return parseSpecsToArray(parsed); // Recursive call
+      if (typeof specs === 'string') {
+        const parsed = JSON.parse(specs)
+        return parseSpecsToArray(parsed) // Recursive call
       }
     } catch (error) {
-      console.error("Error parsing specs:", error);
+      console.error('Error parsing specs:', error)
     }
 
-    return [];
-  };
+    return []
+  }
 
   const addSpecField = () => {
-    const newId = (specs.length + 1).toString();
-    setSpecs([...specs, { id: newId, field: "", value: "" }]);
-  };
+    const newId = (specs.length + 1).toString()
+    setSpecs([...specs, { id: newId, field: '', value: '' }])
+  }
 
   const removeSpecField = (id: string) => {
     if (specs.length > 1) {
-      setSpecs(specs.filter((spec) => spec.id !== id));
+      setSpecs(specs.filter((spec) => spec.id !== id))
     }
-  };
+  }
 
   const updateSpecField = (id: string, field: string, value: string) => {
-    setSpecs(
-      specs.map((spec) => (spec.id === id ? { ...spec, field, value } : spec))
-    );
-  };
+    setSpecs(specs.map((spec) => (spec.id === id ? { ...spec, field, value } : spec)))
+  }
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch("/api/admin/products/add");
-      const data = await response.json();
+      const response = await fetch('/api/admin/products/add')
+      const data = await response.json()
       if (response.ok) {
-        setCategories(data.categories);
+        setCategories(data.categories)
       }
     } catch (error) {
-      console.error("Error fetching categories:", error);
+      console.error('Error fetching categories:', error)
     }
-  };
+  }
 
   const displaySelectedImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.currentTarget.files || !e.currentTarget.files[0]) return;
+    if (!e.currentTarget.files || !e.currentTarget.files[0]) return
 
-    setImageName(e.currentTarget.files[0].name);
+    setImageName(e.currentTarget.files[0].name)
 
-    const fileReader = new FileReader();
+    const fileReader = new FileReader()
     fileReader.onload = function () {
-      setImageUrl(fileReader.result as string);
-    };
-    fileReader.readAsDataURL(e.currentTarget.files[0]);
-  };
+      setImageUrl(fileReader.result as string)
+    }
+    fileReader.readAsDataURL(e.currentTarget.files[0])
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setError("");
+    e.preventDefault()
+    setSubmitting(true)
+    setError('')
 
-    const formData = new FormData(e.currentTarget);
-    formData.set("categoryId", selectedCategory);
+    const formData = new FormData(e.currentTarget)
+    formData.set('categoryId', selectedCategory)
 
     // Create specs array from dynamic fields
-    const specsArray: { field: string; value: string }[] = [];
+    const specsArray: { field: string; value: string }[] = []
     specs.forEach((spec) => {
       if (spec.field.trim() && spec.value.trim()) {
         specsArray.push({
           field: spec.field.trim(),
           value: spec.value.trim(),
-        });
+        })
       }
-    });
-    formData.set("specs", JSON.stringify(specsArray));
+    })
+    formData.set('specs', JSON.stringify(specsArray))
 
     try {
       const response = await fetch(`/api/admin/products/${productId}`, {
-        method: "PUT",
+        method: 'PUT',
         body: formData,
-      });
+      })
 
       if (response.ok) {
-        router.push("/admin/products");
+        router.push('/admin/products')
       } else {
-        const data = await response.json();
-        setError(data.error || "Failed to update product");
+        const data = await response.json()
+        setError(data.error || 'Failed to update product')
       }
     } catch (error) {
-      console.error("Error updating product:", error);
-      setError("Failed to update product");
+      console.error('Error updating product:', error)
+      setError('Failed to update product')
     } finally {
-      setSubmitting(false);
+      setSubmitting(false)
     }
-  };
+  }
 
   if (loading) {
     return (
@@ -229,7 +211,7 @@ export default function EditProductPage() {
           <Spinner className="animate-spin h-8 w-8" />
         </div>
       </main>
-    );
+    )
   }
 
   if (!product) {
@@ -242,7 +224,7 @@ export default function EditProductPage() {
           </Link>
         </div>
       </main>
-    );
+    )
   }
 
   return (
@@ -280,16 +262,14 @@ export default function EditProductPage() {
             <ContactInput
               placeholder="Enter brand name"
               name="brand"
-              defaultValue={product.brand || ""}
+              defaultValue={product.brand || ''}
             />
           </div>
 
           {/* Dynamic Specifications Section */}
           <div className="col-span-2 space-y-4">
             <div className="flex items-center justify-between">
-              <label className="block text-sm font-medium">
-                Product Specifications
-              </label>
+              <label className="block text-sm font-medium">Product Specifications</label>
               <Button
                 type="button"
                 onClick={addSpecField}
@@ -302,34 +282,23 @@ export default function EditProductPage() {
 
             <div className="space-y-3">
               {specs.map((spec) => (
-                <div
-                  key={spec.id}
-                  className="grid grid-cols-12 gap-3 items-end"
-                >
+                <div key={spec.id} className="grid grid-cols-12 gap-3 items-end">
                   <div className="col-span-5">
-                    <label className="block text-xs text-muted-foreground mb-1">
-                      Field
-                    </label>
+                    <label className="block text-xs text-muted-foreground mb-1">Field</label>
                     <ContactInput
                       placeholder="e.g., Horsepower, Flow Rate"
                       value={spec.field}
                       name={`field-${spec.id}`}
-                      onChange={(e) =>
-                        updateSpecField(spec.id, e.target.value, spec.value)
-                      }
+                      onChange={(e) => updateSpecField(spec.id, e.target.value, spec.value)}
                     />
                   </div>
                   <div className="col-span-5">
-                    <label className="block text-xs text-muted-foreground mb-1">
-                      Value
-                    </label>
+                    <label className="block text-xs text-muted-foreground mb-1">Value</label>
                     <ContactInput
                       placeholder="e.g., 2 HP, 150 GPM"
                       value={spec.value}
                       name={`value-${spec.id}`}
-                      onChange={(e) =>
-                        updateSpecField(spec.id, spec.field, e.target.value)
-                      }
+                      onChange={(e) => updateSpecField(spec.id, spec.field, e.target.value)}
                     />
                   </div>
                   <div className="col-span-2">
@@ -359,14 +328,12 @@ export default function EditProductPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium">
-              Discount Price (PKR)
-            </label>
+            <label className="block text-sm font-medium">Discount Price (PKR)</label>
             <ContactInput
               type="number"
               placeholder="0"
               name="discountPrice"
-              defaultValue={product.discountPrice?.toString() || ""}
+              defaultValue={product.discountPrice?.toString() || ''}
             />
           </div>
 
@@ -400,7 +367,7 @@ export default function EditProductPage() {
                 type="checkbox"
                 name="isFeatured"
                 value="true"
-                defaultChecked={product.isFeatured}
+                defaultChecked={product.isFeatured ?? false}
               />
               <span className="text-sm font-medium">Featured Product</span>
             </label>
@@ -408,11 +375,7 @@ export default function EditProductPage() {
 
           <div className="space-y-2">
             <label className="block text-sm font-medium">Category *</label>
-            <Select
-              value={selectedCategory}
-              onValueChange={setSelectedCategory}
-              required
-            >
+            <Select value={selectedCategory} onValueChange={setSelectedCategory} required>
               <SelectTrigger>
                 <SelectValue placeholder="Select a category" />
               </SelectTrigger>
@@ -438,9 +401,7 @@ export default function EditProductPage() {
           </div>
 
           <div className="space-y-2 col-span-2">
-            <label className="block text-sm font-medium">
-              Update Product Image
-            </label>
+            <label className="block text-sm font-medium">Update Product Image</label>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-3 sm:p-6 bg-gray-50/50">
               <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
                 {/* Image Preview */}
@@ -455,7 +416,7 @@ export default function EditProductPage() {
                       <Image
                         className="w-full h-full object-cover"
                         src={imageUrl}
-                        alt={imageName ?? "Product image"}
+                        alt={imageName ?? 'Product image'}
                         width={128}
                         height={128}
                       />
@@ -467,12 +428,10 @@ export default function EditProductPage() {
                 <div className="flex-1 w-full space-y-3 sm:space-y-4">
                   <div className="space-y-1 sm:space-y-2">
                     <h4 className="font-medium text-gray-900 text-sm sm:text-base">
-                      {imageName
-                        ? "New Image Selected"
-                        : "Current Product Image"}
+                      {imageName ? 'New Image Selected' : 'Current Product Image'}
                     </h4>
                     <p className="text-xs sm:text-sm text-gray-600 truncate">
-                      {imageName ? imageName : "No new image selected"}
+                      {imageName ? imageName : 'No new image selected'}
                     </p>
                   </div>
 
@@ -490,16 +449,16 @@ export default function EditProductPage() {
                       htmlFor="product-image"
                       className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-primary text-primary-foreground text-xs sm:text-sm font-medium rounded-md cursor-pointer hover:bg-primary/90 transition-colors text-center"
                     >
-                      {imageName ? "Change Image" : "Choose New Image"}
+                      {imageName ? 'Change Image' : 'Choose New Image'}
                     </Label>
                     {imageName && (
                       <button
                         type="button"
                         onClick={() => {
-                          setImageUrl(product.imageUrl);
-                          setImageName(undefined);
+                          setImageUrl(product.imageUrl)
+                          setImageName(undefined)
                           if (imageRef.current) {
-                            imageRef.current.value = "";
+                            imageRef.current.value = ''
                           }
                         }}
                         className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-gray-100 text-gray-700 text-xs sm:text-sm font-medium rounded-md hover:bg-gray-200 transition-colors"
@@ -510,8 +469,7 @@ export default function EditProductPage() {
                   </div>
 
                   <p className="text-xs text-gray-500">
-                    JPG, PNG or WEBP. Max: 5MB. Leave empty to keep current
-                    image.
+                    JPG, PNG or WEBP. Max: 5MB. Leave empty to keep current image.
                   </p>
                 </div>
               </div>
@@ -529,11 +487,11 @@ export default function EditProductPage() {
                 Updating Product...
               </>
             ) : (
-              "Update Product"
+              'Update Product'
             )}
           </Button>
         </form>
       </Card>
     </main>
-  );
+  )
 }

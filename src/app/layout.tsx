@@ -1,39 +1,39 @@
-import "./globals.css";
-import type { Metadata } from "next";
-import { Cormorant_Garamond, Outfit } from "next/font/google";
-import { Toaster } from "sonner";
+import './globals.css'
+
+import type { Metadata } from 'next'
+
+import { Cormorant_Garamond, Outfit } from 'next/font/google'
+
+import { Toaster } from 'sonner'
 
 const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-cormorant",
-});
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-cormorant',
+})
 
 const outfit = Outfit({
-  subsets: ["latin"],
-  weight: ["300", "400", "700", "900"],
-  variable: "--font-outfit",
-});
+  subsets: ['latin'],
+  weight: ['300', '400', '700', '900'],
+  variable: '--font-outfit',
+})
 
 export const metadata: Metadata = {
-  title: "World Pumps",
-  description:
-    "World Pumps - Your One-Stop Shop for Quality Pumps and Accessories",
-};
+  title: 'World Pumps',
+  description: 'World Pumps - Your One-Stop Shop for Quality Pumps and Accessories',
+}
 
 export default async function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${outfit.variable} ${cormorant.variable} antialiased bg-white `}
-      >
+      <body className={`${outfit.variable} ${cormorant.variable} antialiased bg-white `}>
         {children}
         <Toaster />
       </body>
     </html>
-  );
+  )
 }

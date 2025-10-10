@@ -1,20 +1,21 @@
-import SignOutBtn from "@/components/client/sign_out";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import Link from "next/link";
-import { redirect } from "next/navigation";
-import React from "react";
+import { headers } from 'next/headers'
+import Link from 'next/link'
+import { redirect } from 'next/navigation'
+import React from 'react'
+
+import { auth } from '@/lib/auth/auth'
+import SignOutBtn from '@/components/client/sign_out'
 
 async function UserAccountPage() {
   const session = await auth.api.getSession({
     headers: await headers(),
-  });
+  })
 
   if (!session) {
-    redirect("/sign-in");
+    redirect('/sign-in')
   }
 
-  const joinedDate = new Date(session.user.createdAt);
+  const joinedDate = new Date(session.user.createdAt)
 
   return (
     <main className="px-4 sm:px-[5%] mt-8 max-w-[1600px] mx-auto">
@@ -41,13 +42,13 @@ async function UserAccountPage() {
       </section>
 
       <Link
-        href={"/orders"}
+        href={'/orders'}
         className="sm:ml-4 px-4 py-2 text-secondary mt-8 inline-block border border-secondary text-lg  "
       >
         Order records
       </Link>
     </main>
-  );
+  )
 }
 
-export default UserAccountPage;
+export default UserAccountPage

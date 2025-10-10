@@ -1,8 +1,10 @@
-import Heading from "@/components/client/heading";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Plus } from "lucide-react";
-import ProductsTable from "@/components/admin/products-table";
+import Link from 'next/link'
+
+import { Plus } from 'lucide-react'
+
+import ProductsTable from '@/components/admin/products-table'
+import Heading from '@/components/client/heading'
+import { Button } from '@/components/ui/button'
 
 export default function AdminProductsPage() {
   return (
@@ -19,5 +21,5 @@ export default function AdminProductsPage() {
 
       <ProductsTable />
     </main>
-  );
+  )
 }

@@ -1,122 +1,163 @@
-"use client";
+'use client'
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Image from "next/image";
-import Spinner from "@/icons/spinner";
-import { fetchAccessoryById } from "@/actions/accessory-actions";
-import {
-  fetchAccessoryProductIds,
-  fetchAllProducts,
-} from "@/actions/product-accessory-actions";
+import Image from 'next/image'
+import Link from 'next/link'
+import { useParams } from 'next/navigation'
+import { useEffect, useMemo, useState } from 'react'
+
+import { fetchAccessoryById } from '@/actions/accessory'
+import { fetchAccessoryProductIds, fetchAllProducts } from '@/actions/product-accessory'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import Spinner from '@/icons/spinner'
 
 interface SpecField {
-  id: string;
-  field: string;
-  value: string;
+  id: string
+  field: string
+  value: string
 }
 
 interface Accessory {
-  id: number;
-  title: string;
-  slug: string;
-  imageUrl: string;
-  price: number;
-  discountPrice?: number | null;
-  stock: number;
-  status: "active" | "inactive" | "discontinued";
-  specs: Record<string, string> | SpecField[] | null;
-  brand?: string | null;
-  description: string;
-  createdAt?: string | Date;
-  updatedAt?: string | Date;
+  id: number
+  title: string
+  slug: string
+  imageUrl: string
+  price: number
+  discountPrice?: number | null
+  stock: number
+  status: 'active' | 'inactive' | 'discontinued'
+  specs: Record<string, string> | SpecField[] | null
+  brand?: string | null
+  description: string
+  createdAt?: string | Date
+  updatedAt?: string | Date
+}
+
+/* small helpers placed outside the component for clarity */
+function formatDate(date?: string | Date) {
+  if (!date) return 'N/A'
+  const d = typeof date === 'string' ? new Date(date) : date
+  if (isNaN(d.getTime())) return 'N/A'
+  return d.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+function parseSpecsToArray(specs: unknown): SpecField[] {
+  if (!specs) return []
+  try {
+    if (Array.isArray(specs)) {
+      return specs.map((spec, index) => {
+        const obj = spec && typeof spec === 'object' ? (spec as Record<string, unknown>) : null
+        return {
+          id: String(index + 1),
+          field: obj && 'field' in obj ? String(obj['field'] ?? '') : '',
+          value: obj && 'value' in obj ? String(obj['value'] ?? '') : '',
+        }
+      })
+    }
+
+    if (typeof specs === 'object') {
+      return Object.entries(specs as Record<string, unknown>).map(([field, value], index) => ({
+        id: String(index + 1),
+        field,
+        value: String(value ?? ''),
+      }))
+    }
+
+    if (typeof specs === 'string') {
+      const parsed = JSON.parse(specs)
+      return parseSpecsToArray(parsed)
+    }
+  } catch (e) {
+    // parsing failed — return empty array so UI shows "no specs"
+  }
+  return []
 }
 
 export default function AccessoryDetailPage() {
-  const params = useParams();
-  // Removed unused router
-  const accessoryId = params.id as string;
+  const params = useParams()
+  const accessoryIdStr = params?.id
+  const accessoryId = accessoryIdStr ? Number(accessoryIdStr) : NaN
 
-  const [accessory, setAccessory] = useState<Accessory | null>(null);
-  const [loading, setLoading] = useState(true);
-  // Removed unused error state
-  const [products, setProducts] = useState<{ id: number; title: string }[]>([]);
-  const [attachedProductIds, setAttachedProductIds] = useState<number[]>([]);
-
-  // Format created/updated dates
-  const formatDate = (date?: string | Date) => {
-    if (!date) return "N/A";
-    const d = typeof date === "string" ? new Date(date) : date;
-    if (isNaN(d.getTime())) return "N/A";
-    return d.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  // Parse specs utility
-  const parseSpecsToArray = (specs: unknown): SpecField[] => {
-    if (!specs) return [];
-    try {
-      if (Array.isArray(specs)) {
-        return specs.map((spec, index) => ({
-          id: (index + 1).toString(),
-          field: spec.field || "",
-          value: spec.value || "",
-        }));
-      }
-      if (typeof specs === "object") {
-        return Object.entries(specs).map(([field, value], index) => ({
-          id: (index + 1).toString(),
-          field,
-          value: String(value),
-        }));
-      }
-      if (typeof specs === "string") {
-        const parsed = JSON.parse(specs);
-        return parseSpecsToArray(parsed);
-      }
-    } catch {
-      // ignore
-    }
-    return [];
-  };
+  const [accessory, setAccessory] = useState<Accessory | null>(null)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
+  const [products, setProducts] = useState<{ id: number; title: string }[]>([])
+  const [attachedProductIds, setAttachedProductIds] = useState<number[]>([])
 
   useEffect(() => {
-    async function fetchData() {
-      if (!accessoryId) return;
-      setLoading(true);
-      const id = Number(accessoryId);
+    let mounted = true
+    async function load() {
+      setError(null)
+      setLoading(true)
+
+      if (!accessoryIdStr) {
+        setError('Missing accessory id.')
+        setLoading(false)
+        return
+      }
+
+      if (Number.isNaN(accessoryId)) {
+        setError('Invalid accessory id.')
+        setLoading(false)
+        return
+      }
+
       try {
         const [acc, allProducts, productIds] = await Promise.all([
-          fetchAccessoryById(id),
+          fetchAccessoryById(accessoryId),
           fetchAllProducts(),
-          fetchAccessoryProductIds(id),
-        ]);
-        setAccessory({
-          ...acc,
-          imageUrl: acc.imageUrl ?? "",
-          description: acc.description ?? "",
-          specs: acc.specs as Record<string, string> | SpecField[] | null,
-          createdAt: acc.createdAt ?? undefined,
-          updatedAt: acc.updatedAt ?? undefined,
-        });
-        setProducts(allProducts);
-        setAttachedProductIds(productIds);
-      } catch {
-        // ignore fetch error
+          fetchAccessoryProductIds(accessoryId),
+        ])
+
+        if (!mounted) return
+
+        if (!acc) {
+          setAccessory(null)
+          setError('Accessory not found.')
+        } else {
+          setAccessory({
+            ...acc,
+            imageUrl: acc.imageUrl ?? '',
+            description: acc.description ?? '',
+            specs: acc.specs as Record<string, string> | SpecField[] | null,
+            createdAt: acc.createdAt ?? undefined,
+            updatedAt: acc.updatedAt ?? undefined,
+          })
+          setError(null)
+        }
+
+        setProducts(allProducts ?? [])
+        setAttachedProductIds(productIds ?? [])
+      } catch (err) {
+        console.error('Failed to load accessory data:', err)
+        if (err instanceof Error) setError(err.message)
+        else setError('Failed to load accessory. Please try again.')
+        setAccessory(null)
+        setProducts([])
+        setAttachedProductIds([])
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false)
       }
     }
-    fetchData();
-  }, [accessoryId]);
+
+    load()
+    return () => {
+      mounted = false
+    }
+  }, [accessoryIdStr, accessoryId])
+
+  const specsArray = useMemo(() => parseSpecsToArray(accessory?.specs), [accessory?.specs])
+  const attachedProducts = useMemo(
+    () => products.filter((p) => attachedProductIds.includes(p.id)),
+    [products, attachedProductIds],
+  )
+
   if (loading) {
     return (
       <main className="container py-8 max-w-[95%] sm:max-w-[80%] mx-auto">
@@ -124,7 +165,20 @@ export default function AccessoryDetailPage() {
           <Spinner className="animate-spin h-8 w-8" />
         </div>
       </main>
-    );
+    )
+  }
+
+  if (error) {
+    return (
+      <main className="container py-8 max-w-[95%] sm:max-w-[80%] mx-auto">
+        <div className="text-center py-12">
+          <p className="text-red-600 mb-4">{error}</p>
+          <Link href="/admin/accessories">
+            <Button className="mt-2">Back to Accessories</Button>
+          </Link>
+        </div>
+      </main>
+    )
   }
 
   if (!accessory) {
@@ -137,13 +191,8 @@ export default function AccessoryDetailPage() {
           </Link>
         </div>
       </main>
-    );
+    )
   }
-
-  const specsArray = parseSpecsToArray(accessory.specs);
-  const attachedProducts = products.filter((p) =>
-    attachedProductIds.includes(p.id)
-  );
 
   return (
     <main className="p-6 max-w-7xl mx-auto">
@@ -157,14 +206,16 @@ export default function AccessoryDetailPage() {
           </Link>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                {accessory.title}
-              </h1>
+              <h1 className="text-3xl font-bold text-gray-900">{accessory.title}</h1>
               <p className="text-gray-600 mt-1">Accessory ID: {accessory.id}</p>
             </div>
             <div className="flex gap-2">
               <span
-                className={`px-2 py-1 rounded text-xs ${accessory.status === "active" ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-600"}`}
+                className={`px-2 py-1 rounded text-xs ${
+                  accessory.status === 'active'
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-gray-200 text-gray-600'
+                }`}
               >
                 {accessory.status}
               </span>
@@ -179,16 +230,14 @@ export default function AccessoryDetailPage() {
           {/* Accessory Image (Product-style Card) */}
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                Accessory Image
-              </CardTitle>
+              <CardTitle className="flex items-center justify-between">Accessory Image</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="bg-white rounded-lg overflow-hidden">
                 {accessory.imageUrl ? (
                   <Image
                     src={accessory.imageUrl}
-                    alt={accessory.title || "Accessory Image"}
+                    alt={accessory.title || 'Accessory Image'}
                     width={400}
                     height={400}
                     className="w-full h-full object-contain"
@@ -209,51 +258,39 @@ export default function AccessoryDetailPage() {
           <div className="space-y-6">
             {/* Basic Information */}
             <div className="bg-white rounded-lg shadow p-4">
-              <h2 className="text-lg font-semibold mb-2">
-                Accessory Information
-              </h2>
+              <h2 className="text-lg font-semibold mb-2">Accessory Information</h2>
               <div className="space-y-2">
                 <div>
-                  <span className="font-medium text-gray-500">
-                    Accessory Title:
-                  </span>{" "}
+                  <span className="font-medium text-gray-500">Accessory Title:</span>{' '}
                   {accessory.title}
                 </div>
 
                 <div>
-                  <span className="font-medium text-gray-500">Brand:</span>{" "}
-                  {accessory.brand || "-"}
+                  <span className="font-medium text-gray-500">Brand:</span> {accessory.brand || '-'}
                 </div>
                 <div>
-                  <span className="font-medium text-gray-500">Stock:</span>{" "}
-                  {accessory.stock}
+                  <span className="font-medium text-gray-500">Stock:</span> {accessory.stock}
                 </div>
               </div>
             </div>
 
             {/* Specifications */}
             <div className="bg-white rounded-lg shadow p-4">
-              <h2 className="text-lg font-semibold mb-2">
-                Accessory Specifications
-              </h2>
+              <h2 className="text-lg font-semibold mb-2">Accessory Specifications</h2>
               {specsArray.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {specsArray.map((spec) => (
                     <div key={spec.id}>
                       <p className="text-sm font-medium text-gray-500 capitalize">
-                        {spec.field.replace(/([A-Z])/g, " $1").trim()}
+                        {spec.field.replace(/([A-Z])/g, ' $1').trim()}
                       </p>
-                      <p className="text-sm text-gray-900 font-semibold">
-                        {spec.value}
-                      </p>
+                      <p className="text-sm text-gray-900 font-semibold">{spec.value}</p>
                     </div>
                   ))}
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-gray-500 italic">
-                    No specifications available
-                  </p>
+                  <p className="text-gray-500 italic">No specifications available</p>
                   <p className="text-xs text-gray-400 mt-1">
                     Add specifications when editing this accessory
                   </p>
@@ -263,14 +300,10 @@ export default function AccessoryDetailPage() {
 
             {/* Description */}
             <div className="bg-white rounded-lg shadow p-4">
-              <h2 className="text-lg font-semibold mb-2">
-                Accessory Description
-              </h2>
+              <h2 className="text-lg font-semibold mb-2">Accessory Description</h2>
               {accessory.description ? (
                 <div className="prose max-w-none">
-                  <p className="text-gray-700 whitespace-pre-wrap">
-                    {accessory.description}
-                  </p>
+                  <p className="text-gray-700 whitespace-pre-wrap">{accessory.description}</p>
                 </div>
               ) : (
                 <p className="text-gray-500 italic">No description available</p>
@@ -279,9 +312,7 @@ export default function AccessoryDetailPage() {
 
             {/* Attached Products */}
             <div className="bg-white rounded-lg shadow p-4">
-              <h2 className="text-lg font-semibold mb-2">
-                Attached Pumps (Products)
-              </h2>
+              <h2 className="text-lg font-semibold mb-2">Attached Pumps (Products)</h2>
               <ul className="mt-2 list-disc list-inside text-gray-700">
                 {attachedProducts.length === 0 && <li>No pumps attached</li>}
                 {attachedProducts.map((p) => (
@@ -310,5 +341,5 @@ export default function AccessoryDetailPage() {
         </section>
       </>
     </main>
-  );
+  )
 }

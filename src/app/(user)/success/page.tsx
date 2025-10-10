@@ -1,91 +1,89 @@
-import Link from "next/link";
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
+import Link from 'next/link'
+import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 
-import { auth } from "@/lib/auth";
-import { clearCartDB } from "@/actions/cart-actions";
-import { db } from "@/db";
-import { orderTable } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { auth } from '@/lib/auth/auth'
+import { clearCartDB } from '@/actions/cart'
+import { db } from '@/db'
+import { orderTable } from '@/db/schema'
+import { eq } from 'drizzle-orm'
 
 interface SuccessPageProps {
   searchParams: {
-    session_id?: string;
+    session_id?: string
     // PayFast return
-    pf_payment_id?: string;
-    m_payment_id?: string; // our orderNumber
-    custom_str1?: string; // our internal orderId
-    signature?: string;
+    pf_payment_id?: string
+    m_payment_id?: string // our orderNumber
+    custom_str1?: string // our internal orderId
+    signature?: string
     // COD / Bank
-    orderId?: string;
-    method?: string; // cod | bank
-  };
+    orderId?: string
+    method?: string // cod | bank
+  }
 }
 
 async function SuccessPage({ searchParams }: SuccessPageProps) {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await auth.api.getSession({ headers: await headers() })
   if (!session) {
-    redirect("/sign-in");
+    redirect('/sign-in')
   }
 
-  const pfPaymentId = searchParams.pf_payment_id;
-  const mPaymentId = searchParams.m_payment_id;
-  const orderId = searchParams.orderId;
-  const method = searchParams.method;
+  const pfPaymentId = searchParams.pf_payment_id
+  const mPaymentId = searchParams.m_payment_id
+  const orderId = searchParams.orderId
+  const method = searchParams.method
 
-  let title = "Order Confirmed!";
-  let detail = "Your new look is on the way";
-  const meta: Array<{ label: string; value: string }> = [];
+  let title = 'Order Confirmed!'
+  let detail = 'Your new look is on the way'
+  const meta: Array<{ label: string; value: string }> = []
 
   try {
     if (pfPaymentId || mPaymentId) {
       // PayFast return flow — order was created at checkout; just show status and clear cart
-      await clearCartDB(session.user.id);
+      await clearCartDB(session.user.id)
       // If we have internal order id, check status for confirmation
       const internalOrderId = searchParams.custom_str1
         ? Number(searchParams.custom_str1)
-        : undefined;
+        : undefined
       if (internalOrderId) {
         const rows = await db
           .select({ paymentStatus: orderTable.paymentStatus })
           .from(orderTable)
           .where(eq(orderTable.id, internalOrderId))
-          .limit(1);
-        const ps = rows[0]?.paymentStatus;
-        if (ps === "successful") {
-          title = "Payment Confirmed";
-          detail = "Thank you! Your payment has been confirmed.";
-        } else if (ps === "failed") {
-          title = "Payment Failed";
-          detail = "Your payment did not complete. Please try again.";
+          .limit(1)
+        const ps = rows[0]?.paymentStatus
+        if (ps === 'successful') {
+          title = 'Payment Confirmed'
+          detail = 'Thank you! Your payment has been confirmed.'
+        } else if (ps === 'failed') {
+          title = 'Payment Failed'
+          detail = 'Your payment did not complete. Please try again.'
         } else {
-          title = "Thanks! Payment in progress";
+          title = 'Thanks! Payment in progress'
           detail =
-            "We received your PayFast return. Your payment is being verified. You'll receive an email once it's confirmed.";
+            "We received your PayFast return. Your payment is being verified. You'll receive an email once it's confirmed."
         }
       } else {
-        title = "Thanks! Payment in progress";
+        title = 'Thanks! Payment in progress'
         detail =
-          "We received your PayFast return. Your payment is being verified. You'll receive an email once it's confirmed.";
+          "We received your PayFast return. Your payment is being verified. You'll receive an email once it's confirmed."
       }
-      if (mPaymentId) meta.push({ label: "Order Number", value: mPaymentId });
-      if (pfPaymentId) meta.push({ label: "PayFast Ref", value: pfPaymentId });
+      if (mPaymentId) meta.push({ label: 'Order Number', value: mPaymentId })
+      if (pfPaymentId) meta.push({ label: 'PayFast Ref', value: pfPaymentId })
       if (searchParams.custom_str1)
-        meta.push({ label: "Order ID", value: searchParams.custom_str1 });
-    } else if (orderId && (method === "cod" || method === "bank")) {
+        meta.push({ label: 'Order ID', value: searchParams.custom_str1 })
+    } else if (orderId && (method === 'cod' || method === 'bank')) {
       // COD / Bank — order already created; clear cart and show guidance
-      await clearCartDB(session.user.id);
-      const isBank = method === "bank";
-      title = isBank
-        ? "Order placed — Bank Deposit"
-        : "Order placed — Cash on Delivery";
+      await clearCartDB(session.user.id)
+      const isBank = method === 'bank'
+      title = isBank ? 'Order placed — Bank Deposit' : 'Order placed — Cash on Delivery'
       detail = isBank
         ? "Please deposit the amount and share the slip via WhatsApp/email as instructed. We'll process your order once funds are verified."
-        : "Your order has been placed. Pay cash to our rider upon delivery.";
-      meta.push({ label: "Order ID", value: orderId });
+        : 'Your order has been placed. Pay cash to our rider upon delivery.'
+      meta.push({ label: 'Order ID', value: orderId })
     }
   } catch (error) {
-    console.error("Success flow error:", error);
+    console.error('Success flow error:', error)
   }
 
   return (
@@ -107,13 +105,13 @@ async function SuccessPage({ searchParams }: SuccessPageProps) {
       )}
 
       <Link
-        href={"/orders"}
+        href={'/orders'}
         className="mt-6 bg-secondary hover:bg-secondary/90 px-4 py-2 min-w-72 rounded-full text-center text-white"
       >
         Order Dashboard
       </Link>
     </main>
-  );
+  )
 }
 
-export default SuccessPage;
+export default SuccessPage

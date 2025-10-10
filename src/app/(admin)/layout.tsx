@@ -1,14 +1,19 @@
-import AdminNavBar from "@/components/admin/admin_navbar";
-import AdminAuthProvider from "@/components/admin/admin-auth-provider";
-import { PropsWithChildren } from "react";
+import { redirect } from 'next/navigation'
+import { PropsWithChildren } from 'react'
 
-function AdminLayout({ children }: PropsWithChildren) {
+import { checkAuth } from '@/actions/auth'
+import AdminNavBar from '@/components/admin/admin_navbar'
+
+async function AdminLayout({ children }: PropsWithChildren) {
+  const ok = await checkAuth()
+  if (!ok) redirect('/admin-log-in')
+
   return (
-    <AdminAuthProvider>
+    <>
       <AdminNavBar />
       {children}
-    </AdminAuthProvider>
-  );
+    </>
+  )
 }
 
-export default AdminLayout;
+export default AdminLayout

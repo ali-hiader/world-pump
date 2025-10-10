@@ -1,86 +1,71 @@
-"use client";
+'use client'
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2, Eye } from "lucide-react";
-import { formatPKR } from "@/lib/utils";
+import Image from 'next/image'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
-interface Product {
-  id: number;
-  title: string;
-  slug: string;
-  imageUrl: string;
-  price: number;
-  discountPrice?: number | null;
-  stock: number;
-  status: "active" | "inactive" | "discontinued";
-  isFeatured: boolean;
-  pumpType: string;
-  brand?: string | null;
-  categoryName: string;
-  createdAt: Date;
+import { Edit, Eye, Trash2 } from 'lucide-react'
+
+import { ProductType } from '@/lib/types'
+import { formatPKR } from '@/lib/utils'
+import { fetchAllProducts } from '@/actions/product'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+
+interface ProductI extends ProductType {
+  categoryName: string
 }
 
 export default function ProductsTable() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [deleting, setDeleting] = useState<number | null>(null);
+  const [products, setProducts] = useState<ProductI[]>([])
+  const [loading, setLoading] = useState(true)
+  const [deleting, setDeleting] = useState<number | null>(null)
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    fetchProducts()
+  }, [])
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch("/api/admin/products");
-      const data = await response.json();
+      const products = await fetchAllProducts()
 
-      if (response.ok) {
-        setProducts(data.products);
-      } else {
-        console.error("Failed to fetch products:", data.error);
-      }
+      setProducts(products)
     } catch (error) {
-      console.error("Error fetching products:", error);
+      console.error('Error fetching products:', error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const deleteProduct = async (productId: number) => {
-    setDeleting(productId);
+    setDeleting(productId)
     try {
       const response = await fetch(`/api/admin/products?id=${productId}`, {
-        method: "DELETE",
-      });
+        method: 'DELETE',
+      })
 
       if (response.ok) {
-        setProducts(products.filter((product) => product.id !== productId));
+        setProducts(products.filter((product) => product.id !== productId))
       } else {
-        const data = await response.json();
-        alert("Failed to delete product: " + data.error);
+        const data = await response.json()
+        alert('Failed to delete product: ' + data.error)
       }
     } catch (error) {
-      console.error("Error deleting product:", error);
-      alert("Failed to delete product");
+      console.error('Error deleting product:', error)
+      alert('Failed to delete product')
     } finally {
-      setDeleting(null);
+      setDeleting(null)
     }
-  };
+  }
 
   const confirmDelete = (productId: number) => {
     if (
-      window.confirm(
-        "Are you sure you want to delete this product? This action cannot be undone."
-      )
+      window.confirm('Are you sure you want to delete this product? This action cannot be undone.')
     ) {
-      deleteProduct(productId);
+      deleteProduct(productId)
     }
-  };
+  }
 
   if (loading) {
     return (
@@ -94,7 +79,7 @@ export default function ProductsTable() {
           </div>
         </div>
       </Card>
-    );
+    )
   }
 
   return (
@@ -120,7 +105,6 @@ export default function ProductsTable() {
               <div className="col-span-2 text-right">Actions</div>
             </div>
 
-            {/* Products */}
             {products.map((product) => (
               <div key={product.id}>
                 {/* Mobile Card Layout */}
@@ -135,11 +119,8 @@ export default function ProductsTable() {
                     />
                     <div className="flex-1 min-w-0 space-y-2">
                       <div>
-                        <h3 className="font-medium truncate">
-                          {product.title}
-                        </h3>
+                        <h3 className="font-medium truncate">{product.title}</h3>
                         <p className="text-sm text-muted-foreground truncate">
-                          {product.pumpType}
                           {product.brand && ` • ${product.brand}`}
                         </p>
                       </div>
@@ -154,11 +135,11 @@ export default function ProductsTable() {
                         )}
                         <Badge
                           variant={
-                            product.status === "active"
-                              ? "default"
-                              : product.status === "inactive"
-                                ? "secondary"
-                                : "destructive"
+                            product.status === 'active'
+                              ? 'default'
+                              : product.status === 'inactive'
+                                ? 'secondary'
+                                : 'destructive'
                           }
                           className="text-xs"
                         >
@@ -177,7 +158,7 @@ export default function ProductsTable() {
                         </p>
                       )}
                       <Badge
-                        variant={product.stock > 0 ? "default" : "destructive"}
+                        variant={product.stock > 0 ? 'default' : 'destructive'}
                         className="text-xs"
                       >
                         Stock: {product.stock}
@@ -224,7 +205,7 @@ export default function ProductsTable() {
                     <div>
                       <p className="font-medium">{product.title}</p>
                       <p className="text-sm text-muted-foreground">
-                        {product.pumpType}
+                        {product.categoryName}
                         {product.brand && ` • ${product.brand}`}
                       </p>
                       {product.isFeatured && (
@@ -234,9 +215,7 @@ export default function ProductsTable() {
                       )}
                     </div>
                   </div>
-                  <div className="col-span-2 flex items-center">
-                    {product.categoryName}
-                  </div>
+                  <div className="col-span-2 flex items-center">{product.categoryName}</div>
                   <div className="col-span-2 flex items-center">
                     <div>
                       <p className="font-medium">{formatPKR(product.price)}</p>
@@ -248,20 +227,18 @@ export default function ProductsTable() {
                     </div>
                   </div>
                   <div className="col-span-1 flex items-center">
-                    <Badge
-                      variant={product.stock > 0 ? "default" : "destructive"}
-                    >
+                    <Badge variant={product.stock > 0 ? 'default' : 'destructive'}>
                       {product.stock}
                     </Badge>
                   </div>
                   <div className="col-span-1 flex items-center">
                     <Badge
                       variant={
-                        product.status === "active"
-                          ? "default"
-                          : product.status === "inactive"
-                            ? "secondary"
-                            : "destructive"
+                        product.status === 'active'
+                          ? 'default'
+                          : product.status === 'inactive'
+                            ? 'secondary'
+                            : 'destructive'
                       }
                     >
                       {product.status}
@@ -296,5 +273,5 @@ export default function ProductsTable() {
         )}
       </div>
     </Card>
-  );
+  )
 }

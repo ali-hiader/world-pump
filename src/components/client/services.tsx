@@ -22,10 +22,10 @@ export const services = [
       "Supply, installation, and maintenance of high-performance water pumps for efficient water flow and pressure.",
   },
   {
-    image: "/irrigation_system.png",
-    title: "Irrigation System",
+    image: "/sprinkler-system.jpeg",
+    title: "Sprinkler System",
     description:
-      "Design and install efficient irrigation systems for lawns, gardens, and landscapes saving water while keeping greenery healthy.",
+      "Design and install efficient sprinkler systems for lawns, gardens, and landscapes saving water while keeping greenery healthy.",
   },
   {
     image: "/fiore.jpg",

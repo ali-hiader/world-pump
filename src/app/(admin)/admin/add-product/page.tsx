@@ -1,132 +1,129 @@
-"use client";
+'use client'
 
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
+
+import { ImageIcon, Plus, X } from 'lucide-react'
+
+import Heading from '@/components/client/heading'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import ContactInput from '@/components/ui/contact-input'
+import CustomTextarea from '@/components/ui/custom-textarea'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import ContactInput from "@/components/ui/contact-input";
-import CustomTextarea from "@/components/ui/custom-textarea";
-
-import { ChangeEvent, useRef, useState, useEffect } from "react";
-import { ImageIcon, Plus, X } from "lucide-react";
-import Spinner from "@/icons/spinner";
-import Heading from "@/components/client/heading";
+} from '@/components/ui/select'
+import Spinner from '@/icons/spinner'
 
 interface Category {
-  id: number;
-  name: string;
-  slug: string;
+  id: number
+  name: string
+  slug: string
 }
 
 interface SpecField {
-  id: string;
-  field: string;
-  value: string;
+  id: string
+  field: string
+  value: string
 }
 
 function AddProduct() {
-  const router = useRouter();
-  const imageRef = useRef<HTMLInputElement | null>(null);
-  const [imageName, setImageName] = useState<string | undefined>(undefined);
-  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>("");
-  const [specs, setSpecs] = useState<SpecField[]>([
-    { id: "1", field: "", value: "" },
-  ]);
+  const router = useRouter()
+  const imageRef = useRef<HTMLInputElement | null>(null)
+  const [imageName, setImageName] = useState<string | undefined>(undefined)
+  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined)
+  const [categories, setCategories] = useState<Category[]>([])
+  const [selectedCategory, setSelectedCategory] = useState<string>('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string>('')
+  const [specs, setSpecs] = useState<SpecField[]>([{ id: '1', field: '', value: '' }])
 
   useEffect(() => {
-    fetchCategories();
-  }, []);
+    fetchCategories()
+  }, [])
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch("/api/admin/products/add");
-      const data = await response.json();
+      const response = await fetch('/api/admin/products/add')
+      const data = await response.json()
       if (response.ok) {
-        setCategories(data.categories);
+        setCategories(data.categories)
       }
     } catch (error) {
-      console.error("Error fetching categories:", error);
+      console.error('Error fetching categories:', error)
     }
-  };
+  }
 
   function displaySelectedImage(e: ChangeEvent<HTMLInputElement>) {
-    if (!e.currentTarget.files || !e.currentTarget.files[0]) return;
+    if (!e.currentTarget.files || !e.currentTarget.files[0]) return
 
-    setImageName(e.currentTarget.files[0].name);
+    setImageName(e.currentTarget.files[0].name)
 
-    const fileReader = new FileReader();
+    const fileReader = new FileReader()
     fileReader.onload = function () {
-      setImageUrl(fileReader.result as string);
-    };
-    fileReader.readAsDataURL(e.currentTarget.files[0]);
+      setImageUrl(fileReader.result as string)
+    }
+    fileReader.readAsDataURL(e.currentTarget.files[0])
   }
 
   const addSpecField = () => {
-    const newId = (specs.length + 1).toString();
-    setSpecs([...specs, { id: newId, field: "", value: "" }]);
-  };
+    const newId = (specs.length + 1).toString()
+    setSpecs([...specs, { id: newId, field: '', value: '' }])
+  }
 
   const removeSpecField = (id: string) => {
     if (specs.length > 1) {
-      setSpecs(specs.filter((spec) => spec.id !== id));
+      setSpecs(specs.filter((spec) => spec.id !== id))
     }
-  };
+  }
 
   const updateSpecField = (id: string, field: string, value: string) => {
-    setSpecs(
-      specs.map((spec) => (spec.id === id ? { ...spec, field, value } : spec))
-    );
-  };
+    setSpecs(specs.map((spec) => (spec.id === id ? { ...spec, field, value } : spec)))
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+    e.preventDefault()
+    setLoading(true)
+    setError('')
 
-    const formData = new FormData(e.currentTarget);
-    formData.set("categoryId", selectedCategory);
+    const formData = new FormData(e.currentTarget)
+    formData.set('categoryId', selectedCategory)
 
     // Create specs object from dynamic fields
-    const specsObject: Record<string, string> = {};
+    const specsObject: Record<string, string> = {}
     specs.forEach((spec) => {
       if (spec.field.trim() && spec.value.trim()) {
-        specsObject[spec.field.trim()] = spec.value.trim();
+        specsObject[spec.field.trim()] = spec.value.trim()
       }
-    });
-    formData.set("specs", JSON.stringify(specsObject));
+    })
+    formData.set('specs', JSON.stringify(specsObject))
 
     try {
-      const response = await fetch("/api/admin/products/add", {
-        method: "POST",
+      const response = await fetch('/api/admin/products/add', {
+        method: 'POST',
         body: formData,
-      });
+      })
 
       if (response.ok) {
-        router.push("/admin/products");
+        router.push('/admin/products')
       } else {
-        const data = await response.json();
-        setError(data.error || "Failed to create product");
+        const data = await response.json()
+        setError(data.error || 'Failed to create product')
       }
     } catch (error) {
-      console.error("Error creating product:", error);
-      setError("Failed to create product");
+      console.error('Error creating product:', error)
+      setError('Failed to create product')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <main className="container py-4 sm:py-8 px-2 sm:px-4 max-w-[95%] sm:max-w-[80%] mx-auto">
@@ -150,19 +147,13 @@ function AddProduct() {
 
           <div className="space-y-2">
             <label className="block text-sm font-medium">Brand</label>
-            <ContactInput
-              placeholder="Enter brand name"
-              name="brand"
-              defaultValue="AquaFlow"
-            />
+            <ContactInput placeholder="Enter brand name" name="brand" defaultValue="AquaFlow" />
           </div>
 
           {/* Dynamic Specifications Section */}
           <div className="col-span-2 space-y-4">
             <div className="flex items-center justify-between">
-              <label className="block text-sm font-medium">
-                Product Specifications
-              </label>
+              <label className="block text-sm font-medium">Product Specifications</label>
               <Button
                 type="button"
                 onClick={addSpecField}
@@ -175,34 +166,23 @@ function AddProduct() {
 
             <div className="space-y-3">
               {specs.map((spec) => (
-                <div
-                  key={spec.id}
-                  className="grid grid-cols-12 gap-3 items-end"
-                >
+                <div key={spec.id} className="grid grid-cols-12 gap-3 items-end">
                   <div className="col-span-5">
-                    <label className="block text-xs text-muted-foreground mb-1">
-                      Field
-                    </label>
+                    <label className="block text-xs text-muted-foreground mb-1">Field</label>
                     <ContactInput
                       placeholder="e.g., Horsepower, Flow Rate"
                       value={spec.field}
                       name={`field-${spec.id}`}
-                      onChange={(e) =>
-                        updateSpecField(spec.id, e.target.value, spec.value)
-                      }
+                      onChange={(e) => updateSpecField(spec.id, e.target.value, spec.value)}
                     />
                   </div>
                   <div className="col-span-5">
-                    <label className="block text-xs text-muted-foreground mb-1">
-                      Value
-                    </label>
+                    <label className="block text-xs text-muted-foreground mb-1">Value</label>
                     <ContactInput
                       placeholder="e.g., 2 HP, 150 GPM"
                       value={spec.value}
                       name={`value-${spec.id}`}
-                      onChange={(e) =>
-                        updateSpecField(spec.id, spec.field, e.target.value)
-                      }
+                      onChange={(e) => updateSpecField(spec.id, spec.field, e.target.value)}
                     />
                   </div>
                   <div className="col-span-2">
@@ -222,29 +202,16 @@ function AddProduct() {
 
           <div className="space-y-2">
             <label className="block text-sm font-medium">Price (PKR) *</label>
-            <ContactInput
-              type="number"
-              placeholder="0"
-              name="price"
-              required
-              defaultValue=""
-            />
+            <ContactInput type="number" placeholder="0" name="price" required defaultValue="" />
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium">
-              Discount Price (PKR)
-            </label>
+            <label className="block text-sm font-medium">Discount Price (PKR)</label>
             <ContactInput type="number" placeholder="0" name="discountPrice" />
           </div>
           <div className="space-y-2">
             <label className="block text-sm font-medium">Stock Quantity</label>
-            <ContactInput
-              type="number"
-              placeholder="0"
-              name="stock"
-              defaultValue="5"
-            />
+            <ContactInput type="number" placeholder="0" name="stock" defaultValue="5" />
           </div>
           <div className="space-y-2">
             <label className="block text-sm font-medium">Status</label>
@@ -268,11 +235,7 @@ function AddProduct() {
 
           <div className="space-y-2">
             <label className="block text-sm font-medium">Category *</label>
-            <Select
-              value={selectedCategory}
-              onValueChange={setSelectedCategory}
-              required
-            >
+            <Select value={selectedCategory} onValueChange={setSelectedCategory} required>
               <SelectTrigger>
                 <SelectValue placeholder="Select a category" />
               </SelectTrigger>
@@ -296,9 +259,7 @@ function AddProduct() {
             />
           </div>
           <div className="space-y-2 col-span-2">
-            <label className="block text-sm font-medium">
-              Upload Product Image
-            </label>
+            <label className="block text-sm font-medium">Upload Product Image</label>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-3 sm:p-6 bg-gray-50/50">
               <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
                 {/* Image Preview */}
@@ -313,7 +274,7 @@ function AddProduct() {
                       <Image
                         className="w-full h-full object-cover"
                         src={imageUrl}
-                        alt={imageName ?? "Product image"}
+                        alt={imageName ?? 'Product image'}
                         width={128}
                         height={128}
                       />
@@ -325,10 +286,10 @@ function AddProduct() {
                 <div className="flex-1 w-full space-y-3 sm:space-y-4">
                   <div className="space-y-1 sm:space-y-2">
                     <h4 className="font-medium text-gray-900 text-sm sm:text-base">
-                      {imageUrl ? "Selected Image" : "Choose Product Image"}
+                      {imageUrl ? 'Selected Image' : 'Choose Product Image'}
                     </h4>
                     <p className="text-xs sm:text-sm text-gray-600 truncate">
-                      {imageName ? imageName : "No file chosen"}
+                      {imageName ? imageName : 'No file chosen'}
                     </p>
                   </div>
 
@@ -346,16 +307,16 @@ function AddProduct() {
                       htmlFor="product-image"
                       className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-primary text-primary-foreground text-xs sm:text-sm font-medium rounded-md cursor-pointer hover:bg-primary/90 transition-colors text-center"
                     >
-                      {imageUrl ? "Change Image" : "Choose Image"}
+                      {imageUrl ? 'Change Image' : 'Choose Image'}
                     </Label>
                     {imageUrl && (
                       <button
                         type="button"
                         onClick={() => {
-                          setImageUrl(undefined);
-                          setImageName(undefined);
+                          setImageUrl(undefined)
+                          setImageName(undefined)
                           if (imageRef.current) {
-                            imageRef.current.value = "";
+                            imageRef.current.value = ''
                           }
                         }}
                         className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-gray-100 text-gray-700 text-xs sm:text-sm font-medium rounded-md hover:bg-gray-200 transition-colors"
@@ -365,9 +326,7 @@ function AddProduct() {
                     )}
                   </div>
 
-                  <p className="text-xs text-gray-500">
-                    JPG, PNG or WEBP. Max: 5MB
-                  </p>
+                  <p className="text-xs text-gray-500">JPG, PNG or WEBP. Max: 5MB</p>
                 </div>
               </div>
             </div>
@@ -383,13 +342,13 @@ function AddProduct() {
                 Creating Product...
               </>
             ) : (
-              "Create Product"
+              'Create Product'
             )}
           </Button>
         </form>
       </Card>
     </main>
-  );
+  )
 }
 
-export default AddProduct;
+export default AddProduct

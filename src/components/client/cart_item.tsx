@@ -1,77 +1,73 @@
-"use client";
-import Spinner from "@/icons/spinner";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { CartItemType } from "@/lib/types";
-import {
-  decreaseQtyDB,
-  increaseQtyDB,
-  removeFromCartDB,
-} from "@/actions/cart-actions";
-import { Minus, Plus, Trash2 } from "lucide-react";
-import Image from "next/image";
-import { useState } from "react";
-import useCartStore from "@/stores/cart_store";
-import { useAuthStore } from "@/stores/auth_store";
-import { formatPKR } from "@/lib/utils";
+'use client'
+import Spinner from '@/icons/spinner'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { CartItemType } from '@/lib/types'
+import { decreaseQtyDB, increaseQtyDB, removeFromCartDB } from '@/actions/cart'
+import { Minus, Plus, Trash2 } from 'lucide-react'
+import Image from 'next/image'
+import { useState } from 'react'
+import useCartStore from '@/stores/cart_store'
+import { useAuthStore } from '@/stores/auth_store'
+import { formatPKR } from '@/lib/utils'
 
 interface Props {
-  product: CartItemType;
+  product: CartItemType
 }
 
 function CartItem({ product }: Props) {
-  const userIdAuthS = useAuthStore((state) => state.userIdAuthS);
+  const userIdAuthS = useAuthStore((state) => state.userIdAuthS)
   const {
     decreaseCartProductQuantity_S: decreaseProductQuantityCartS,
     removeCartProduct_S: removeProductCartS,
     increaseCartProductQuantity_S: increaseProductQuantityCartS,
-  } = useCartStore();
+  } = useCartStore()
 
   const [loading, setLoading] = useState({
     delete: false,
     increase: false,
     decrease: false,
-  });
+  })
 
   async function increaseQty() {
-    if (!userIdAuthS) return;
+    if (!userIdAuthS) return
 
     try {
-      setLoading((prev) => ({ ...prev, increase: true }));
-      await increaseQtyDB(product.id, userIdAuthS);
-      increaseProductQuantityCartS(product.id, userIdAuthS);
+      setLoading((prev) => ({ ...prev, increase: true }))
+      await increaseQtyDB(product.id, userIdAuthS)
+      increaseProductQuantityCartS(product.id, userIdAuthS)
     } catch (error) {
-      console.error("Failed to increase item's qty:", error);
+      console.error("Failed to increase item's qty:", error)
     } finally {
-      setLoading((prev) => ({ ...prev, increase: false }));
+      setLoading((prev) => ({ ...prev, increase: false }))
     }
   }
 
   async function decQty(productId: number) {
-    if (!userIdAuthS) return;
+    if (!userIdAuthS) return
 
     try {
-      setLoading((prev) => ({ ...prev, decrease: true }));
-      await decreaseQtyDB(productId, userIdAuthS);
-      decreaseProductQuantityCartS(productId, userIdAuthS);
+      setLoading((prev) => ({ ...prev, decrease: true }))
+      await decreaseQtyDB(productId, userIdAuthS)
+      decreaseProductQuantityCartS(productId, userIdAuthS)
     } catch (error) {
-      console.error("Failed to decrease item's qty:", error);
+      console.error("Failed to decrease item's qty:", error)
     } finally {
-      setLoading((prev) => ({ ...prev, decrease: false }));
+      setLoading((prev) => ({ ...prev, decrease: false }))
     }
   }
 
   async function deleteProduct(productId: number) {
-    if (!userIdAuthS) return;
+    if (!userIdAuthS) return
 
     try {
-      setLoading((prev) => ({ ...prev, delete: true }));
-      await removeFromCartDB(productId, userIdAuthS);
-      removeProductCartS(productId, userIdAuthS);
+      setLoading((prev) => ({ ...prev, delete: true }))
+      await removeFromCartDB(productId, userIdAuthS)
+      removeProductCartS(productId, userIdAuthS)
     } catch (error) {
-      console.error("Failed to remove item:", error);
+      console.error('Failed to remove item:', error)
     } finally {
-      setLoading((prev) => ({ ...prev, delete: false }));
+      setLoading((prev) => ({ ...prev, delete: false }))
     }
   }
 
@@ -91,17 +87,14 @@ function CartItem({ product }: Props) {
 
       <section className="flex-1 min-w-0">
         <div className="flex justify-between items-center gap-4">
-          <h3 className="font-medium truncate flex-1 min-w-0">
-            {product.title}
-          </h3>
+          <h3 className="font-medium truncate flex-1 min-w-0">{product.title}</h3>
           <p className="font-bold headingFont text-emerald-700 text-lg leading-1 whitespace-nowrap flex-shrink-0">
             {formatPKR(product.price)}
           </p>
         </div>
 
         <p className="text-sm text-muted-foreground mt-1 truncate">
-          <span className="sm:inline hidden">Category:</span>{" "}
-          {product.categoryId}
+          <span className="sm:inline hidden">Category:</span> {product.categoryId}
         </p>
 
         <div className="flex items-center justify-between mt-5">
@@ -156,7 +149,7 @@ function CartItem({ product }: Props) {
         </div>
       </section>
     </Card>
-  );
+  )
 }
 
-export default CartItem;
+export default CartItem

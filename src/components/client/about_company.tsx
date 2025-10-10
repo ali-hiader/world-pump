@@ -15,24 +15,26 @@ function AboutCompany() {
         {/* Left Content */}
         <div className="space-y-4">
           <h3 className="text-xl font-semibold text-gray-800">
-            Welcome to World Pumps
+            Welcome to WORLD PUMPS
           </h3>
           <p className="text-gray-600 leading-relaxed">
-            We are your trusted partner in water pump solutions, providing
-            reliable products and professional services tailored to meet both
-            residential and commercial needs.
+            Pakistan’s trusted name in custom swimming pool and luxurious sauna
+            room design and construction. We specialize in creating stunning,
+            modern pools tailored to your lifestyle—whether it’s a luxurious
+            backyard retreat, a commercial pool for hotels and gyms, or a
+            compact design for limited spaces.
           </p>
           <p className="text-gray-600 leading-relaxed">
-            With years of expertise, our offerings include high-efficiency
-            pressure pumps, advanced water filtration systems, swimming pool
-            accessories, and modern geysers. Our commitment is to deliver
-            long-lasting performance and customer satisfaction with every
-            solution we provide.
+            Beyond recreation, we care about reliable water solutions. Our team
+            supplies and installs advanced water filtration systems, durable
+            water pumps, and efficient water geysers to keep your home or
+            business running smoothly. We also offer fire-fighting systems and
+            irrigation solutions to ensure safety and sustainable water
+            management.
           </p>
+
           <p className="text-gray-600 leading-relaxed">
-            At World Pumps, we don’t just sell products — we build trust,
-            ensuring your water systems remain strong, efficient, and
-            worry-free.
+            Let us turn your dream pool into a refreshing reality.
           </p>
 
           <Link

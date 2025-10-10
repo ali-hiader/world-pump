@@ -1,17 +1,18 @@
-"use client";
+'use client'
 
-import { useAuthStore } from "@/stores/auth_store";
-import { redirect } from "next/navigation";
+import { redirect } from 'next/navigation'
+
+import { useAuthStore } from '@/stores/auth_store'
 
 function SignOutBtn() {
-  const { setUserIdAuthS } = useAuthStore();
+  const { setUserIdAuthS } = useAuthStore()
 
   function signout() {
-    fetch("/api/sign-out", {
-      cache: "no-store",
-    });
-    setUserIdAuthS(undefined);
-    redirect("/");
+    fetch('/api/auth/sign-out', {
+      cache: 'no-store',
+    })
+    setUserIdAuthS(undefined)
+    redirect('/')
   }
 
   return (
@@ -23,7 +24,7 @@ function SignOutBtn() {
         <span className="button-label">Sign out</span>
       </button>
     </form>
-  );
+  )
 }
 
-export default SignOutBtn;
+export default SignOutBtn

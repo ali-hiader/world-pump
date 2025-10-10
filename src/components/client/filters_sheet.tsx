@@ -1,84 +1,78 @@
-"use client";
+'use client'
 
-import React from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetTrigger,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetFooter,
-} from "@/components/ui/sheet";
+import { useRouter } from 'next/navigation'
+import React from 'react'
+
+import { Button } from '@/components/ui/button'
+import ContactInput from '@/components/ui/contact-input'
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
-} from "@/components/ui/select";
-import ContactInput from "@/components/ui/contact-input";
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet'
 
 type FiltersState = {
-  category: string;
-  minPrice?: string;
-  maxPrice?: string;
-  brand?: string;
-  horsepower?: string;
-  sort?: string;
-};
+  category: string
+  minPrice?: string
+  maxPrice?: string
+  brand?: string
+  horsepower?: string
+  sort?: string
+}
 
 export default function FiltersSheet(props: {
-  categorySlug: string;
-  categories: { slug: string; name: string }[];
-  brands: string[];
-  horsepowers: string[];
-  current: FiltersState;
+  categorySlug: string
+  categories: { slug: string; name: string }[]
+  brands: string[]
+  current: FiltersState
 }) {
-  const router = useRouter();
-  const [open, setOpen] = React.useState(false);
+  const router = useRouter()
+  const [open, setOpen] = React.useState(false)
   const [state, setState] = React.useState<FiltersState>(() => ({
     category: props.categorySlug,
-    minPrice: props.current.minPrice || "",
-    maxPrice: props.current.maxPrice || "",
-    brand: props.current.brand || "all",
-    horsepower: props.current.horsepower || "all",
-    sort: props.current.sort || "newest",
-  }));
+    minPrice: props.current.minPrice || '',
+    maxPrice: props.current.maxPrice || '',
+    brand: props.current.brand || 'all',
+    horsepower: props.current.horsepower || 'all',
+    sort: props.current.sort || 'newest',
+  }))
 
   const onApply = () => {
-    const params = new URLSearchParams();
-    if (state.minPrice) params.set("minPrice", state.minPrice);
-    if (state.maxPrice) params.set("maxPrice", state.maxPrice);
-    if (state.brand && state.brand !== "all") params.set("brand", state.brand);
-    if (state.horsepower && state.horsepower !== "all")
-      params.set("horsepower", state.horsepower);
-    if (state.sort && state.sort !== "newest") params.set("sort", state.sort);
-    router.push(
-      `/pumps/${state.category}${params.toString() ? `?${params.toString()}` : ""}`
-    );
-    setOpen(false);
-  };
+    const params = new URLSearchParams()
+    if (state.minPrice) params.set('minPrice', state.minPrice)
+    if (state.maxPrice) params.set('maxPrice', state.maxPrice)
+    if (state.brand && state.brand !== 'all') params.set('brand', state.brand)
+    if (state.horsepower && state.horsepower !== 'all') params.set('horsepower', state.horsepower)
+    if (state.sort && state.sort !== 'newest') params.set('sort', state.sort)
+    router.push(`/pumps/${state.category}${params.toString() ? `?${params.toString()}` : ''}`)
+    setOpen(false)
+  }
 
   const onClear = () => {
     setState((s) => ({
       ...s,
-      minPrice: "",
-      maxPrice: "",
-      brand: "all",
-      horsepower: "all",
-      sort: "newest",
-    }));
-  };
+      minPrice: '',
+      maxPrice: '',
+      brand: 'all',
+      horsepower: 'all',
+      sort: 'newest',
+    }))
+  }
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button
-          className="inline-block min-w-24 text-white"
-          variant="secondary"
-        >
+        <Button className="inline-block min-w-24 text-white" variant="secondary">
           Filters
         </Button>
       </SheetTrigger>
@@ -113,9 +107,7 @@ export default function FiltersSheet(props: {
               <ContactInput
                 type="number"
                 value={state.minPrice}
-                onChange={(e) =>
-                  setState((s) => ({ ...s, minPrice: e.target.value }))
-                }
+                onChange={(e) => setState((s) => ({ ...s, minPrice: e.target.value }))}
                 placeholder="0"
                 name="minPrice"
               />
@@ -125,9 +117,7 @@ export default function FiltersSheet(props: {
               <ContactInput
                 type="number"
                 value={state.maxPrice}
-                onChange={(e) =>
-                  setState((s) => ({ ...s, maxPrice: e.target.value }))
-                }
+                onChange={(e) => setState((s) => ({ ...s, maxPrice: e.target.value }))}
                 placeholder="Enter max price"
                 name="maxPrice"
               />
@@ -155,31 +145,8 @@ export default function FiltersSheet(props: {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Horsepower</label>
-            <Select
-              value={state.horsepower}
-              onValueChange={(v) => setState((s) => ({ ...s, horsepower: v }))}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="All HP" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All HP</SelectItem>
-                {props.horsepowers.map((hp) => (
-                  <SelectItem key={hp} value={hp}>
-                    {hp}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-1">
             <label className="text-xs text-muted-foreground">Sort</label>
-            <Select
-              value={state.sort}
-              onValueChange={(v) => setState((s) => ({ ...s, sort: v }))}
-            >
+            <Select value={state.sort} onValueChange={(v) => setState((s) => ({ ...s, sort: v }))}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
@@ -194,10 +161,7 @@ export default function FiltersSheet(props: {
 
         <SheetFooter>
           <div className="flex items-center gap-2">
-            <Button
-              onClick={onApply}
-              className="bg-secondary text-white hover:bg-secondary/90"
-            >
+            <Button onClick={onApply} className="bg-secondary text-white hover:bg-secondary/90">
               Apply Filters
             </Button>
             <Button variant="outline" onClick={onClear}>
@@ -207,5 +171,5 @@ export default function FiltersSheet(props: {
         </SheetFooter>
       </SheetContent>
     </Sheet>
-  );
+  )
 }
