@@ -1,7 +1,9 @@
-import { NextResponse } from 'next/server'
-import { z } from 'zod'
-import { auth } from '@/lib/auth/auth'
 import { headers } from 'next/headers'
+import { NextResponse } from 'next/server'
+
+import { z } from 'zod'
+
+import { auth } from '@/lib/auth/auth'
 
 const signUpSchema = z.object({
   name: z.string().min(1, { message: 'Name is required' }),

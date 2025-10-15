@@ -10,8 +10,6 @@ import { auth } from '@/lib/auth/auth'
 import { db } from '@/db'
 import { cartTable, productTable } from '@/db/schema'
 
-import { getSingleProductForCart } from './product'
-
 export async function getCartDB(userId: string) {
   try {
     const cart = await db
@@ -19,6 +17,7 @@ export async function getCartDB(userId: string) {
         cartId: cartTable.id,
         quantity: cartTable.quantity,
         addedBy: cartTable.createdBy,
+
         ...getTableColumns(productTable),
       })
       .from(cartTable)
@@ -38,6 +37,21 @@ export async function getSingleCartProductDB(productId: number, userId: string) 
     .select()
     .from(cartTable)
     .where(and(eq(cartTable.productId, productId), eq(cartTable.createdBy, userId)))
+  return products[0]
+}
+
+// utilty function to get single product with cart details
+export async function getSingleProductForCart(productId: number) {
+  const products = await db
+    .select({
+      cartId: cartTable.id,
+      quantity: cartTable.quantity,
+      addedBy: cartTable.createdBy,
+      ...getTableColumns(productTable),
+    })
+    .from(cartTable)
+    .innerJoin(productTable, eq(cartTable.productId, productTable.id))
+    .where(eq(cartTable.productId, productId))
   return products[0]
 }
 

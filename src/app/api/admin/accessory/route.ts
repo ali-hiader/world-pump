@@ -1,10 +1,13 @@
 // ===================== Imports =====================
+import type { UploadApiResponse } from 'cloudinary'
+
 import { NextResponse } from 'next/server'
+
+import { eq } from 'drizzle-orm'
+
+import { deleteAccessory, fetchAccessoryById, fetchAllAccessories } from '@/actions/accessory'
 import { db } from '@/db'
 import { accessoryTable, productAccessoryTable } from '@/db/schema'
-import { eq } from 'drizzle-orm'
-import type { UploadApiResponse } from 'cloudinary'
-import { fetchAllAccessories, fetchAccessoryById, deleteAccessory } from '@/actions/accessory'
 
 export async function GET(req: Request) {
   try {
@@ -126,7 +129,7 @@ export async function POST(req: Request) {
     try {
       const arrayBuffer = await image.arrayBuffer()
       const buffer = Buffer.from(arrayBuffer)
-      const { uploadImage } = await import('@/lib/cloudinary')
+      const { uploadImage } = await import('@/lib/cloudinary/cloudinary')
       // Use the expected type from Cloudinary
       const result = await new Promise<UploadApiResponse | undefined>((resolve) => {
         uploadImage(buffer, (uploadResult: UploadApiResponse | undefined) => {

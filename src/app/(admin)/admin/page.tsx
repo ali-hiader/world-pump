@@ -2,13 +2,17 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 
 import { sql } from 'drizzle-orm'
-import { Package, Plus, ShoppingCart, Users } from 'lucide-react'
 
+import AddItemBtn from '@/components/admin/add-item-btn'
 import Heading from '@/components/client/heading'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { db } from '@/db'
 import { accessoryTable, orderTable, productTable, user } from '@/db/schema'
+import { CartIcon } from '@/icons/cart'
+import { PlusIcon } from '@/icons/plus'
+import { ProductsIcon } from '@/icons/products'
+import { UsersIcon } from '@/icons/users'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,136 +21,152 @@ export default async function AdminDashboard() {
     <main className="py-6 px-4 sm:px-[3%] space-y-6">
       <section className="flex justify-between items-center">
         <Heading title="Admin Dashboard" />
-        <Link href="/admin/add-product">
-          <Button className="bg-secondary hover:bg-secondary/90">
-            <Plus className="mr-2 h-4 w-4" />
-            Add Product
-          </Button>
-        </Link>
+        <AddItemBtn />
       </section>
 
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
+        {/* Quick Actions */}
+        <Card className="">
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
             <CardDescription>Manage your store efficiently</CardDescription>
           </CardHeader>
+
           <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Link href="/admin/products">
-              <Button variant="outline" className="w-full h-20 flex flex-col">
-                <Package className="h-6 w-6 mb-2" />
-                Manage Products
-              </Button>
-            </Link>
-
-            <Link href="/admin/orders">
-              <Button variant="outline" className="w-full h-20 flex flex-col">
-                <ShoppingCart className="h-6 w-6 mb-2" />
-                View Orders
-              </Button>
-            </Link>
-
-            <Link href="/admin/users">
-              <Button variant="outline" className="w-full h-20 flex flex-col">
-                <Users className="h-6 w-6 mb-2" />
-                View Users
-              </Button>
-            </Link>
-
-            <Link href="/admin/add-product">
-              <Button variant="outline" className="w-full h-20 flex flex-col">
-                <Plus className="h-6 w-6 mb-2" />
-                Add New Product
-              </Button>
-            </Link>
+            {quickActions.map((action) => (
+              <QuickActionButton
+                key={action.href}
+                href={action.href}
+                title={action.title}
+                icon={action.icon}
+              />
+            ))}
           </CardContent>
         </Card>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Products & Orders Stats */}
-          <Suspense fallback={<StatsCardSkeleton />}>
-            <ProductStatsCard />
-          </Suspense>
-          <Suspense fallback={<StatsCardSkeleton />}>
-            <AccessoryStatsCard />
-          </Suspense>
-
-          {/* Revenue & Users Stats */}
-          <Suspense fallback={<StatsCardSkeleton />}>
-            <UserStatsCard />
-          </Suspense>
-          <Suspense fallback={<StatsCardSkeleton />}>
-            <OrderStatsCard />
-          </Suspense>
+          {cards.map((card) => (
+            <Suspense key={card.table} fallback={<StatsCardSkeleton />}>
+              <StatsCard
+                title={card.title}
+                table={card.table as StatusCardTable['table']}
+                icon={card.icon}
+                description={card.description}
+              />
+            </Suspense>
+          ))}
         </div>
       </section>
     </main>
   )
 }
 
-async function ProductStatsCard() {
-  const [result] = await db.select({ count: sql<number>`count(*)` }).from(productTable)
+const cards = [
+  {
+    title: 'Products',
+    table: 'product',
+    icon: ProductsIcon,
+    description: 'Active products',
+  },
+  {
+    title: 'Accessories',
+    table: 'accessory',
+    icon: ProductsIcon,
+    description: 'Active accessories',
+  },
+  {
+    title: 'Users',
+    table: 'user',
+    icon: UsersIcon,
+    description: 'Registered users',
+  },
+  {
+    title: 'Orders',
+    table: 'order',
+    icon: CartIcon,
+    description: 'All time orders',
+  },
+]
 
+const quickActions = [
+  {
+    href: '/admin/products',
+    title: 'View Products',
+    icon: ProductsIcon,
+  },
+  {
+    href: '/admin/orders',
+    title: 'View Orders',
+    icon: CartIcon,
+  },
+  {
+    href: '/admin/users',
+    title: 'View Users',
+    icon: UsersIcon,
+  },
+  {
+    href: '/admin/add-product',
+    title: 'Add New Product',
+    icon: PlusIcon,
+  },
+]
+interface QuickActionButtonProps {
+  href: string
+  title: string
+  icon: React.ComponentType<{ className?: string }>
+}
+
+function QuickActionButton({ href, title, icon: Icon }: QuickActionButtonProps) {
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">Total Products</CardTitle>
-        <Package className="h-4 w-4 text-muted-foreground" />
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{result?.count || 0}</div>
-        <p className="text-xs text-muted-foreground">Active products</p>
-      </CardContent>
-    </Card>
+    <Link href={href}>
+      <Button
+        variant="outline"
+        className="w-full py-2 px-4 h-fit flex justify-between items-center"
+      >
+        {title}
+        <Icon className="size-5 fill-muted-foreground mb-2" />
+      </Button>
+    </Link>
   )
 }
 
-async function OrderStatsCard() {
-  const [result] = await db.select({ count: sql<number>`count(*)` }).from(orderTable)
-
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
-        <ShoppingCart className="h-4 w-4 text-muted-foreground" />
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{result?.count || 0}</div>
-        <p className="text-xs text-muted-foreground">All time orders</p>
-      </CardContent>
-    </Card>
-  )
+interface StatusCardTable {
+  table: 'product' | 'accessory' | 'user' | 'order'
 }
 
-async function UserStatsCard() {
-  const [result] = await db.select({ count: sql<number>`count(*)` }).from(user)
-
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-        <Users className="h-4 w-4 text-muted-foreground" />
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{result?.count || 0}</div>
-        <p className="text-xs text-muted-foreground">Registered users</p>
-      </CardContent>
-    </Card>
-  )
+type StatsCardProps = StatusCardTable & {
+  title: string
+  icon: React.ComponentType<{ className?: string }>
+  description: string
 }
 
-async function AccessoryStatsCard() {
-  const [result] = await db.select({ count: sql<number>`count(*)` }).from(accessoryTable)
+async function StatsCard({ title, table, icon: Icon, description }: StatsCardProps) {
+  const cardTable =
+    table === 'product'
+      ? productTable
+      : table === 'accessory'
+        ? accessoryTable
+        : table === 'user'
+          ? user
+          : orderTable
+
+  const [result] = await db.select({ count: sql<number>`count(*)` }).from(cardTable)
 
   return (
-    <Card>
+    <Card className="py-4 gap-3">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">Accessories</CardTitle>
-        <Package className="h-4 w-4 text-muted-foreground" />
+        <CardTitle className="font-medium">{title}</CardTitle>
+        <Icon className="size-4 fill-muted-foreground" />
       </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{result?.count || 0}</div>
-        <p className="text-xs text-muted-foreground">Active accessories</p>
+      <CardContent className="space-y-1">
+        <div className="text-sm flex items-center justify-between">
+          <p className="text-muted-foreground underline">{description}</p>
+          <span
+            className={`${result?.count > 0 ? 'text-emerald-800 bg-emerald-100' : 'text-rose-600 bg-rose-100'} size-6 flex items-center justify-center rounded-md `}
+          >
+            {result?.count || 0}
+          </span>
+        </div>
       </CardContent>
     </Card>
   )
@@ -154,14 +174,16 @@ async function AccessoryStatsCard() {
 
 function StatsCardSkeleton() {
   return (
-    <Card>
+    <Card className="py-4 gap-3">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <div className="h-4 w-24 bg-gray-200 animate-pulse rounded" />
-        <div className="h-4 w-4 bg-gray-200 animate-pulse rounded" />
+        <div className="h-4 w-24 bg-gray-200 animate-pulse rounded font-medium" />
+        <div className="size-4 bg-gray-200 animate-pulse rounded" />
       </CardHeader>
-      <CardContent>
-        <div className="h-8 w-16 bg-gray-200 animate-pulse rounded mb-1" />
-        <div className="h-3 w-20 bg-gray-200 animate-pulse rounded" />
+      <CardContent className="space-y-1">
+        <div className="text-sm flex items-center justify-between">
+          <div className="h-3 w-20 bg-gray-200 animate-pulse rounded underline" />
+          <div className="size-6 bg-gray-200 animate-pulse rounded-md" />
+        </div>
       </CardContent>
     </Card>
   )

@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { formatPKR } from '@/lib/utils'
-import { fetchRelatedProducts, fetchSingleProduct } from '@/actions/product'
+import { fetchProductBySlug, fetchRelatedProducts } from '@/actions/product'
 import AddToCartBtn from '@/components/client/add_to_cart'
 import DisplayAlert from '@/components/client/display_alert'
 import ProductCard from '@/components/client/product_card'
@@ -21,7 +21,7 @@ interface Props {
 async function PumpDetailsPage({ params }: Props) {
   const { pump_slug } = await params
   const decodedSlug = decodeURIComponent(pump_slug)
-  const product = await fetchSingleProduct(decodedSlug)
+  const product = await fetchProductBySlug(decodedSlug)
 
   // Helper function to parse specs
   const parseSpecs = (specs: unknown): Record<string, string> => {
@@ -132,23 +132,12 @@ async function PumpDetailsPage({ params }: Props) {
               <CardTitle>Product Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Product Title</p>
-                <p className="text-lg">{product.title}</p>
-              </div>
+              <p className="text-lg">{product.title}</p>
 
               {product.brand && (
                 <div>
                   <p className="text-sm font-medium text-gray-500">Brand</p>
                   <Badge variant="outline">{product.brand}</Badge>
-                </div>
-              )}
-              {product.stock !== undefined && (
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Stock</p>
-                  <p className={`text-sm ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {product.stock > 0 ? `${product.stock} available` : 'Out of stock'}
-                  </p>
                 </div>
               )}
             </CardContent>

@@ -1,4 +1,5 @@
 import { create } from "zustand";
+
 import { CategoryType, ProductType } from "@/lib/types";
 
 interface ProductStore {

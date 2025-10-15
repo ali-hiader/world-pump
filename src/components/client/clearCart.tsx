@@ -1,7 +1,8 @@
 "use client";
 
-import useCartStore from "@/stores/cart_store";
 import { useEffect } from "react";
+
+import useCartStore from "@/stores/cart_store";
 
 function ClearCart() {
   const clearCartS = useCartStore((state) => state.clearCart_S);

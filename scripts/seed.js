@@ -1,4 +1,5 @@
 import "dotenv/config";
+
 import { seedAccessories } from "../src/db/seed.ts";
 
 async function main() {

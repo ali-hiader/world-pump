@@ -4,7 +4,8 @@ import { PropsWithChildren } from 'react'
 import { auth } from '@/lib/auth/auth'
 import { CartItemType } from '@/lib/types'
 import { getCartDB } from '@/actions/cart'
-import { fetchAllProducts, getAllCategories } from '@/actions/product'
+import { fetchAllCategories } from '@/actions/category'
+import { fetchAllProducts } from '@/actions/product'
 import ContactNavBar from '@/components/client/contact-nav'
 import Footer from '@/components/client/footer'
 import NavBar from '@/components/client/nav_bar'
@@ -15,7 +16,7 @@ async function UserLayout({ children }: PropsWithChildren) {
     headers: await headers(),
   })
 
-  const categories = await getAllCategories()
+  const categories = await fetchAllCategories()
   const initialProducts = await fetchAllProducts()
 
   let cart: CartItemType[] = []

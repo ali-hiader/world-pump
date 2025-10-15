@@ -1,5 +1,6 @@
-import Spinner from "@/icons/spinner";
 import React from "react";
+
+import Spinner from "@/icons/spinner";
 
 function LoadingPage() {
   return (

@@ -1,26 +1,30 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+
 import { fetchAccessoryById } from '@/actions/accessory'
-import { fetchAllProducts, fetchAccessoryProductIds } from '@/actions/product-accessory'
+import { fetchAllProducts } from '@/actions/product'
+import { fetchAccessoryProductIds } from '@/actions/product-accessory'
 import { Combobox } from '@/components/ui/combobox'
 
 interface Product {
   id: number
   title: string
 }
-import { useRouter, useParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useParams, useRouter } from 'next/navigation'
+
+import { ArrowLeft, ImageIcon, Plus, X } from 'lucide-react'
+
+import Heading from '@/components/client/heading'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import ContactInput from '@/components/ui/contact-input'
 import CustomTextarea from '@/components/ui/custom-textarea'
-import { ImageIcon, ArrowLeft, Plus, X } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import Spinner from '@/icons/spinner'
-import Heading from '@/components/client/heading'
 
 interface SpecField {
   id: string

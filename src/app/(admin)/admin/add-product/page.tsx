@@ -51,7 +51,7 @@ function AddProduct() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/admin/products/add')
+      const response = await fetch('/api/admin/category')
       const data = await response.json()
       if (response.ok) {
         setCategories(data.categories)
@@ -106,7 +106,7 @@ function AddProduct() {
     formData.set('specs', JSON.stringify(specsObject))
 
     try {
-      const response = await fetch('/api/admin/products/add', {
+      const response = await fetch('/api/admin/products', {
         method: 'POST',
         body: formData,
       })

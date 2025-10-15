@@ -1,13 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
-import {
-  fetchProductsByCategoryPaginated,
-  getAllCategories,
-  getCategoryBrands,
-  getCategoryBySlug,
-  type ProductFilters,
-} from '@/actions/product'
+import { fetchAllCategories, fetchCategoryBrands, fetchCategoryBySlug } from '@/actions/category'
+import { fetchProductsByCategoryPaginated, type ProductFilters } from '@/actions/product'
 import CategorySelect from '@/components/client/category_select'
 import DisplayAlert from '@/components/client/display_alert'
 import FiltersSheet from '@/components/client/filters_sheet'
@@ -33,7 +28,7 @@ interface PageProps {
 
 export default async function CategoryPage({ params, searchParams }: PageProps) {
   const categorySlug = (await params).category
-  const category = await getCategoryBySlug(categorySlug)
+  const category = await fetchCategoryBySlug(categorySlug)
 
   const sp: SearchParams = await searchParams
   const filters: ProductFilters = {
@@ -49,8 +44,8 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
 
   const [{ products, total }, brands, categories] = await Promise.all([
     fetchProductsByCategoryPaginated(categorySlug, filters, page, limit),
-    getCategoryBrands(categorySlug),
-    getAllCategories(),
+    fetchCategoryBrands(categorySlug),
+    fetchAllCategories(),
   ])
 
   return (

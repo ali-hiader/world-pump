@@ -1,4 +1,5 @@
 import React from "react";
+
 import Heading from "./heading";
 
 function Newsletter() {

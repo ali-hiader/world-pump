@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { eq } from "drizzle-orm";
+
 import { db } from "@/db";
 import {
-  orderTable,
-  orderItemTable,
-  productTable,
   addressTable,
+  orderItemTable,
+  orderTable,
+  productTable,
   user,
 } from "@/db/schema";
 

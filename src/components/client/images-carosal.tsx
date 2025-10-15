@@ -1,6 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import React from "react";
+
 import {
   Carousel,
   CarouselContent,
@@ -8,7 +10,6 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import Image from "next/image";
 
 const images = [
   "/carosal_image.png",

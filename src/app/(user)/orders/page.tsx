@@ -1,15 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { OrderType } from "@/lib/types";
 import { OrderItem as OrderItemI } from "@/lib/types";
-
-import Heading from "@/components/client/heading";
 import DisplayAlert from "@/components/client/display_alert";
-import { Card } from "@/components/ui/card";
+import Heading from "@/components/client/heading";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import Spinner from "@/icons/spinner";
 
 interface OrderWithItems {

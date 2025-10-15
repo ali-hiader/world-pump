@@ -1,8 +1,10 @@
-import React from "react";
 import type { Metadata } from "next";
-import Heading from "@/components/client/heading";
+
 import Image from "next/image";
 import Link from "next/link";
+import React from "react";
+
+import Heading from "@/components/client/heading";
 import Testimonials from "@/components/client/testimonials";
 
 export const metadata: Metadata = {

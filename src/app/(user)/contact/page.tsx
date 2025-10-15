@@ -1,7 +1,9 @@
-import React from "react";
 import type { Metadata } from "next";
-import Heading from "@/components/client/heading";
+
+import React from "react";
+
 import ContactForm from "@/components/client/contact_form";
+import Heading from "@/components/client/heading";
 
 export const dynamic = "force-dynamic";
 

@@ -1,59 +1,13 @@
 import { NextResponse } from 'next/server'
 
 import { UploadApiResponse } from 'cloudinary'
-import { eq, getTableColumns } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 
-import { getCategorySlugById } from '@/lib/category-utils'
-import { uploadImage } from '@/lib/cloudinary'
+import { deleteImage, extractCloudinaryPublicId, uploadImage } from '@/lib/cloudinary/cloudinary'
 import { slugifyIt } from '@/lib/utils'
 import { checkAuth } from '@/actions/auth'
 import { db } from '@/db'
-import { categoryTable, productTable } from '@/db/schema'
-
-// GET: Get single product for editing
-export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const { id } = await params
-    const productId = id
-
-    const [product] = await db
-      .select({
-        categoryName: categoryTable.name,
-        categorySlug: categoryTable.slug,
-        ...getTableColumns(productTable),
-      })
-      .from(productTable)
-      .leftJoin(categoryTable, eq(productTable.categoryId, categoryTable.id))
-      .where(eq(productTable.id, Number(productId)))
-
-    if (!product) {
-      return NextResponse.json({ error: 'Product not found' }, { status: 404 })
-    }
-
-    // Ensure categorySlug is available, use fallback if needed
-    const productWithSlug = {
-      ...product,
-      categorySlug: product.categorySlug || getCategorySlugById(product.categoryId),
-    }
-
-    console.log('API Response - Product:', {
-      id: productWithSlug.id,
-      title: productWithSlug.title,
-      slug: productWithSlug.slug,
-      categoryId: productWithSlug.categoryId,
-      categoryName: productWithSlug.categoryName,
-      categorySlug: productWithSlug.categorySlug,
-      specs: productWithSlug.specs,
-      specsType: typeof productWithSlug.specs,
-      specsIsArray: Array.isArray(productWithSlug.specs),
-    })
-
-    return NextResponse.json({ product: productWithSlug })
-  } catch (error) {
-    console.error('Error fetching product:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-  }
-}
+import { productTable } from '@/db/schema'
 
 // PUT: Update product
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -134,6 +88,69 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error updating product:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+// DELETE: Delete a product
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const admin = await checkAuth()
+    if (!admin) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { id } = await params
+    console.log('Deleting product with ID:', id)
+
+    // Validate ID
+    if (!id) {
+      return NextResponse.json({ error: 'Product ID is required' }, { status: 400 })
+    }
+
+    const productId = Number(id)
+    if (Number.isNaN(productId) || productId <= 0) {
+      return NextResponse.json({ error: 'Invalid product ID' }, { status: 400 })
+    }
+
+    const [existingProduct] = await db
+      .select({
+        id: productTable.id,
+        imageUrl: productTable.imageUrl,
+        title: productTable.title,
+      })
+      .from(productTable)
+      .where(eq(productTable.id, productId))
+
+    if (!existingProduct) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+    }
+
+    // Delete Cloudinary image if exists
+    if (existingProduct.imageUrl) {
+      const publicId = extractCloudinaryPublicId(existingProduct.imageUrl)
+
+      if (publicId) {
+        try {
+          console.log('Deleting Cloudinary image with public ID:', publicId)
+          const deleteResult = await deleteImage(publicId)
+          console.log('Cloudinary delete result:', deleteResult)
+        } catch (imageError) {
+          console.warn('Failed to delete Cloudinary image:', imageError)
+          // Continue with product deletion even if image deletion fails
+        }
+      }
+    }
+
+    // Delete the product from database
+    await db.delete(productTable).where(eq(productTable.id, productId))
+
+    return NextResponse.json({
+      success: true,
+      message: `Product "${existingProduct.title}" deleted successfully`,
+    })
+  } catch (error) {
+    console.error('Error deleting product:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

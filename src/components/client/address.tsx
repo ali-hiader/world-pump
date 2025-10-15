@@ -1,13 +1,14 @@
 import React from "react";
-import ContactInput from "@/components/ui/contact-input";
+
 import { checkoutAddressFields } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { cn } from "@/lib/utils";
+import ContactInput from "@/components/ui/contact-input";
 
 export type AddressValues = {
   fullName: string;

@@ -1,3 +1,5 @@
+import type * as React from "react";
+
 import {
   Body,
   Column,
@@ -13,7 +15,6 @@ import {
   Section,
   Text,
 } from "@react-email/components";
-import type * as React from "react";
 
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL
   ? `https://${process.env.NEXT_PUBLIC_APP_URL}`

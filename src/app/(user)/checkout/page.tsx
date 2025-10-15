@@ -2,11 +2,11 @@ import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import { eq, getTableColumns } from 'drizzle-orm'
-import { cartTable, productTable } from '@/db/schema'
-import { db } from '@/db'
-import { auth } from '@/lib/auth/auth'
 
+import { auth } from '@/lib/auth/auth'
 import Checkout from '@/components/client/checkout'
+import { db } from '@/db'
+import { cartTable, productTable } from '@/db/schema'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,15 +30,7 @@ async function CheckoutPage() {
     .innerJoin(productTable, eq(cartTable.productId, productTable.id))
     .where(eq(cartTable.createdBy, session.user.id))
 
-  const payfastEnabled = Boolean(
-    process.env.PAYFAST_MERCHANT_ID && process.env.PAYFAST_MERCHANT_KEY,
-  )
-
-  console.log(payfastEnabled)
-
-  return (
-    <Checkout cartItems={cartItems} userName={session.user.name} payfastEnabled={payfastEnabled} />
-  )
+  return <Checkout cartItems={cartItems} userName={session.user.name} />
 }
 
 export default CheckoutPage

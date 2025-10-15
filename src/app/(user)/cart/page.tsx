@@ -1,7 +1,7 @@
-import { auth } from '@/lib/auth/auth'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
+import { auth } from '@/lib/auth/auth'
 import CartList from '@/components/client/cart_list'
 
 export const dynamic = 'force-dynamic'

@@ -7,14 +7,11 @@ import { useEffect, useState } from 'react'
 import { generateProductUrl } from '@/lib/category-utils'
 import { ProductType } from '@/lib/types'
 import { formatPKR } from '@/lib/utils'
+import { fetchProductById } from '@/actions/product'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Spinner from '@/icons/spinner'
-
-interface ProductI extends ProductType {
-  categoryName: string
-}
 
 interface Props {
   params: Promise<{ id: string }>
@@ -81,7 +78,7 @@ function LoadingSkeleton() {
 }
 
 function ProductDetailsPage({ params }: Props) {
-  const [product, setProduct] = useState<ProductI | null>(null)
+  const [product, setProduct] = useState<ProductType | null>(null)
   const [loading, setLoading] = useState(true)
   const [updating, setUpdating] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -93,10 +90,9 @@ function ProductDetailsPage({ params }: Props) {
       setLoading(true)
       try {
         const id = (await params).id
-        const res = await fetch(`/api/admin/products/${id}`)
-        if (!res.ok) throw new Error('Failed to fetch product')
-        const data = await res.json()
-        setProduct(data.product)
+        const product = await fetchProductById(Number(id))
+
+        setProduct(product)
         setError('')
       } catch (err: unknown) {
         if (err instanceof Error) {
@@ -116,7 +112,7 @@ function ProductDetailsPage({ params }: Props) {
     if (!product) return
     setUpdating(true)
     try {
-      const res = await fetch(`/api/admin/products/${product.id}/toggle-status`, {
+      const res = await fetch(`/api/admin/products?id=${product.id}`, {
         method: 'PUT',
       })
       if (!res.ok) throw new Error('Failed to update status')
@@ -140,6 +136,7 @@ function ProductDetailsPage({ params }: Props) {
     if (!product) return
     setDeleting(true)
 
+    console.log('productId - ', product.id)
     try {
       const res = await fetch(`/api/admin/products/${product.id}`, {
         method: 'DELETE',
@@ -369,7 +366,7 @@ function ProductDetailsPage({ params }: Props) {
             </CardHeader>
             <CardContent>
               {(() => {
-                const parseSpecs = (specs: ProductI['specs']) => {
+                const parseSpecs = (specs: ProductType['specs']) => {
                   if (!specs) return []
                   if (Array.isArray(specs)) {
                     return specs.filter((spec) => spec?.field && spec?.value)

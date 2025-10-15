@@ -1,22 +1,23 @@
-import { desc, eq, sql } from "drizzle-orm";
-import Link from "next/link";
+import Link from 'next/link'
 
-import { db } from "@/db";
-import { user, orderTable } from "@/db/schema";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { desc, eq, sql } from 'drizzle-orm'
 
-export const dynamic = "force-dynamic";
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { db } from '@/db'
+import { orderTable, user } from '@/db/schema'
+
+export const dynamic = 'force-dynamic'
 
 interface UserWithStats {
-  id: string;
-  name: string;
-  email: string;
-  emailVerified: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  orderCount: number;
+  id: string
+  name: string
+  email: string
+  emailVerified: boolean
+  createdAt: Date
+  updatedAt: Date
+  orderCount: number
 }
 
 async function AdminUsersPage() {
@@ -31,7 +32,7 @@ async function AdminUsersPage() {
       updatedAt: user.updatedAt,
     })
     .from(user)
-    .orderBy(desc(user.createdAt));
+    .orderBy(desc(user.createdAt))
 
   // Get order counts for each user
   const usersWithStats: UserWithStats[] = await Promise.all(
@@ -39,14 +40,14 @@ async function AdminUsersPage() {
       const orderCount = await db
         .select({ count: sql<number>`count(*)` })
         .from(orderTable)
-        .where(eq(orderTable.userEmail, userData.email));
+        .where(eq(orderTable.userEmail, userData.email))
 
       return {
         ...userData,
         orderCount: orderCount[0]?.count || 0,
-      };
-    })
-  );
+      }
+    }),
+  )
 
   return (
     <main className="p-6 max-w-7xl mx-auto">
@@ -55,9 +56,7 @@ async function AdminUsersPage() {
           <h1 className="text-3xl font-bold text-gray-900">Users Management</h1>
           <p className="text-gray-600 mt-2">Manage registered users</p>
         </div>
-        <div className="text-sm text-gray-500">
-          Total Users: {usersWithStats.length}
-        </div>
+        <div className="text-sm text-gray-500">Total Users: {usersWithStats.length}</div>
       </div>
 
       {usersWithStats.length === 0 ? (
@@ -77,9 +76,7 @@ async function AdminUsersPage() {
                   strokeLinejoin="round"
                 />
               </svg>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                No Users Found
-              </h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No Users Found</h3>
               <p className="text-gray-500">No users have registered yet.</p>
             </div>
           </CardContent>
@@ -87,55 +84,38 @@ async function AdminUsersPage() {
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
           {usersWithStats.map((userData) => (
-            <Card
-              key={userData.id}
-              className="hover:shadow-md transition-shadow"
-            >
+            <Card key={userData.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-6">
                 <div className="space-y-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                         <span className="text-blue-600 font-semibold text-sm">
-                          {userData.name?.charAt(0).toUpperCase() || "U"}
+                          {userData.name?.charAt(0).toUpperCase() || 'U'}
                         </span>
                       </div>
                       <div>
-                        <h3 className="font-semibold text-lg">
-                          {userData.name}
-                        </h3>
-                        <p className="text-gray-600 text-sm">
-                          {userData.email}
-                        </p>
+                        <h3 className="font-semibold text-lg">{userData.name}</h3>
+                        <p className="text-gray-600 text-sm">{userData.email}</p>
                       </div>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-4 mt-4">
                       <div>
-                        <p className="text-sm font-medium text-gray-500">
-                          Email Status
-                        </p>
+                        <p className="text-sm font-medium text-gray-500">Email Status</p>
                         <Badge
-                          variant={
-                            userData.emailVerified ? "default" : "secondary"
-                          }
+                          variant={userData.emailVerified ? 'default' : 'secondary'}
                           className="text-xs"
                         >
-                          {userData.emailVerified ? "Verified" : "Unverified"}
+                          {userData.emailVerified ? 'Verified' : 'Unverified'}
                         </Badge>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-500">
-                          Total Orders
-                        </p>
-                        <p className="text-sm font-semibold">
-                          {userData.orderCount}
-                        </p>
+                        <p className="text-sm font-medium text-gray-500">Total Orders</p>
+                        <p className="text-sm font-semibold">{userData.orderCount}</p>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-500">
-                          Joined
-                        </p>
+                        <p className="text-sm font-medium text-gray-500">Joined</p>
                         <p className="text-sm">
                           {new Date(userData.createdAt).toLocaleDateString()}
                         </p>
@@ -159,7 +139,7 @@ async function AdminUsersPage() {
         </div>
       )}
     </main>
-  );
+  )
 }
 
-export default AdminUsersPage;
+export default AdminUsersPage

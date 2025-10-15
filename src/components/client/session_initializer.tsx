@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import { useAuthStore } from "@/stores/auth_store";
+
 import { CartItemType, CategoryType, ProductType } from "@/lib/types";
+import { useAuthStore } from "@/stores/auth_store";
 import useCartStore from "@/stores/cart_store";
 import useProductsStore from "@/stores/pump_store";
 

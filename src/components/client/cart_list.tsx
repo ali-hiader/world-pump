@@ -1,27 +1,22 @@
-"use client";
+'use client'
 
-import Link from "next/link";
+import Link from 'next/link'
 
-import useCartStore from "@/stores/cart_store";
-import CartItem from "./cart_item";
-import DisplayAlert from "@/components/client/display_alert";
+import { formatPKR } from '@/lib/utils'
+import DisplayAlert from '@/components/client/display_alert'
+import { Button } from '@/components/ui/button'
+import useCartStore from '@/stores/cart_store'
 
-import { Button } from "@/components/ui/button";
-import Heading from "./heading";
-import { formatPKR } from "@/lib/utils";
+import CartItem from './cart_item'
+import Heading from './heading'
 
 function CartList() {
-  const { cartProducts_S } = useCartStore();
+  const { cartProducts_S } = useCartStore()
 
   const totalPrice = cartProducts_S.reduce(
     (sum, item) => sum + item.price * (item.quantity || 1),
-    0
-  );
-
-  // const totalItemsInCart = cartProducts_S.reduce(
-  //   (totalQty, item) => item.quantity + totalQty,
-  //   0
-  // );
+    0,
+  )
 
   return (
     <>
@@ -42,7 +37,7 @@ function CartList() {
             <p className="font-medium">Amount to Pay</p>
             <p className="font-bold headingFont ">{formatPKR(totalPrice)}</p>
           </div>
-          <Link href={"/checkout"} className="sm:w-fit self-center w-full">
+          <Link href={'/checkout'} className="sm:w-fit self-center w-full">
             <Button className="sm:w-96 w-full bg-secondary cursor-pointer hover:bg-secondary/90 transition-all duration-300 text-white rounded-md py-6">
               Continue to Checkout
             </Button>
@@ -50,7 +45,7 @@ function CartList() {
         </footer>
       )}
     </>
-  );
+  )
 }
 
-export default CartList;
+export default CartList

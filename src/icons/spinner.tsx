@@ -1,5 +1,6 @@
-import React from "react";
 import type { SVGProps } from "react";
+
+import React from "react";
 
 export default function Spinner(props: SVGProps<SVGSVGElement>) {
   return (

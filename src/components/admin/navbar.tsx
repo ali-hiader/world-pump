@@ -1,8 +1,8 @@
-"use client";
+'use client'
 
-import { PropsWithChildren, useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { PropsWithChildren, useState } from 'react'
 
 import {
   Dialog,
@@ -10,28 +10,28 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog'
 
 const navLinks = [
-  { href: "/admin", label: "Dashboard" },
-  { href: "/admin/products", label: "Products" },
-  { href: "/admin/accessories", label: "Accessories" },
-  { href: "/admin/orders", label: "Orders" },
-  { href: "/admin/users", label: "Users" },
-  { href: "/admin/add-product", label: "Add Product" },
-  { href: "/admin/add-accessory", label: "Add Accessory" },
-];
+  { href: '/admin', label: 'Dashboard' },
+  { href: '/admin/products', label: 'Products' },
+  { href: '/admin/accessories', label: 'Accessories' },
+  { href: '/admin/orders', label: 'Orders' },
+  { href: '/admin/users', label: 'Users' },
+  { href: '/admin/add-product', label: 'Add Product' },
+  { href: '/admin/add-accessory', label: 'Add Accessory' },
+]
 
 export default function AdminNavBar() {
-  const pathName = usePathname();
-  const [open, setOpen] = useState(false);
+  const pathName = usePathname()
+  const [open, setOpen] = useState(false)
 
   return (
     <nav className="flex justify-between items-center py-4 px-4 sm:px-[2%] bg-white">
       {/* Logo */}
       <hgroup className="space-y-1">
         <Link
-          href={"/admin"}
+          href={'/admin'}
           className="headingFont text-2xl sm:text-3xl font-extrabold cursor-pointer"
         >
           World Pumps - Admin
@@ -71,16 +71,13 @@ export default function AdminNavBar() {
           </DialogTrigger>
           <DialogContent className="p-6 rounded-md outline-none">
             <DialogHeader>
-              <DialogTitle className="text-sm text-start font-normal">
-                Navigation
-              </DialogTitle>
+              <DialogTitle className="text-sm text-start font-normal">Navigation</DialogTitle>
             </DialogHeader>
 
             <ul className="flex flex-col gap-2 mt-2">
               {navLinks.map((link) => {
                 const active =
-                  pathName === link.href ||
-                  (pathName === "/sign-up" && link.href === "/sign-in");
+                  pathName === link.href || (pathName === '/sign-up' && link.href === '/sign-in')
                 return (
                   <div key={link.href}>
                     <li>
@@ -89,49 +86,44 @@ export default function AdminNavBar() {
                         onClick={() => setOpen(false)}
                         className={`block w-full px-4 py-2 rounded-md text-lg ${
                           active
-                            ? "bg-secondary text-secondary-foreground"
-                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            ? 'bg-secondary text-secondary-foreground'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                       >
                         {link.label}
                       </Link>
                     </li>
                   </div>
-                );
+                )
               })}
             </ul>
           </DialogContent>
         </Dialog>
       </section>
     </nav>
-  );
+  )
 }
 
 interface NavLinkProps {
-  href: string;
-  pathName: string;
-  onClick?: () => void;
+  href: string
+  pathName: string
+  onClick?: () => void
 }
 
-function NavLink({
-  href,
-  pathName,
-  children,
-  onClick,
-}: NavLinkProps & PropsWithChildren) {
+function NavLink({ href, pathName, children, onClick }: NavLinkProps & PropsWithChildren) {
   return (
     <li>
       <Link
         href={href}
         onClick={onClick}
         className={`${
-          pathName === href || (pathName === "/sign-up" && href === "/sign-in")
-            ? "text-primary font-medium border-b border-b-primary"
-            : "text-black"
+          pathName === href || (pathName === '/sign-up' && href === '/sign-in')
+            ? 'text-primary font-medium border-b border-b-primary'
+            : 'text-black'
         } text-lg`}
       >
         {children}
       </Link>
     </li>
-  );
+  )
 }

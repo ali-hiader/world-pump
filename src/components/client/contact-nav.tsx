@@ -1,6 +1,7 @@
-import { FacebookIcon } from "@/icons/facebook";
 import Link from "next/link";
 import React from "react";
+
+import { FacebookIcon } from "@/icons/facebook";
 
 function ContactNavBar() {
   return (

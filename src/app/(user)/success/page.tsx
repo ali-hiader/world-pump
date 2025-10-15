@@ -1,12 +1,13 @@
+import { headers } from 'next/headers'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { headers } from 'next/headers'
+
+import { eq } from 'drizzle-orm'
 
 import { auth } from '@/lib/auth/auth'
 import { clearCartDB } from '@/actions/cart'
 import { db } from '@/db'
 import { orderTable } from '@/db/schema'
-import { eq } from 'drizzle-orm'
 
 interface SuccessPageProps {
   searchParams: {

@@ -1,16 +1,17 @@
 'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
-import { AccessoryType } from '@/lib/types'
-import { fetchAccessoryProductIds, fetchAllProducts } from '@/actions/product-accessory'
-import { fetchAccessoryById } from '@/actions/accessory'
+import { ProductType } from '@/lib/types'
+import { fetchAccessoryBySlug } from '@/actions/accessory'
+import { fetchAllProducts } from '@/actions/product'
+import { fetchAccessoryProductIds } from '@/actions/product-accessory'
 import AddToCartBtn from '@/components/client/add_to_cart'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { db } from '@/db'
 import Spinner from '@/icons/spinner'
 
 interface SpecField {
@@ -19,38 +20,70 @@ interface SpecField {
   value: string
 }
 
+interface AccessoryType {
+  id: number
+  title: string
+  brand?: string | null
+  stock: number
+  status: string
+  imageUrl?: string | null
+  description?: string | null
+  specs?: Record<string, string> | SpecField[] | null
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+// Move helper function outside component
+const parseSpecsToArray = (specs: unknown): SpecField[] => {
+  if (!specs) return []
+  try {
+    if (Array.isArray(specs)) {
+      return specs.map((spec, index) => ({
+        id: (index + 1).toString(),
+        field: spec.field || '',
+        value: spec.value || '',
+      }))
+    }
+    if (typeof specs === 'object') {
+      return Object.entries(specs).map(([field, value], index) => ({
+        id: (index + 1).toString(),
+        field,
+        value: String(value),
+      }))
+    }
+    if (typeof specs === 'string') {
+      const parsed = JSON.parse(specs)
+      return parseSpecsToArray(parsed)
+    }
+  } catch {
+    // ignore
+  }
+  return []
+}
+
+// Helper function to format dates
+const formatDate = (date?: Date): string => {
+  if (!date) return 'N/A'
+  try {
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    })
+  } catch {
+    return 'N/A'
+  }
+}
+
 export default function AccessoryDetailPage() {
   const params = useParams()
   const accessorySlug = params.id as string
 
-  const accessory = await db.select().from
-
-  const parseSpecsToArray = (specs: unknown): SpecField[] => {
-    if (!specs) return []
-    try {
-      if (Array.isArray(specs)) {
-        return specs.map((spec, index) => ({
-          id: (index + 1).toString(),
-          field: spec.field || '',
-          value: spec.value || '',
-        }))
-      }
-      if (typeof specs === 'object') {
-        return Object.entries(specs).map(([field, value], index) => ({
-          id: (index + 1).toString(),
-          field,
-          value: String(value),
-        }))
-      }
-      if (typeof specs === 'string') {
-        const parsed = JSON.parse(specs)
-        return parseSpecsToArray(parsed)
-      }
-    } catch {
-      // ignore
-    }
-    return []
-  }
+  // State declarations
+  const [accessory, setAccessory] = useState<AccessoryType | null>(null)
+  const [products, setProducts] = useState<ProductType[]>([])
+  const [attachedProductIds, setAttachedProductIds] = useState<number[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchData() {
@@ -58,25 +91,28 @@ export default function AccessoryDetailPage() {
       setLoading(true)
       try {
         const [acc, allProducts] = await Promise.all([
-          fetchAccessoryById(accessorySlug),
+          fetchAccessoryBySlug(accessorySlug),
           fetchAllProducts(),
         ])
-        setAccessory({
-          ...acc,
-          imageUrl: acc.imageUrl ?? '',
-          description: acc.description ?? '',
-          specs: acc.specs as Record<string, string> | SpecField[] | null,
-          createdAt: acc.createdAt ?? undefined,
-          updatedAt: acc.updatedAt ?? undefined,
-        })
-        // If you need attached product IDs, you may need to fetch by acc.id after acc is loaded
-        if (acc && acc.id) {
+
+        if (acc) {
+          setAccessory({
+            ...acc,
+            imageUrl: acc.imageUrl ?? '',
+            description: acc.description ?? '',
+            specs: acc.specs as Record<string, string> | SpecField[] | null,
+            createdAt: acc.createdAt ?? undefined,
+            updatedAt: acc.updatedAt ?? undefined,
+          })
+
+          // Fetch attached product IDs
           const productIds = await fetchAccessoryProductIds(acc.id)
           setAttachedProductIds(productIds)
         }
+
         setProducts(allProducts)
-      } catch {
-        // ignore fetch error
+      } catch (error) {
+        console.error('Error fetching accessory data:', error)
       } finally {
         setLoading(false)
       }
@@ -126,7 +162,11 @@ export default function AccessoryDetailPage() {
           </div>
           <div className="flex gap-2">
             <span
-              className={`px-2 py-1 rounded text-xs ${accessory.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}`}
+              className={`px-2 py-1 rounded text-xs ${
+                accessory.status === 'active'
+                  ? 'bg-green-100 text-green-700'
+                  : 'bg-gray-200 text-gray-600'
+              }`}
             >
               {accessory.status}
             </span>
@@ -172,7 +212,6 @@ export default function AccessoryDetailPage() {
                 <span className="font-medium text-gray-500">Accessory Title:</span>{' '}
                 {accessory.title}
               </div>
-
               <div>
                 <span className="font-medium text-gray-500">Brand:</span> {accessory.brand || '-'}
               </div>

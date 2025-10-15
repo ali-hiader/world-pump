@@ -1,7 +1,8 @@
-import React from "react";
-import Heading from "./heading";
 import Image from "next/image";
 import Link from "next/link";
+import React from "react";
+
+import Heading from "./heading";
 
 function AboutCompany() {
   return (

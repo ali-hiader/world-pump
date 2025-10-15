@@ -4,10 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { ProductType } from "@/lib/types";
-import { Badge } from "@/components/ui/badge";
-import AddToCartBtn from "./add_to_cart";
 import { formatPKR } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+
 import { Separator } from "../ui/separator";
+
+import AddToCartBtn from "./add_to_cart";
 
 export default function ProductCard({ product }: { product: ProductType }) {
   if (!product) return;

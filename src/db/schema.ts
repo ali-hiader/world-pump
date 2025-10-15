@@ -94,7 +94,7 @@ export const paymentStatusEnum = pgEnum('payment_status', [
   'refunded', // refunded later
 ])
 
-export const paymentMethodEnum = pgEnum('payment_method', ['payfast', 'cod'])
+export const paymentMethodEnum = pgEnum('payment_method', ['bank', 'cod'])
 
 export const paymentTable = pgTable('payment', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity(),

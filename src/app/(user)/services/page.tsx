@@ -1,9 +1,11 @@
-import React from "react";
 import type { Metadata } from "next";
+
+import Link from "next/link";
+import React from "react";
+
 import Heading from "@/components/client/heading";
 import ServiceCard from "@/components/client/service_card";
 import { services } from "@/components/client/services";
-import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 

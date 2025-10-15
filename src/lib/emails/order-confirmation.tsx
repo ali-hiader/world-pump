@@ -1,15 +1,16 @@
 import React from "react";
+
 import {
   Body,
+  Column,
   Container,
   Head,
   Heading,
   Hr,
   Html,
+  Row,
   Section,
   Text,
-  Row,
-  Column,
 } from "@react-email/components";
 
 export type EmailItem = {

@@ -2,7 +2,7 @@
 import { and, asc, desc, eq, getTableColumns, gte, lte, sql } from 'drizzle-orm'
 
 import { db } from '@/db'
-import { cartTable, categoryTable, productTable } from '@/db/schema'
+import { categoryTable, productTable } from '@/db/schema'
 
 export async function fetchAllProducts() {
   const products = await db
@@ -17,10 +17,40 @@ export async function fetchAllProducts() {
   return products
 }
 
+export async function fetchProductBySlug(productSlug: string) {
+  const products = await db
+    .select({
+      categorySlug: categoryTable.slug,
+      categoryName: categoryTable.name,
+      ...getTableColumns(productTable),
+    })
+    .from(productTable)
+    .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id))
+    .where(eq(productTable.slug, productSlug))
+
+  return products[0]
+}
+
+export async function fetchProductById(id: number) {
+  const products = await db
+    .select({
+      categorySlug: categoryTable.slug,
+      categoryName: categoryTable.name,
+      ...getTableColumns(productTable),
+    })
+    .from(productTable)
+    .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id))
+    .where(eq(productTable.id, id))
+
+  return products[0]
+}
+
+// Fetch featured products for homepage
 export async function fetchFeaturedProducts(limit = 8) {
   const products = await db
     .select({
       categorySlug: categoryTable.slug,
+      categoryName: categoryTable.name,
       ...getTableColumns(productTable),
     })
     .from(productTable)
@@ -31,37 +61,11 @@ export async function fetchFeaturedProducts(limit = 8) {
   return products
 }
 
-export async function getSingleProductForCart(productId: number) {
-  const products = await db
-    .select({
-      cartId: cartTable.id,
-      quantity: cartTable.quantity,
-      addedBy: cartTable.createdBy,
-      ...getTableColumns(productTable),
-    })
-    .from(cartTable)
-    .innerJoin(productTable, eq(cartTable.productId, productTable.id))
-    .where(eq(cartTable.productId, productId))
-  return products[0]
-}
-
-export async function fetchSingleProduct(productSlug: string) {
-  const products = await db
-    .select({
-      categorySlug: categoryTable.slug,
-      ...getTableColumns(productTable),
-    })
-    .from(productTable)
-    .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id))
-    .where(eq(productTable.slug, productSlug))
-
-  return products[0]
-}
-
 export async function fetchRelatedProducts(categoryId: number) {
   const products = await db
     .select({
       categorySlug: categoryTable.slug,
+      categoryName: categoryTable.name,
       ...getTableColumns(productTable),
     })
     .from(productTable)
@@ -78,36 +82,6 @@ export type ProductFilters = {
   brand?: string
   horsepower?: string
   sort?: 'newest' | 'price_asc' | 'price_desc'
-}
-
-export async function getCategoryBySlug(slug: string) {
-  const rows = await db
-    .select({ ...getTableColumns(categoryTable) })
-    .from(categoryTable)
-    .where(eq(categoryTable.slug, slug))
-    .limit(1)
-  return rows[0] || null
-}
-
-export async function getCategoryBrands(slug: string) {
-  const base = db
-    .select({ brand: productTable.brand })
-    .from(productTable)
-    .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id))
-  const rows =
-    slug === 'all'
-      ? await base.where(eq(productTable.status, 'active'))
-      : await base.where(and(eq(categoryTable.slug, slug), eq(productTable.status, 'active')))
-  const set = new Set(rows.map((r) => r.brand).filter((b): b is string => Boolean(b)))
-  return Array.from(set).sort((a, b) => a.localeCompare(b))
-}
-
-export async function getAllCategories() {
-  const rows = await db
-    .select({ ...getTableColumns(categoryTable) })
-    .from(categoryTable)
-    .orderBy(asc(categoryTable.name))
-  return rows
 }
 
 export async function fetchProductsByCategoryPaginated(
@@ -150,6 +124,7 @@ export async function fetchProductsByCategoryPaginated(
     db
       .select({
         categorySlug: categoryTable.slug,
+        categoryName: categoryTable.name,
         ...getTableColumns(productTable),
       })
       .from(productTable)

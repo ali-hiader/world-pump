@@ -1,9 +1,10 @@
 "use client";
 
-import React, { PropsWithChildren, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import React, { PropsWithChildren, useEffect, useState } from "react";
 
+import { CategoryType } from "@/lib/types";
 import {
   Dialog,
   DialogContent,
@@ -12,11 +13,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAuthStore } from "@/stores/auth_store";
-import PumpsCategories from "./pumps_categories";
-import useProductsStore from "@/stores/pump_store";
-import { CategoryType } from "@/lib/types";
-import { Badge } from "../ui/badge";
 import useCartStore from "@/stores/cart_store";
+import useProductsStore from "@/stores/pump_store";
+
+import { Badge } from "../ui/badge";
+
+import PumpsCategories from "./pumps_categories";
 
 const navLinks = [
   { href: "/", label: "Home" },

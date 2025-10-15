@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+
 import { OrderType } from "@/lib/types";
+import { Button } from "@/components/ui/button";
 import Spinner from "@/icons/spinner";
 
 interface OrderActionsProps {

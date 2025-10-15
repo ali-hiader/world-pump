@@ -96,14 +96,21 @@ function AddAccessory() {
 
     // Get form data
     const form = e.currentTarget
-    const title = (form.elements.namedItem('title') as HTMLInputElement)?.value?.trim()
-    const price = Number((form.elements.namedItem('price') as HTMLInputElement)?.value)
-    const description = (form.elements.namedItem('description') as HTMLInputElement)?.value?.trim()
-    const status = (form.elements.namedItem('status') as HTMLSelectElement)?.value
-    const imagePresent = !!imageUrl
+    const formData = new FormData(form)
+
+    const title = formData.get('title') as string
+    const brand = formData.get('brand') as string
+    const price = Number(formData.get('price'))
+    const discountPrice = formData.get('discountPrice')
+      ? Number(formData.get('discountPrice'))
+      : null
+    const stock = formData.get('stock') ? Number(formData.get('stock')) : 0
+    const status = formData.get('status') as string
+    const description = formData.get('description') as string
+    const isFeatured = formData.get('isFeatured') === 'true'
 
     // Validation
-    if (!title) {
+    if (!title?.trim()) {
       setError('Accessory title is required.')
       return
     }
@@ -111,7 +118,7 @@ function AddAccessory() {
       setError('Valid price is required.')
       return
     }
-    if (!description) {
+    if (!description?.trim()) {
       setError('Description is required.')
       return
     }
@@ -119,7 +126,7 @@ function AddAccessory() {
       setError('Status is required.')
       return
     }
-    if (!imagePresent) {
+    if (!imageRef.current?.files?.[0]) {
       setError('Accessory image is required.')
       return
     }
@@ -129,8 +136,66 @@ function AddAccessory() {
     }
 
     setLoading(true)
-    // ...API integration not required for now
-    setLoading(false)
+
+    try {
+      // Prepare form data for API
+      const apiFormData = new FormData()
+      apiFormData.append('title', title)
+      if (brand) apiFormData.append('brand', brand)
+      apiFormData.append('price', price.toString())
+      if (discountPrice) apiFormData.append('discountPrice', discountPrice.toString())
+      apiFormData.append('stock', stock.toString())
+      apiFormData.append('status', status)
+      apiFormData.append('description', description)
+      apiFormData.append('isFeatured', isFeatured.toString())
+      apiFormData.append('image', imageRef.current.files[0])
+      apiFormData.append('productIds', JSON.stringify(selectedProducts))
+
+      // Prepare specs data
+      const validSpecs = specs.filter((spec) => spec.field.trim() && spec.value.trim())
+      if (validSpecs.length > 0) {
+        const specsObject = validSpecs.reduce(
+          (acc, spec) => {
+            acc[spec.field] = spec.value
+            return acc
+          },
+          {} as Record<string, string>,
+        )
+        apiFormData.append('specs', JSON.stringify(specsObject))
+      }
+
+      const res = await fetch('/api/admin/accessory', {
+        method: 'POST',
+        body: apiFormData,
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to create accessory')
+      }
+
+      if (data.success) {
+        // Reset form
+        form.reset()
+        setImageUrl(undefined)
+        setImageName(undefined)
+        setSelectedProducts([])
+        setSpecs([{ id: '1', field: '', value: '' }])
+
+        // Show success message or redirect
+        alert('Accessory created successfully!')
+        // Optionally redirect to accessories list
+        // router.push('/admin/accessories')
+      } else {
+        setError(data.error || 'Failed to create accessory')
+      }
+    } catch (error) {
+      console.error('Error creating accessory:', error)
+      setError(error instanceof Error ? error.message : 'Failed to create accessory')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

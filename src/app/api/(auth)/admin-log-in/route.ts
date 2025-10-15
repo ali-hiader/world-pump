@@ -67,7 +67,7 @@ export async function POST(req: Request) {
     if (error instanceof Error) {
       console.error('❌ Signin error:', error.message)
       return NextResponse.json(
-        { success: false, userId: undefined, generalError: error.message },
+        { success: false, userId: undefined, generalError: 'Something went wrong' },
         { status: 500 },
       )
     }

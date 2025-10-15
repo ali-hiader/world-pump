@@ -1,10 +1,13 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 import {
   Accordion,
+  AccordionContent,
   AccordionItem,
   AccordionTrigger,
-  AccordionContent,
 } from "@/components/ui/accordion";
 import {
   Menubar,
@@ -14,8 +17,6 @@ import {
   MenubarTrigger,
 } from "@/components/ui/menubar";
 import useProductsStore from "@/stores/pump_store";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
 
 interface PumpsCategoriesProps {
   mobile?: boolean; // true → accordion, false → menubar

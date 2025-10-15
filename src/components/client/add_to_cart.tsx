@@ -1,15 +1,14 @@
 'use client'
 
-import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
-import Spinner from '@/icons/spinner'
+import { toast } from 'sonner'
 
 import { addToCartDB } from '@/actions/cart'
-
-import useCartStore from '@/stores/cart_store'
+import Spinner from '@/icons/spinner'
 import { useAuthStore } from '@/stores/auth_store'
-import { toast } from 'sonner'
+import useCartStore from '@/stores/cart_store'
 
 interface Props {
   productId: number

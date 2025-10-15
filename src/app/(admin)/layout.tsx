@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { PropsWithChildren } from 'react'
 
 import { checkAuth } from '@/actions/auth'
-import AdminNavBar from '@/components/admin/admin_navbar'
+import AdminNavBar from '@/components/admin/navbar'
 
 async function AdminLayout({ children }: PropsWithChildren) {
   const ok = await checkAuth()

@@ -1,6 +1,7 @@
-import React from "react";
-import Heading from "./heading";
 import Image from "next/image";
+import React from "react";
+
+import Heading from "./heading";
 
 const logos = [
   "/brands/1.png",

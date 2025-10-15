@@ -1,9 +1,12 @@
-import { NextResponse } from 'next/server'
 import { headers } from 'next/headers'
+import { NextResponse } from 'next/server'
+
+import { eq } from 'drizzle-orm'
 import { z } from 'zod'
-// PayFast for online payments
-import { buildPayfastFields } from '@/lib/payfast'
+
 import { auth } from '@/lib/auth/auth'
+// PayFast for online payments
+import { db } from '@/db'
 import {
   addressTable,
   orderItemTable,
@@ -11,8 +14,6 @@ import {
   paymentTable,
   user as userTable,
 } from '@/db/schema'
-import { eq } from 'drizzle-orm'
-import { db } from '@/db'
 
 const addressSchema = z.object({
   fullName: z.string().min(1),
@@ -44,7 +45,7 @@ const bodySchema = z.object({
       billing: addressSchema.optional(),
     })
     .optional(),
-  paymentMethod: z.enum(['payfast', 'cod', 'bank']).default('cod'),
+  paymentMethod: z.enum(['cod', 'bank']).default('cod'),
 })
 
 function makeOrderNumber() {
@@ -144,7 +145,6 @@ export async function POST(req: Request) {
         shippingAddressId: shippingAddressId ?? null,
         billingAddressId: billingAddressId ?? null,
         totalAmount,
-        // paymentStatus defaults to pending; status defaults to pending
       })
       .returning({ id: orderTable.id })
     const orderId = orderInsert[0]?.id
@@ -166,44 +166,13 @@ export async function POST(req: Request) {
       )
     }
 
-    // Payment record
-    const payfastAvailable = Boolean(
-      process.env.PAYFAST_MERCHANT_ID && process.env.PAYFAST_MERCHANT_KEY,
-    )
-    const methodMapped: 'payfast' | 'cod' =
-      paymentMethod === 'payfast' && payfastAvailable ? 'payfast' : 'cod'
     await db.insert(paymentTable).values({
       orderId,
-      method: methodMapped,
+      method: paymentMethod,
       amount: totalAmount,
       // status: pending by default
     })
 
-    // If online payment requested, return PayFast process data
-    if (paymentMethod === 'payfast' && payfastAvailable) {
-      const firstLast = (addresses?.shipping.fullName || '').split(' ')
-      const firstName = firstLast.slice(0, -1).join(' ') || firstLast[0] || ''
-      const lastName = firstLast.slice(-1)[0] || ''
-
-      const { fields, processUrl } = buildPayfastFields({
-        orderNumber,
-        orderId,
-        amount: totalAmount,
-        itemName: `Order ${orderNumber}`,
-        customerEmail: userEmail || undefined,
-        customerFirstName: firstName,
-        customerLastName: lastName,
-      })
-
-      return NextResponse.json({
-        gateway: 'payfast',
-        processUrl,
-        fields,
-        orderId,
-      })
-    }
-
-    // COD / Bank deposit flow (or PayFast disabled)
     return NextResponse.json({ orderId, status: 'pending' })
   } catch (error) {
     console.error('Error handling checkout:', error)

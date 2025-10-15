@@ -1,25 +1,20 @@
-import Link from 'next/link'
-
-import { Plus } from 'lucide-react'
-
-import ProductsTable from '@/components/admin/products-table'
+import { fetchAllProducts } from '@/actions/product'
+import AddItemBtn from '@/components/admin/add-item-btn'
+import ProductsTable from '@/components/admin/table-products'
 import Heading from '@/components/client/heading'
-import { Button } from '@/components/ui/button'
 
-export default function AdminProductsPage() {
+export const dynamic = 'force-dynamic'
+
+export default async function AdminProductsPage() {
+  const products = await fetchAllProducts()
   return (
     <main className="py-6 px-4 sm:px-[3%] space-y-6 max-w-[2000px] mx-auto">
       <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center">
         <Heading title="Manage Products" />
-        <Link href="/admin/add-product" className="w-fit">
-          <Button className="bg-primary hover:bg-primary/90 w-full sm:w-auto">
-            <Plus className="mr-2 h-4 w-4" />
-            <span className="sm:inline">Add Product</span>
-          </Button>
-        </Link>
+        <AddItemBtn />
       </div>
 
-      <ProductsTable />
+      <ProductsTable initialProducts={products} />
     </main>
   )
 }
