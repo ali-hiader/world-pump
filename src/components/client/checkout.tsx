@@ -88,7 +88,11 @@ function Checkout({ cartItems, userName }: Props) {
   }
 
   if (cartItems.length === 0) {
-    return <DisplayAlert showBtn={false}>Please add Products to cart to review here!</DisplayAlert>
+    return (
+      <DisplayAlert showBtn buttonText="Start Shopping" buttonHref="/pumps">
+        Please add Products to cart to review here!
+      </DisplayAlert>
+    )
   }
 
   return (

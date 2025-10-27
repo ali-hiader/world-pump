@@ -98,7 +98,9 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
         </section>
 
         {products.length === 0 ? (
-          <DisplayAlert showBtn={false}>No products found.</DisplayAlert>
+          <DisplayAlert showBtn buttonText="Explore All Pumps" buttonHref="/pumps">
+            No products found.
+          </DisplayAlert>
         ) : (
           <>
             <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 justify-center gap-6 mt-8">

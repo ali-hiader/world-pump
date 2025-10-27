@@ -58,7 +58,9 @@ export default function ProductsTable({ initialProducts }: Props) {
   if (products.length === 0) {
     return (
       <div className="mt-20">
-        <DisplayAlert showBtn={false}>No products found. Please add new products.</DisplayAlert>
+        <DisplayAlert showBtn buttonText="Add Product" buttonHref="/admin/add-product">
+          No products found. Please add new products.
+        </DisplayAlert>
       </div>
     )
   }

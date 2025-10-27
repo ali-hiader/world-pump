@@ -87,7 +87,9 @@ export default function AccessoriesTable() {
   if (accessories.length === 0) {
     return (
       <div className="mt-20">
-        <DisplayAlert showBtn={false}>No accessory found. Please add new accessories.</DisplayAlert>
+        <DisplayAlert showBtn buttonText="Add Accessory" buttonHref="/admin/add-accessory">
+          No accessory found. Please add new accessories.
+        </DisplayAlert>
       </div>
     )
   }

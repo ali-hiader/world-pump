@@ -1,50 +1,50 @@
-"use client";
+'use client'
 
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
-import { OrderType } from "@/lib/types";
-import { OrderItem as OrderItemI } from "@/lib/types";
-import DisplayAlert from "@/components/client/display_alert";
-import Heading from "@/components/client/heading";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import Spinner from "@/icons/spinner";
+import { OrderType } from '@/lib/types'
+import { OrderItem as OrderItemI } from '@/lib/types'
+import DisplayAlert from '@/components/client/display_alert'
+import Heading from '@/components/client/heading'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import Spinner from '@/icons/spinner'
 
 interface OrderWithItems {
-  order: OrderType;
-  items: OrderItemI[];
+  order: OrderType
+  items: OrderItemI[]
 }
 
 function Analytics() {
-  const router = useRouter();
-  const [orderItems, setOrderItems] = useState<OrderWithItems[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>("");
+  const router = useRouter()
+  const [orderItems, setOrderItems] = useState<OrderWithItems[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string>('')
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch("/api/orders");
-        const data = await response.json();
+        const response = await fetch('/api/orders')
+        const data = await response.json()
 
         if (response.ok) {
-          setOrderItems(data.orderItems || []);
+          setOrderItems(data.orderItems || [])
         } else if (response.status === 401) {
-          router.push("/signup");
+          router.push('/signup')
         } else {
-          setError(data.error || "Failed to fetch orders");
+          setError(data.error || 'Failed to fetch orders')
         }
       } catch (error) {
-        console.error("Error fetching orders:", error);
-        setError("Failed to fetch orders");
+        console.error('Error fetching orders:', error)
+        setError('Failed to fetch orders')
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchOrders();
-  }, [router]);
+    fetchOrders()
+  }, [router])
 
   const handleStatusUpdate = (orderId: number, newStatus: string) => {
     setOrderItems((prev) =>
@@ -54,18 +54,13 @@ function Analytics() {
               ...orderData,
               order: {
                 ...orderData.order,
-                status: newStatus as
-                  | "pending"
-                  | "paid"
-                  | "shipped"
-                  | "completed"
-                  | "cancelled",
+                status: newStatus as 'pending' | 'paid' | 'shipped' | 'completed' | 'cancelled',
               },
             }
-          : orderData
-      )
-    );
-  };
+          : orderData,
+      ),
+    )
+  }
 
   if (loading) {
     return (
@@ -74,7 +69,7 @@ function Analytics() {
           <Spinner className="animate-spin h-8 w-8" />
         </div>
       </main>
-    );
+    )
   }
 
   if (error) {
@@ -84,29 +79,26 @@ function Analytics() {
           <p className="text-red-600">{error}</p>
         </div>
       </main>
-    );
+    )
   }
 
   function getTime(order: OrderType) {
-    if (!order.createdAt) return "N/A";
+    if (!order.createdAt) return 'N/A'
 
     // Convert string to Date object if it's a string
-    const date =
-      typeof order.createdAt === "string"
-        ? new Date(order.createdAt)
-        : order.createdAt;
+    const date = typeof order.createdAt === 'string' ? new Date(order.createdAt) : order.createdAt
 
     // Check if date is valid
-    if (isNaN(date.getTime())) return "Invalid Date";
+    if (isNaN(date.getTime())) return 'Invalid Date'
 
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    const seconds = String(date.getSeconds()).padStart(2, "0");
-    const day = date.getDate();
-    const month = date.getMonth() + 1; // getMonth() returns 0-11
-    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0')
+    const minutes = String(date.getMinutes()).padStart(2, '0')
+    const seconds = String(date.getSeconds()).padStart(2, '0')
+    const day = date.getDate()
+    const month = date.getMonth() + 1 // getMonth() returns 0-11
+    const year = date.getFullYear()
 
-    return `${hours}:${minutes}:${seconds} - ${day}/${month}/${year}`;
+    return `${hours}:${minutes}:${seconds} - ${day}/${month}/${year}`
   }
 
   return (
@@ -114,13 +106,12 @@ function Analytics() {
       <Heading title="Orders" />
       <ul className="w-full">
         {orderItems.length === 0 ? (
-          <DisplayAlert showBtn>Create Orders to view here!</DisplayAlert>
+          <DisplayAlert showBtn buttonText="Start Shopping" buttonHref="/pumps/all">
+            Create Orders to view here!
+          </DisplayAlert>
         ) : (
           orderItems.map((orderData, i) => (
-            <li
-              key={orderData.order.id}
-              className="w-full flex flex-col items-start gap-2"
-            >
+            <li key={orderData.order.id} className="w-full flex flex-col items-start gap-2">
               <section className="mt-6 flex sm:items-center sm:flex-row flex-col sm:justify-between w-full">
                 <span className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
                   <span>
@@ -139,15 +130,9 @@ function Analytics() {
               <section className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-2 text-sm">
                   <StatusBadge label="Order" value={orderData.order.status} />
-                  <StatusBadge
-                    label="Payment"
-                    value={orderData.order.paymentStatus}
-                  />
+                  <StatusBadge label="Payment" value={orderData.order.paymentStatus} />
                 </div>
-                <OrderActions
-                  order={orderData.order}
-                  onStatusUpdate={handleStatusUpdate}
-                />
+                <OrderActions order={orderData.order} onStatusUpdate={handleStatusUpdate} />
               </section>
               <section className="w-full grid grid-cols-1 gap-4 lg:grid-cols-2">
                 {orderData.items.map((item) => (
@@ -162,11 +147,11 @@ function Analytics() {
         )}
       </ul>
     </main>
-  );
+  )
 }
 
 interface Props {
-  item: OrderItemI;
+  item: OrderItemI
 }
 
 function OrderItem({ item }: Props) {
@@ -186,56 +171,56 @@ function OrderItem({ item }: Props) {
         </div>
       </section>
     </Card>
-  );
+  )
 }
 
-export default Analytics;
+export default Analytics
 
 // Inline OrderActions component
 function OrderActions({
   order,
   onStatusUpdate,
 }: {
-  order: OrderType;
-  onStatusUpdate: (orderId: number, newStatus: string) => void;
+  order: OrderType
+  onStatusUpdate: (orderId: number, newStatus: string) => void
 }) {
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [error, setError] = useState<string>("");
+  const [isUpdating, setIsUpdating] = useState(false)
+  const [error, setError] = useState<string>('')
 
   const handleMarkAsReceived = async () => {
-    if (!order.id) return;
+    if (!order.id) return
 
-    setIsUpdating(true);
-    setError("");
+    setIsUpdating(true)
+    setError('')
 
     try {
       const response = await fetch(`/api/orders/${order.id}/status`, {
-        method: "PATCH",
+        method: 'PATCH',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          status: "completed",
+          status: 'completed',
         }),
-      });
+      })
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (response.ok) {
-        onStatusUpdate(order.id, "completed");
+        onStatusUpdate(order.id, 'completed')
       } else {
-        setError(data.error || "Failed to update order status");
+        setError(data.error || 'Failed to update order status')
       }
     } catch (error) {
-      console.error("Error updating order status:", error);
-      setError("Failed to update order status");
+      console.error('Error updating order status:', error)
+      setError('Failed to update order status')
     } finally {
-      setIsUpdating(false);
+      setIsUpdating(false)
     }
-  };
+  }
 
   // Show the button only if order is paid or shipped
-  const canMarkAsReceived = ["paid", "shipped"].includes(order.status || "");
+  const canMarkAsReceived = ['paid', 'shipped'].includes(order.status || '')
 
   return (
     <div className="flex flex-col gap-2">
@@ -259,33 +244,25 @@ function OrderActions({
               Updating...
             </>
           ) : (
-            "Mark as Received"
+            'Mark as Received'
           )}
         </Button>
       )}
     </div>
-  );
+  )
 }
 
-function StatusBadge({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | null;
-}) {
+function StatusBadge({ label, value }: { label: string; value: string | null }) {
   const color =
-    value === "successful" || value === "paid"
-      ? "bg-emerald-100 text-emerald-700"
-      : value === "failed" || value === "cancelled"
-        ? "bg-rose-100 text-rose-700"
-        : "bg-amber-100 text-amber-700"; // pending or others
+    value === 'successful' || value === 'paid'
+      ? 'bg-emerald-100 text-emerald-700'
+      : value === 'failed' || value === 'cancelled'
+        ? 'bg-rose-100 text-rose-700'
+        : 'bg-amber-100 text-amber-700' // pending or others
   return (
-    <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded ${color}`}
-    >
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded ${color}`}>
       <span className="text-xs uppercase opacity-70">{label}</span>
-      <span className="text-xs font-medium">{value || "pending"}</span>
+      <span className="text-xs font-medium">{value || 'pending'}</span>
     </span>
-  );
+  )
 }

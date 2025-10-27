@@ -22,7 +22,9 @@ function CartList() {
     <>
       <Heading title="Cart" />
       {cartProducts_S.length === 0 ? (
-        <DisplayAlert showBtn> No products in the cart!</DisplayAlert>
+        <DisplayAlert showBtn buttonText="Start Shopping" buttonHref="/pumps">
+          No products in the cart!
+        </DisplayAlert>
       ) : (
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-12 px-4 max-w-7xl mx-auto">
           {cartProducts_S.map((product) => (

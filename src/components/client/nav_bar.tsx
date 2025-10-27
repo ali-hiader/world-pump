@@ -1,58 +1,52 @@
-"use client";
+'use client'
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import React, { PropsWithChildren, useEffect, useState } from "react";
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import React, { PropsWithChildren, useEffect, useState } from 'react'
 
-import { CategoryType } from "@/lib/types";
+import { CategoryType } from '@/lib/types'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { useAuthStore } from "@/stores/auth_store";
-import useCartStore from "@/stores/cart_store";
-import useProductsStore from "@/stores/pump_store";
+} from '@/components/ui/dialog'
+import { useAuthStore } from '@/stores/auth_store'
+import useCartStore from '@/stores/cart_store'
+import useProductsStore from '@/stores/pump_store'
 
-import { Badge } from "../ui/badge";
+import { Badge } from '../ui/badge'
 
-import PumpsCategories from "./pumps_categories";
+import PumpsCategories from './pumps_categories'
 
 const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/services", label: "Services" },
-  { href: "/about-us", label: "About" },
-  { href: "/contact", label: "Contact" },
-];
+  { href: '/', label: 'Home' },
+  { href: '/services', label: 'Services' },
+  { href: '/about-us', label: 'About' },
+  { href: '/contact', label: 'Contact' },
+  { href: '/blogs', label: 'Blog' },
+]
 
-export default function NavBar({
-  categories,
-}: {
-  categories?: CategoryType[];
-}) {
-  const pathName = usePathname();
-  const [open, setOpen] = useState(false);
-  const { setCategories } = useProductsStore();
+export default function NavBar({ categories }: { categories?: CategoryType[] }) {
+  const pathName = usePathname()
+  const [open, setOpen] = useState(false)
+  const { setCategories } = useProductsStore()
 
-  const session = useAuthStore((state) => state.userIdAuthS);
-  const { cartProducts_S } = useCartStore();
+  const session = useAuthStore((state) => state.userIdAuthS)
+  const { cartProducts_S } = useCartStore()
 
   useEffect(() => {
     if (categories && categories.length > 0) {
-      setCategories(categories);
+      setCategories(categories)
     }
-  }, [categories, setCategories]);
+  }, [categories, setCategories])
 
   return (
     <nav aria-label="Main Nav" className="sticky top-0 z-50 bg-white shadow-md">
       <section className="max-w-[1600px] mx-auto flex justify-between items-center p-4 sm:px-[2%] ">
         {/* Logo */}
-        <Link
-          href={"/"}
-          className="headingFont text-2xl sm:text-3xl font-extrabold cursor-pointer"
-        >
+        <Link href={'/'} className="headingFont text-2xl sm:text-3xl font-extrabold cursor-pointer">
           World Pumps
         </Link>
 
@@ -75,15 +69,15 @@ export default function NavBar({
         {/* Desktop Right Side */}
         <ul className="hidden md:flex items-center justify-between gap-6 mr-2">
           {session ? (
-            <NavLink pathName={pathName} href={"/account"}>
+            <NavLink pathName={pathName} href={'/account'}>
               Account
             </NavLink>
           ) : (
-            <NavLink pathName={pathName} href={"/sign-in"}>
+            <NavLink pathName={pathName} href={'/sign-in'}>
               Login
             </NavLink>
           )}
-          <NavLink pathName={pathName} href={"/cart"}>
+          <NavLink pathName={pathName} href={'/cart'}>
             Cart
             {cartProducts_S.length !== 0 && (
               <Badge className="absolute size-5 top-3 right-4 bg-secondary rounded-full text-white">
@@ -96,10 +90,7 @@ export default function NavBar({
         <section className="md:hidden">
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <button
-                className="relative cursor-pointer"
-                aria-label="Open menu"
-              >
+              <button className="relative cursor-pointer" aria-label="Open menu">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="22"
@@ -117,16 +108,13 @@ export default function NavBar({
             </DialogTrigger>
             <DialogContent className="p-6 rounded-md outline-none">
               <DialogHeader>
-                <DialogTitle className="text-sm text-start font-normal">
-                  Navigation
-                </DialogTitle>
+                <DialogTitle className="text-sm text-start font-normal">Navigation</DialogTitle>
               </DialogHeader>
 
               <ul className="flex flex-col gap-2 mt-2">
                 {navLinks.map((link, index) => {
                   const active =
-                    pathName === link.href ||
-                    (pathName === "/sign-up" && link.href === "/sign-in");
+                    pathName === link.href || (pathName === '/sign-up' && link.href === '/sign-in')
                   return (
                     <React.Fragment key={link.href}>
                       <li>
@@ -135,8 +123,8 @@ export default function NavBar({
                           onClick={() => setOpen(false)}
                           className={`block w-full px-4 py-2 rounded-md text-lg ${
                             active
-                              ? "bg-secondary text-white"
-                              : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                              ? 'bg-secondary text-white'
+                              : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                           }`}
                         >
                           {link.label}
@@ -144,27 +132,24 @@ export default function NavBar({
                       </li>
                       {index === 0 && (
                         <li key="pumps-mobile" className="mt-2 list-none">
-                          <PumpsCategories
-                            mobile
-                            onNavigate={() => setOpen(false)}
-                          />
+                          <PumpsCategories mobile onNavigate={() => setOpen(false)} />
                         </li>
                       )}
                     </React.Fragment>
-                  );
+                  )
                 })}
 
                 <li>
                   <Link
-                    href={session ? "/account" : "/sign-in"}
+                    href={session ? '/account' : '/sign-in'}
                     onClick={() => setOpen(false)}
                     className={`block w-full px-4 py-2 rounded-md text-lg ${
-                      pathName === (session ? "/account" : "/sign-in")
-                        ? "bg-secondary text-white"
-                        : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                      pathName === (session ? '/account' : '/sign-in')
+                        ? 'bg-secondary text-white'
+                        : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                     }`}
                   >
-                    {session ? "Account" : "Login"}
+                    {session ? 'Account' : 'Login'}
                   </Link>
                 </li>
                 <li>
@@ -172,9 +157,9 @@ export default function NavBar({
                     href="/cart"
                     onClick={() => setOpen(false)}
                     className={`block w-full px-4 py-2 rounded-md text-lg ${
-                      pathName === "/cart"
-                        ? "bg-secondary text-white"
-                        : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                      pathName === '/cart'
+                        ? 'bg-secondary text-white'
+                        : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                     }`}
                   >
                     Cart
@@ -186,37 +171,29 @@ export default function NavBar({
         </section>
       </section>
     </nav>
-  );
+  )
 }
 
 interface NavLinkProps {
-  href: string;
-  pathName: string;
-  onClick?: () => void;
+  href: string
+  pathName: string
+  onClick?: () => void
 }
 
-function NavLink({
-  href,
-  pathName,
-  children,
-  onClick,
-}: NavLinkProps & PropsWithChildren) {
-  const isActive =
-    pathName === href || (pathName === "/sign-up" && href === "/sign-in");
+function NavLink({ href, pathName, children, onClick }: NavLinkProps & PropsWithChildren) {
+  const isActive = pathName === href || (pathName === '/sign-up' && href === '/sign-in')
   return (
     <li>
       <Link
         href={href}
         onClick={onClick}
-        aria-current={isActive ? "page" : undefined}
+        aria-current={isActive ? 'page' : undefined}
         className={`${
-          isActive
-            ? "text-primary font-medium border-b border-b-primary"
-            : "text-black"
+          isActive ? 'text-primary font-medium border-b border-b-primary' : 'text-black'
         } text-lg`}
       >
         {children}
       </Link>
     </li>
-  );
+  )
 }
