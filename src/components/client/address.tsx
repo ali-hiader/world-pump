@@ -1,67 +1,65 @@
-import React from "react";
+import React from 'react'
 
-import { checkoutAddressFields } from "@/lib/utils";
-import { cn } from "@/lib/utils";
+import { checkoutAddressFields } from '@/lib/constants'
+import { cn } from '@/lib/utils'
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import ContactInput from "@/components/ui/contact-input";
+} from '@/components/ui/accordion'
+import ContactInput from '@/components/ui/contact-input'
 
 export type AddressValues = {
-  fullName: string;
-  phone: string;
-  addressLine1: string;
-  addressLine2: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-};
+  fullName: string
+  phone: string
+  addressLine1: string
+  addressLine2: string
+  city: string
+  state: string
+  postalCode: string
+  country: string
+}
 
 export type AddressesData = {
-  shipping: AddressValues;
-  billingSameAsShipping: boolean;
-  billing?: AddressValues;
-};
+  shipping: AddressValues
+  billingSameAsShipping: boolean
+  billing?: AddressValues
+}
 
 interface Props {
-  userName: string;
-  onAddressesChange?: (data: AddressesData) => void;
+  userName: string
+  onAddressesChange?: (data: AddressesData) => void
 }
 
 function Address({ userName, onAddressesChange }: Props) {
-  const [billingSelection, setBillingSelection] = React.useState<
-    "same" | "different"
-  >("same");
+  const [billingSelection, setBillingSelection] = React.useState<'same' | 'different'>('same')
 
   const initialAddress: AddressValues = React.useMemo(
     () => ({
-      fullName: userName || "",
-      phone: "",
-      addressLine1: "",
-      addressLine2: "",
-      city: "",
-      state: "",
-      postalCode: "",
-      country: "Pakistan",
+      fullName: userName || '',
+      phone: '',
+      addressLine1: '',
+      addressLine2: '',
+      city: '',
+      state: '',
+      postalCode: '',
+      country: 'Pakistan',
     }),
-    [userName]
-  );
+    [userName],
+  )
 
-  const [shipping, setShipping] = React.useState<AddressValues>(initialAddress);
-  const [billing, setBilling] = React.useState<AddressValues>(initialAddress);
+  const [shipping, setShipping] = React.useState<AddressValues>(initialAddress)
+  const [billing, setBilling] = React.useState<AddressValues>(initialAddress)
 
   React.useEffect(() => {
     const payload: AddressesData = {
       shipping,
-      billingSameAsShipping: billingSelection === "same",
-      billing: billingSelection === "different" ? billing : undefined,
-    };
-    onAddressesChange?.(payload);
-  }, [shipping, billing, billingSelection, onAddressesChange]);
+      billingSameAsShipping: billingSelection === 'same',
+      billing: billingSelection === 'different' ? billing : undefined,
+    }
+    onAddressesChange?.(payload)
+  }, [shipping, billing, billingSelection, onAddressesChange])
 
   const billingAddressFields = React.useMemo(
     () =>
@@ -69,27 +67,25 @@ function Address({ userName, onAddressesChange }: Props) {
         ...field,
         name: `billing_${field.name}`,
       })),
-    []
-  );
+    [],
+  )
 
   return (
     <section className="">
       <h2 className="">Enter your shipping details</h2>
       <form className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-6">
         {checkoutAddressFields.map((field) => {
-          const name = field.name as keyof AddressValues;
-          const value = shipping[name] ?? "";
+          const name = field.name as keyof AddressValues
+          const value = shipping[name] ?? ''
           return (
             <AddressInput
               key={field.name}
               {...field}
               userName={userName}
               value={value as string}
-              onChange={(val) =>
-                setShipping((prev) => ({ ...prev, [name]: val }))
-              }
+              onChange={(val) => setShipping((prev) => ({ ...prev, [name]: val }))}
             />
-          );
+          )
         })}
       </form>
 
@@ -99,13 +95,11 @@ function Address({ userName, onAddressesChange }: Props) {
           <Accordion
             type="single"
             value={billingSelection}
-            onValueChange={(v) =>
-              v && setBillingSelection(v as "same" | "different")
-            }
+            onValueChange={(v) => v && setBillingSelection(v as 'same' | 'different')}
           >
             <BillingOption
               value="same"
-              selected={billingSelection === "same"}
+              selected={billingSelection === 'same'}
               title="Billing address same as shipping address"
             >
               We will use your shipping address for billing.
@@ -113,26 +107,21 @@ function Address({ userName, onAddressesChange }: Props) {
 
             <BillingOption
               value="different"
-              selected={billingSelection === "different"}
+              selected={billingSelection === 'different'}
               title="Use a different billing address"
             >
               <form className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {billingAddressFields.map((field) => {
-                  const baseName = field.name.replace(
-                    /^billing_/,
-                    ""
-                  ) as keyof AddressValues;
-                  const value = billing[baseName] ?? "";
+                  const baseName = field.name.replace(/^billing_/, '') as keyof AddressValues
+                  const value = billing[baseName] ?? ''
                   return (
                     <AddressInput
                       key={field.name}
                       {...field}
                       value={value as string}
-                      onChange={(val) =>
-                        setBilling((prev) => ({ ...prev, [baseName]: val }))
-                      }
+                      onChange={(val) => setBilling((prev) => ({ ...prev, [baseName]: val }))}
                     />
-                  );
+                  )
                 })}
               </form>
             </BillingOption>
@@ -140,44 +129,38 @@ function Address({ userName, onAddressesChange }: Props) {
         </div>
       </div>
     </section>
-  );
+  )
 }
 
-export default Address;
+export default Address
 
 export interface InputProps {
-  name: string;
-  label: string;
-  type?: string;
-  required?: boolean;
-  defaultValue?: string;
-  userName?: string;
-  value?: string;
-  onChange?: (value: string) => void;
+  name: string
+  label: string
+  type?: string
+  required?: boolean
+  defaultValue?: string
+  userName?: string
+  value?: string
+  onChange?: (value: string) => void
 }
 
 function AddressInput({
   name,
   label,
-  type = "text",
+  type = 'text',
   required = false,
-  defaultValue = "",
+  defaultValue = '',
   userName,
   value,
   onChange,
 }: InputProps) {
   const inputValue =
-    value !== undefined
-      ? value
-      : name === "fullName"
-        ? userName || ""
-        : defaultValue || "";
+    value !== undefined ? value : name === 'fullName' ? userName || '' : defaultValue || ''
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    onChange?.(e.target.value);
-  };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    onChange?.(e.target.value)
+  }
 
   return (
     <ContactInput
@@ -188,7 +171,7 @@ function AddressInput({
       value={inputValue}
       onChange={handleChange}
     />
-  );
+  )
 }
 
 function BillingOption({
@@ -197,47 +180,36 @@ function BillingOption({
   title,
   children,
 }: {
-  value: "same" | "different";
-  selected: boolean;
-  title: string;
-  children: React.ReactNode;
+  value: 'same' | 'different'
+  selected: boolean
+  title: string
+  children: React.ReactNode
 }) {
-  const itemBase =
-    "not-first:border-t !border-b-0 border-primary/20 overflow-hidden";
-  const triggerBase =
-    "px-4 py-4 [&>svg]:hidden flex items-center gap-3 text-[15px]";
+  const itemBase = 'not-first:border-t !border-b-0 border-primary/20 overflow-hidden'
+  const triggerBase = 'px-4 py-4 [&>svg]:hidden flex items-center gap-3 text-[15px]'
 
   return (
     <AccordionItem
       value={value}
-      className={cn(
-        itemBase,
-        selected ? "border-primary/40" : "border-primary/20"
-      )}
+      className={cn(itemBase, selected ? 'border-primary/40' : 'border-primary/20')}
     >
       <AccordionTrigger
-        className={cn(
-          triggerBase,
-          selected ? "bg-primary/5" : "bg-muted/30 hover:bg-muted/50"
-        )}
+        className={cn(triggerBase, selected ? 'bg-primary/5' : 'bg-muted/30 hover:bg-muted/50')}
       >
         <span
           aria-hidden
           className={cn(
-            "inline-flex h-5 w-5 items-center justify-center rounded-full border-2",
-            selected ? "border-primary" : "border-muted-foreground/40"
+            'inline-flex h-5 w-5 items-center justify-center rounded-full border-2',
+            selected ? 'border-primary' : 'border-muted-foreground/40',
           )}
         >
           <span
-            className={cn(
-              "h-2.5 w-2.5 rounded-full",
-              selected ? "bg-primary" : "bg-transparent"
-            )}
+            className={cn('h-2.5 w-2.5 rounded-full', selected ? 'bg-primary' : 'bg-transparent')}
           />
         </span>
         <span>{title}</span>
       </AccordionTrigger>
       <AccordionContent className="px-4">{children}</AccordionContent>
     </AccordionItem>
-  );
+  )
 }

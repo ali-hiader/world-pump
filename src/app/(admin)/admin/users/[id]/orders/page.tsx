@@ -1,35 +1,27 @@
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
 
-import { desc, eq } from "drizzle-orm";
+import { desc, eq } from 'drizzle-orm'
 
-import { formatPKR } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { db } from "@/db";
-import { orderTable, user } from "@/db/schema";
+import { OrderType } from '@/lib/types'
+import { formatPKR } from '@/lib/utils'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { db } from '@/db'
+import { orderTable, user } from '@/db/schema'
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic'
 
 interface Props {
   params: Promise<{
-    id: string;
-  }>;
-}
-
-interface OrderData {
-  id: number;
-  status: string;
-  paymentStatus: string;
-  totalAmount: number;
-  createdAt: Date;
-  updatedAt: Date;
+    id: string
+  }>
 }
 
 async function UserOrdersPage({ params }: Props) {
-  const resolvedParams = await params;
-  const userId = resolvedParams.id;
+  const resolvedParams = await params
+  const userId = resolvedParams.id
 
   // Fetch user details
   const [userData] = await db
@@ -41,57 +33,50 @@ async function UserOrdersPage({ params }: Props) {
     })
     .from(user)
     .where(eq(user.id, userId))
-    .limit(1);
+    .limit(1)
 
   if (!userData) {
-    notFound();
+    notFound()
   }
 
   // Fetch user's orders
-  const orders: OrderData[] = await db
-    .select({
-      id: orderTable.id,
-      status: orderTable.status,
-      paymentStatus: orderTable.paymentStatus,
-      totalAmount: orderTable.totalAmount,
-      createdAt: orderTable.createdAt,
-      updatedAt: orderTable.updatedAt,
-    })
+  const orders: OrderType[] = await db
+    .select()
     .from(orderTable)
     .where(eq(orderTable.userEmail, userData.email))
-    .orderBy(desc(orderTable.createdAt));
+    .orderBy(desc(orderTable.createdAt))
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status?.toLowerCase()) {
-      case "completed":
-        return "default";
-      case "delivered":
-        return "default";
-      case "shipped":
-        return "outline";
-      case "pending":
-        return "secondary";
-      case "cancelled":
-        return "destructive";
+      case 'completed':
+        return 'default'
+      case 'delivered':
+        return 'default'
+      case 'shipped':
+        return 'outline'
+      case 'pending':
+        return 'secondary'
+      case 'cancelled':
+        return 'destructive'
       default:
-        return "secondary";
+        return 'secondary'
     }
-  };
+  }
 
   const getPaymentBadgeVariant = (status: string) => {
     switch (status?.toLowerCase()) {
-      case "successful":
-        return "default";
-      case "pending":
-        return "secondary";
-      case "failed":
-        return "destructive";
-      case "refunded":
-        return "outline";
+      case 'successful':
+        return 'default'
+      case 'pending':
+        return 'secondary'
+      case 'failed':
+        return 'destructive'
+      case 'refunded':
+        return 'outline'
       default:
-        return "secondary";
+        return 'secondary'
     }
-  };
+  }
 
   return (
     <main className="p-6 max-w-7xl mx-auto">
@@ -106,23 +91,21 @@ async function UserOrdersPage({ params }: Props) {
         <div className="flex items-center gap-4 mb-4">
           <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
             <span className="text-blue-600 font-semibold">
-              {userData.name?.charAt(0).toUpperCase() || "U"}
+              {userData.name?.charAt(0).toUpperCase() || 'U'}
             </span>
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              {userData.name}&apos;s Orders
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-900">{userData.name}&apos;s Orders</h1>
             <p className="text-gray-600">{userData.email}</p>
           </div>
         </div>
 
         <div className="flex gap-2">
-          <Badge variant={userData.emailVerified ? "default" : "secondary"}>
-            {userData.emailVerified ? "Verified" : "Unverified"}
+          <Badge variant={userData.emailVerified ? 'default' : 'secondary'}>
+            {userData.emailVerified ? 'Verified' : 'Unverified'}
           </Badge>
           <Badge variant="outline">
-            {orders.length} Order{orders.length !== 1 ? "s" : ""}
+            {orders.length} Order{orders.length !== 1 ? 's' : ''}
           </Badge>
         </div>
       </div>
@@ -159,12 +142,8 @@ async function UserOrdersPage({ params }: Props) {
                 <circle cx={18} cy={35} r={2} strokeWidth={2} />
                 <circle cx={30} cy={35} r={2} strokeWidth={2} />
               </svg>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                No Orders Found
-              </h3>
-              <p className="text-gray-500">
-                This user hasn&apos;t placed any orders yet.
-              </p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No Orders Found</h3>
+              <p className="text-gray-500">This user hasn&apos;t placed any orders yet.</p>
             </div>
           </CardContent>
         </Card>
@@ -176,9 +155,7 @@ async function UserOrdersPage({ params }: Props) {
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg">Order #{order.id}</CardTitle>
                   <div className="flex gap-2">
-                    <Badge
-                      variant={getPaymentBadgeVariant(order.paymentStatus)}
-                    >
+                    <Badge variant={getPaymentBadgeVariant(order.paymentStatus)}>
                       Payment: {order.paymentStatus}
                     </Badge>
                     <Badge variant={getStatusBadgeVariant(order.status)}>
@@ -190,31 +167,19 @@ async function UserOrdersPage({ params }: Props) {
               <CardContent>
                 <div className="grid md:grid-cols-3 gap-4 mb-4">
                   <div>
-                    <p className="text-sm font-medium text-gray-500">
-                      Total Amount
-                    </p>
-                    <p className="text-lg font-semibold">
-                      {formatPKR(order.totalAmount)}
-                    </p>
+                    <p className="text-sm font-medium text-gray-500">Total Amount</p>
+                    <p className="text-lg font-semibold">{formatPKR(order.totalAmount)}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">
-                      Order Date
-                    </p>
-                    <p className="text-sm">
-                      {new Date(order.createdAt).toLocaleDateString()}
-                    </p>
+                    <p className="text-sm font-medium text-gray-500">Order Date</p>
+                    <p className="text-sm">{new Date(order.createdAt).toLocaleDateString()}</p>
                     <p className="text-xs text-gray-500">
                       {new Date(order.createdAt).toLocaleTimeString()}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">
-                      Last Updated
-                    </p>
-                    <p className="text-sm">
-                      {new Date(order.updatedAt).toLocaleDateString()}
-                    </p>
+                    <p className="text-sm font-medium text-gray-500">Last Updated</p>
+                    <p className="text-sm">{new Date(order.updatedAt).toLocaleDateString()}</p>
                     <p className="text-xs text-gray-500">
                       {new Date(order.updatedAt).toLocaleTimeString()}
                     </p>
@@ -234,7 +199,7 @@ async function UserOrdersPage({ params }: Props) {
         </div>
       )}
     </main>
-  );
+  )
 }
 
-export default UserOrdersPage;
+export default UserOrdersPage

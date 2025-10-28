@@ -45,8 +45,7 @@ export async function fetchProductById(id: number) {
   return products[0]
 }
 
-// Fetch featured products for homepage
-export async function fetchFeaturedProducts(limit = 8) {
+export async function fetchFeaturedProducts(limit: number) {
   const products = await db
     .select({
       categorySlug: categoryTable.slug,

@@ -4,36 +4,9 @@ import path from 'path'
 import { remark } from 'remark'
 import html from 'remark-html'
 
+import { BlogPost, BlogPostMeta } from './types'
+
 const postsDirectory = path.join(process.cwd(), 'content/blogs')
-
-export interface BlogPost {
-  id: string
-  title: string
-  excerpt: string
-  content: string
-  category: string
-  readTime: string
-  publishedAt: string
-  imageUrl: string
-  author: string
-  tags: string[]
-  featured: boolean
-  slug: string
-}
-
-export interface BlogPostMeta {
-  id: string
-  title: string
-  excerpt: string
-  category: string
-  readTime: string
-  publishedAt: string
-  imageUrl: string
-  author: string
-  tags: string[]
-  featured: boolean
-  slug: string
-}
 
 // Get all blog post slugs
 export function getAllPostSlugs(): { params: { slug: string } }[] {

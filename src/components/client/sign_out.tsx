@@ -5,26 +5,26 @@ import { redirect } from 'next/navigation'
 import { useAuthStore } from '@/stores/auth_store'
 
 function SignOutBtn() {
-  const { setUserIdAuthS } = useAuthStore()
+   const { setUserIdAuthS } = useAuthStore()
 
-  function signout() {
-    fetch('/api/auth/sign-out', {
-      cache: 'no-store',
-    })
-    setUserIdAuthS(undefined)
-    redirect('/')
-  }
+   async function signout() {
+      await fetch('/api/sign-out', {
+         cache: 'no-store',
+      })
+      setUserIdAuthS(undefined)
+      redirect('/')
+   }
 
-  return (
-    <form action={signout}>
-      <button
-        type="submit"
-        className="rounded-md px-5 py-2.5 bg-primary/20 text-muted-foreground font-medium cursor-pointer hover:text-foreground transition-colors"
-      >
-        <span className="button-label">Sign out</span>
-      </button>
-    </form>
-  )
+   return (
+      <form action={signout}>
+         <button
+            type="submit"
+            className="rounded-md px-5 py-2.5 bg-primary/20 text-muted-foreground font-medium cursor-pointer hover:text-foreground transition-colors"
+         >
+            <span className="button-label">Sign out</span>
+         </button>
+      </form>
+   )
 }
 
 export default SignOutBtn

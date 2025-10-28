@@ -20,11 +20,8 @@ interface Props {
 
 function CartItem({ product }: Props) {
   const userIdAuthS = useAuthStore((state) => state.userIdAuthS)
-  const {
-    decreaseCartProductQuantity_S: decreaseProductQuantityCartS,
-    removeCartProduct_S: removeProductCartS,
-    increaseCartProductQuantity_S: increaseProductQuantityCartS,
-  } = useCartStore()
+  const { decreaseCartProductQuantity, removeCartProduct, increaseCartProductQuantity } =
+    useCartStore()
 
   const [loading, setLoading] = useState({
     delete: false,
@@ -38,7 +35,7 @@ function CartItem({ product }: Props) {
     try {
       setLoading((prev) => ({ ...prev, increase: true }))
       await increaseQtyDB(product.id, userIdAuthS)
-      increaseProductQuantityCartS(product.id, userIdAuthS)
+      increaseCartProductQuantity(product.id, userIdAuthS)
       //
     } catch (error) {
       console.error("Failed to increase item's qty:", error)
@@ -56,7 +53,7 @@ function CartItem({ product }: Props) {
     try {
       setLoading((prev) => ({ ...prev, decrease: true }))
       await decreaseQtyDB(productId, userIdAuthS)
-      decreaseProductQuantityCartS(productId, userIdAuthS)
+      decreaseCartProductQuantity(productId, userIdAuthS)
       //
     } catch (error) {
       console.error("Failed to decrease item's qty:", error)
@@ -74,7 +71,7 @@ function CartItem({ product }: Props) {
     try {
       setLoading((prev) => ({ ...prev, delete: true }))
       await removeFromCartDB(productId, userIdAuthS)
-      removeProductCartS(productId, userIdAuthS)
+      removeCartProduct(productId, userIdAuthS)
       //
     } catch (error) {
       console.error('Failed to remove item:', error)

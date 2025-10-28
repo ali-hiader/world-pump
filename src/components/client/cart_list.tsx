@@ -5,35 +5,36 @@ import Link from 'next/link'
 import { formatPKR } from '@/lib/utils'
 import DisplayAlert from '@/components/client/display_alert'
 import { Button } from '@/components/ui/button'
+import { useAuthStore } from '@/stores/auth_store'
 import useCartStore from '@/stores/cart_store'
 
 import CartItem from './cart_item'
 import Heading from './heading'
 
 function CartList() {
-  const { cartProducts_S } = useCartStore()
+  const session = useAuthStore((state) => state.userIdAuthS)
+  const { getUserCartItems, getTotalPrice } = useCartStore()
 
-  const totalPrice = cartProducts_S.reduce(
-    (sum, item) => sum + item.price * (item.quantity || 1),
-    0,
-  )
+  // Get user's cart items and total price
+  const userCartItems = session ? getUserCartItems(session) : []
+  const totalPrice = session ? getTotalPrice(session) : 0
 
   return (
     <>
       <Heading title="Cart" />
-      {cartProducts_S.length === 0 ? (
+      {userCartItems.length === 0 ? (
         <DisplayAlert showBtn buttonText="Start Shopping" buttonHref="/pumps">
           No products in the cart!
         </DisplayAlert>
       ) : (
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-12 px-4 max-w-7xl mx-auto">
-          {cartProducts_S.map((product) => (
+          {userCartItems.map((product) => (
             <CartItem key={product.id} product={product} />
           ))}
         </section>
       )}
 
-      {cartProducts_S.length > 0 && (
+      {userCartItems.length > 0 && (
         <footer className="mt-12 space-y-4 flex flex-col max-w-7xl mx-auto">
           <div className="flex justify-between w-full px-6 text-gray-700">
             <p className="font-medium">Amount to Pay</p>

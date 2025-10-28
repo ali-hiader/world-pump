@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
-import { formatPKR } from '@/lib/utils'
+import { formatPKR, parseSpecsToArray } from '@/lib/utils'
 import { fetchAccessoryBySlug } from '@/actions/accessory'
 import AddToCartBtn from '@/components/client/add_to_cart'
 import { Badge } from '@/components/ui/badge'
@@ -10,43 +10,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-
-interface SpecField {
-  id: string
-  field: string
-  value: string
-}
-
-const parseSpecsToArray = (specs: unknown): SpecField[] => {
-  if (!specs) return []
-
-  if (Array.isArray(specs)) {
-    return specs.map((spec, index) => ({
-      id: (index + 1).toString(),
-      field: spec.field || '',
-      value: spec.value || '',
-    }))
-  }
-
-  if (typeof specs === 'object') {
-    return Object.entries(specs).map(([field, value], index) => ({
-      id: (index + 1).toString(),
-      field,
-      value: String(value),
-    }))
-  }
-
-  if (typeof specs === 'string') {
-    try {
-      const parsed = JSON.parse(specs)
-      return parseSpecsToArray(parsed)
-    } catch {
-      return []
-    }
-  }
-
-  return []
-}
 
 interface AccessoryDetailPageProps {
   params: {

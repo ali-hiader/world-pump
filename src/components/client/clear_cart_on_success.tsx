@@ -1,18 +1,17 @@
-"use client";
+'use client'
 
-import { useEffect } from "react";
+import { useEffect } from 'react'
 
-import useCartStore from "@/stores/cart_store";
+import useCartStore from '@/stores/cart_store'
 
 export default function ClearCartOnSuccess({ userId }: { userId: string }) {
-  const { clearCart_S } = useCartStore();
+  const { clearCart } = useCartStore()
 
   useEffect(() => {
     if (userId) {
-      clearCart_S(userId);
+      clearCart(userId)
     }
-  }, [userId, clearCart_S]);
+  }, [userId, clearCart])
 
-  return null;
+  return null
 }
-

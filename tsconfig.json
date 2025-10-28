@@ -28,8 +28,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/db/seed.ts",
-    "src/db/seed.ts"
+    "src/lib/database/seed.ts",
+    "src/lib/database/seed.ts"
   ],
   "exclude": ["node_modules"]
 }

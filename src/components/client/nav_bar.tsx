@@ -34,7 +34,9 @@ export default function NavBar({ categories }: { categories?: CategoryType[] }) 
   const { setCategories } = useProductsStore()
 
   const session = useAuthStore((state) => state.userIdAuthS)
-  const { cartProducts_S } = useCartStore()
+  const { getTotalItems } = useCartStore()
+
+  const totalItems = session ? getTotalItems(session) : 0
 
   useEffect(() => {
     if (categories && categories.length > 0) {
@@ -79,9 +81,9 @@ export default function NavBar({ categories }: { categories?: CategoryType[] }) 
           )}
           <NavLink pathName={pathName} href={'/cart'}>
             Cart
-            {cartProducts_S.length !== 0 && (
+            {totalItems > 0 && (
               <Badge className="absolute size-5 top-3 right-4 bg-secondary rounded-full text-white">
-                {cartProducts_S.reduce((sum, p) => p.quantity + sum, 0)}
+                {totalItems}
               </Badge>
             )}
           </NavLink>

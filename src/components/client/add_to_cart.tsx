@@ -17,7 +17,7 @@ interface Props {
 function AddToCartBtn({ productId }: Props) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const addProduct = useCartStore((state) => state.addCartProduct_S)
+  const addProduct = useCartStore((state) => state.addCartProduct)
   const session = useAuthStore((state) => state.userIdAuthS)
 
   async function handleAddingToCart() {

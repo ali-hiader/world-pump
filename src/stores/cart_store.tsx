@@ -3,77 +3,112 @@ import { create } from 'zustand'
 import { CartItemType } from '@/lib/types'
 
 interface CartStore {
-  cartProducts_S: CartItemType[]
-  setCartProducts_S: (products: CartItemType[]) => void
-  addCartProduct_S: (product: CartItemType, userId: string) => void
-  increaseCartProductQuantity_S: (productId: number, userId: string) => void
-  decreaseCartProductQuantity_S: (productId: number, userId: string) => void
-  removeCartProduct_S: (productId: number, userId: string) => void
-  clearCart_S: (userId: string) => void
+  // State
+  cartProducts: CartItemType[]
+
+  // Actions
+  setCartProducts: (products: CartItemType[]) => void
+  addCartProduct: (product: CartItemType, userId: string) => void
+  increaseCartProductQuantity: (productId: number, userId: string) => void
+  decreaseCartProductQuantity: (productId: number, userId: string) => void
+  removeCartProduct: (productId: number, userId: string) => void
+  clearCart: (userId: string) => void
+
+  // Computed values
+  getTotalItems: (userId: string) => number
+  getTotalPrice: (userId: string) => number
+  getUserCartItems: (userId: string) => CartItemType[]
 }
 
-const useCartStore = create<CartStore>((set) => ({
-  cartProducts_S: [],
-  setCartProducts_S: (products) => set({ cartProducts_S: products }),
+const useCartStore = create<CartStore>((set, get) => ({
+  // State
+  cartProducts: [],
 
-  addCartProduct_S: (product, userId) =>
+  // Actions
+  setCartProducts: (products: CartItemType[]) => set({ cartProducts: products }),
+
+  addCartProduct: (product: CartItemType, userId: string) =>
     set((state) => {
-      const exsistingProductIdx = state.cartProducts_S.findIndex(
+      const existingProductIdx = state.cartProducts.findIndex(
         (p) => p.id === product.id && p.addedBy === userId,
       )
-      if (exsistingProductIdx !== -1) {
+
+      if (existingProductIdx !== -1) {
         return {
-          cartProducts_S: state.cartProducts_S.map((p) =>
+          cartProducts: state.cartProducts.map((p) =>
             p.id === product.id && p.addedBy === userId ? { ...p, quantity: p.quantity + 1 } : p,
           ),
         }
       } else {
         return {
-          cartProducts_S: [...state.cartProducts_S, product],
+          cartProducts: [...state.cartProducts, product],
         }
       }
     }),
 
-  increaseCartProductQuantity_S: (productId, userId) =>
+  increaseCartProductQuantity: (productId: number, userId: string) =>
     set((state) => ({
-      cartProducts_S: state.cartProducts_S.map((product) =>
+      cartProducts: state.cartProducts.map((product) =>
         product.id === productId && product.addedBy === userId
           ? { ...product, quantity: product.quantity + 1 }
           : product,
       ),
     })),
 
-  decreaseCartProductQuantity_S: (productId, userId) =>
+  decreaseCartProductQuantity: (productId: number, userId: string) =>
     set((state) => {
-      const exsistingProduct = state.cartProducts_S.find(
+      const existingProduct = state.cartProducts.find(
         (p) => p.id === productId && p.addedBy === userId,
       )
-      if (!exsistingProduct) return state
 
-      if (exsistingProduct.quantity === 1) {
+      if (!existingProduct) return state
+
+      if (existingProduct.quantity === 1) {
         return {
-          cartProducts_S: state.cartProducts_S.filter(
+          cartProducts: state.cartProducts.filter(
             (p) => !(p.id === productId && p.addedBy === userId),
           ),
         }
       } else {
         return {
-          cartProducts_S: state.cartProducts_S.map((p) =>
+          cartProducts: state.cartProducts.map((p) =>
             p.id === productId && p.addedBy === userId ? { ...p, quantity: p.quantity - 1 } : p,
           ),
         }
       }
     }),
 
-  removeCartProduct_S: (productId) =>
+  removeCartProduct: (productId: number, userId: string) =>
     set((state) => ({
-      cartProducts_S: state.cartProducts_S.filter((product) => product.id !== productId),
+      cartProducts: state.cartProducts.filter(
+        (product) => !(product.id === productId && product.addedBy === userId),
+      ),
     })),
 
-  clearCart_S: (userId) =>
+  clearCart: (userId: string) =>
     set((state) => ({
-      cartProducts_S: state.cartProducts_S.filter((product) => product.addedBy !== userId),
+      cartProducts: state.cartProducts.filter((product) => product.addedBy !== userId),
     })),
+
+  // Computed values
+  getTotalItems: (userId: string) => {
+    const state = get()
+    return state.cartProducts
+      .filter((item) => item.addedBy === userId)
+      .reduce((total, item) => total + item.quantity, 0)
+  },
+
+  getTotalPrice: (userId: string) => {
+    const state = get()
+    return state.cartProducts
+      .filter((item) => item.addedBy === userId)
+      .reduce((total, item) => total + item.price * item.quantity, 0)
+  },
+
+  getUserCartItems: (userId: string) => {
+    const state = get()
+    return state.cartProducts.filter((item) => item.addedBy === userId)
+  },
 }))
 
 export default useCartStore

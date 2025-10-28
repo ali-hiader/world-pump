@@ -1,15 +1,15 @@
-"use client";
+'use client'
 
-import { useEffect } from "react";
+import { useEffect } from 'react'
 
-import useCartStore from "@/stores/cart_store";
+import useCartStore from '@/stores/cart_store'
 
 function ClearCart() {
-  const clearCartS = useCartStore((state) => state.clearCart_S);
+  const clearCart = useCartStore((state) => state.clearCart)
   useEffect(() => {
-    // clearCartS();
-  }, [clearCartS]);
-  return null;
+    // clearCart();
+  }, [clearCart])
+  return null
 }
 
-export default ClearCart;
+export default ClearCart

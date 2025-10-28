@@ -1,22 +1,23 @@
-"use client";
+'use client'
 
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image'
+import Link from 'next/link'
 
-import { ProductType } from "@/lib/types";
-import { formatPKR } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
+import { ProductType } from '@/lib/types'
+import { formatPKR } from '@/lib/utils'
+import { Badge } from '@/components/ui/badge'
 
-import { Separator } from "../ui/separator";
+import { Separator } from '../ui/separator'
 
-import AddToCartBtn from "./add_to_cart";
+import AddToCartBtn from './add_to_cart'
 
-export default function ProductCard({ product }: { product: ProductType }) {
-  if (!product) return;
+interface ProductCardProps {
+  product: ProductType
+}
 
+export default function ProductCard({ product }: ProductCardProps) {
   return (
     <div className="min-w-72 max-w-96 w-full relative grid grid-rows-[4fr_auto] rounded-md  gap-3 px-2 py-4 shadow border border-secondary/10">
-      {/* Image */}
       <Link
         href={`/pumps/${product.categorySlug}/${product.slug}`}
         className="block relative overflow-hidden h-48"
@@ -30,12 +31,10 @@ export default function ProductCard({ product }: { product: ProductType }) {
         />
       </Link>
       <Separator className="mt-2" />
-      {/* Product Info */}
+
       <div className="flex mt-2 gap-2 flex-col px-2">
         <h3 className="my-0 font-medium text-sm sm:text-base line-clamp-2">
-          <Link href={`/pumps/${product.categorySlug}/${product.slug}`}>
-            {product.title}
-          </Link>
+          <Link href={`/pumps/${product.categorySlug}/${product.slug}`}>{product.title}</Link>
           <span className="text-xs sm:text-sm text-muted-foreground"></span>
         </h3>
 
@@ -58,16 +57,10 @@ export default function ProductCard({ product }: { product: ProductType }) {
       </div>
 
       {product.discountPrice && (
-        <Badge
-          variant="destructive"
-          className="absolute top-2 right-2 text-white"
-        >
-          {Math.round(
-            ((product.price - product.discountPrice) / product.price) * 100
-          )}
-          % OFF
+        <Badge variant="destructive" className="absolute top-2 right-2 text-white">
+          {Math.round(((product.price - product.discountPrice) / product.price) * 100)}% OFF
         </Badge>
       )}
     </div>
-  );
+  )
 }

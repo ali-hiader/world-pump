@@ -1,6 +1,6 @@
 import { fetchAllProducts } from '@/actions/product'
 import AddItemBtn from '@/components/admin/add-item-btn'
-import ProductsTable from '@/components/admin/table-products'
+import ProductTable from '@/components/admin/product-table'
 import Heading from '@/components/client/heading'
 
 export const dynamic = 'force-dynamic'
@@ -14,7 +14,7 @@ export default async function AdminProductsPage() {
         <AddItemBtn />
       </div>
 
-      <ProductsTable initialProducts={products} />
+      <ProductTable items={products} itemType="product" />
     </main>
   )
 }
