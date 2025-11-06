@@ -2,7 +2,7 @@
 title: 'Understanding Centrifugal Pump Technology'
 excerpt: 'Dive deep into how centrifugal pumps work and their applications in various industries.'
 category: 'Technical'
-readTime: '12 min read'
+readTime: '12 min'
 publishedAt: '2025-01-05'
 imageUrl: '/blogs/understanding-centrifugal-pump-technology.jpg'
 author: 'World Pumps Expert Team'

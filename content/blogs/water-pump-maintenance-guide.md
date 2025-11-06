@@ -2,7 +2,7 @@
 title: 'Complete Guide to Water Pump Maintenance'
 excerpt: 'Learn essential maintenance tips to keep your water pumps running efficiently and extend their lifespan.'
 category: 'Maintenance'
-readTime: '5 min read'
+readTime: '5 min'
 publishedAt: '2025-01-15'
 imageUrl: '/blogs/water-pump-maintenance-guide.jpg'
 author: 'World Pumps Expert Team'

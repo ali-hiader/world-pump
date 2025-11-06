@@ -2,7 +2,7 @@
 title: 'Choosing the Right Pump for Your Home'
 excerpt: 'Discover how to select the perfect water pump system for your residential needs and budget.'
 category: 'Buying Guide'
-readTime: '8 min read'
+readTime: '8 min'
 publishedAt: '2025-01-10'
 imageUrl: '/blogs/right-pump-for-home.jpg'
 author: 'World Pumps Expert Team'

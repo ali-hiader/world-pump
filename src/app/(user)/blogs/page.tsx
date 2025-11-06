@@ -2,123 +2,82 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
-import { getAllPosts, getFeaturedPost } from '@/lib/blog'
+import { getAllPosts } from '@/lib/blog'
 import Heading from '@/components/client/heading'
 import NewsletterSignUp from '@/components/client/newsletter'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
 
 function BlogsPage() {
    const allPosts = getAllPosts()
-   const featuredPost = getFeaturedPost()
 
    return (
-      <main className="px-4 sm:px-[2%] max-w-[1500px] mx-auto py-8">
+      <main className="px-4 sm:px-[2%] max-w-[1500px] mx-auto py-8 md:space-y-30 space-y-20">
          {/* Header Section */}
-         <section className="text-center mb-12">
-            <Heading
-               title="Our Blog"
-               summary="Expert insights, tips, and guides about water pumps and filtration systems"
-            />
+         <section className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-20 xl:gap-40 sm:p-8 p-4 lg:place-items-start place-items-center">
+            <div className="space-y-8">
+               <h1 className="text-3xl headingFont sm:text-4xl whitespace-nowrap font-bold">
+                  The World Pumps Newsletter
+               </h1>
+               <p className="italic">“Your weekly dose of smart insights for smarter pumping.”</p>
+               <p>
+                  The World Pumps Newsletter delivers practical, easy-to-use guidance for anyone who
+                  works with or depends on water pumps. Each week, we share expert maintenance tips,
+                  product updates, real-world problem solutions, and insights that help you get
+                  better performance, longer pump life, and smarter water-management decisions.
+               </p>
+               <p>
+                  Whether you&apos;re a technician, contractor, or homeowner, our newsletter keeps
+                  you informed, prepared, and ahead of the curve.
+               </p>
+            </div>
+
+            <NewsletterSignUp isOnBlogsPage />
          </section>
-
-         <Separator className="mb-8" />
-
-         {/* Featured Blog Post */}
-         {featuredPost && (
-            <section className="mb-12">
-               <h2 className="text-2xl font-bold mb-6">Featured Article</h2>
-               <div className="grid md:grid-cols-2 gap-8 p-6 border border-secondary/10 rounded-lg shadow-sm">
-                  <div className="relative h-64 md:h-80 overflow-hidden rounded-md">
-                     <Image
-                        src={featuredPost.imageUrl}
-                        alt={featuredPost.title}
-                        fill
-                        className="object-cover transition-transform duration-300 hover:scale-105"
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                     />
-                  </div>
-                  <div className="flex flex-col justify-center">
-                     <Badge variant="outline" className="w-fit mb-3">
-                        {featuredPost.category}
-                     </Badge>
-                     <h3 className="text-2xl md:text-3xl font-bold headingFont mb-4">
-                        <Link
-                           href={`/blogs/${featuredPost.slug}`}
-                           className="hover:text-primary transition-colors"
-                        >
-                           {featuredPost.title}
-                        </Link>
-                     </h3>
-                     <p className="text-muted-foreground mb-4 leading-relaxed">
-                        {featuredPost.excerpt}
-                     </p>
-                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <span>{featuredPost.readTime}</span>
-                        <span>•</span>
-                        <span>{new Date(featuredPost.publishedAt).toLocaleDateString()}</span>
-                     </div>
-                  </div>
-               </div>
-            </section>
-         )}
 
          {/* Blog Posts Grid */}
-         <section>
-            <h2 className="text-2xl font-bold mb-6">Latest Articles</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-               {allPosts
-                  .filter((post) => !post.featured)
-                  .map((post) => (
-                     <article
-                        key={post.id}
-                        className="border border-secondary/10 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
-                     >
-                        <div className="relative h-48 overflow-hidden">
-                           <Image
-                              src={post.imageUrl}
-                              alt={post.title}
-                              fill
-                              className="object-cover transition-transform duration-300 hover:scale-105"
-                              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                           />
-                        </div>
-                        <div className="p-4">
-                           <Badge variant="outline" className="mb-3">
-                              {post.category}
-                           </Badge>
-                           <h3 className="font-semibold text-lg mb-2 line-clamp-2">
-                              <Link
-                                 href={`/blogs/${post.slug}`}
-                                 className="hover:text-primary transition-colors"
-                              >
-                                 {post.title}
-                              </Link>
-                           </h3>
-                           <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
-                              {post.excerpt}
-                           </p>
-                           <div className="flex items-center justify-between text-xs text-muted-foreground">
-                              <span>{post.readTime}</span>
-                              <span>{new Date(post.publishedAt).toLocaleDateString()}</span>
-                           </div>
-                        </div>
-                     </article>
-                  ))}
+         <section className="max-w-5xl mx-auto">
+            <Heading title="All Newsletters" summary="Read the past insight from world pumps" />{' '}
+            <div className="sm:p-8 p-6 mt-12 gap-1 bg-secondary/5 grid lg:grid-cols-1 md:grid-cols-2 grid-cols-1">
+               {allPosts.map((post) => (
+                  <article
+                     key={post.id}
+                     className="border border-secondary/10 overflow-hidden flex lg:flex-row flex-col gap-4 p-12 bg-white"
+                  >
+                     <div className="relative lg:w-48 w-full h-40 overflow-hidden">
+                        <Image
+                           src={post.imageUrl}
+                           alt={post.title}
+                           fill
+                           className="object-cover transition-transform duration-300  hover:scale-105"
+                           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        />
+                     </div>
+                     <div className="space-y-3">
+                        <h3 className="font-semibold text-xl sm:text-2xl line-clamp-2">
+                           <Link
+                              href={`/blogs/${post.slug}`}
+                              className="hover:text-primary transition-colors"
+                           >
+                              {post.title}
+                           </Link>
+                        </h3>
+                        <p className=" text-secondary/70 line-clamp-3 max-w-3/4 ">{post.excerpt}</p>
+                     </div>
+                     <div className="flex flex-col">
+                        <p className="flex flex-col">
+                           <span className="font-medium text-secondary/80">Read</span>
+                           <span className="text-xl font-medium text-primary">{post.readTime}</span>
+                        </p>
+                        <p className="flex flex-col whitespace-nowrap">
+                           <span className="font-medium text-secondary/80">Published At</span>
+                           <span className="text-xl font-medium text-primary">
+                              {new Date(post.publishedAt).toLocaleDateString()}
+                           </span>
+                        </p>
+                     </div>
+                  </article>
+               ))}
             </div>
          </section>
-
-         {/* Load More Button */}
-         {allPosts.length > 6 && (
-            <section className="text-center mt-12">
-               <button className="px-6 py-3 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium">
-                  Load More Articles
-               </button>
-            </section>
-         )}
-
-         {/* Newsletter Signup */}
-         <NewsletterSignUp />
       </main>
    )
 }
