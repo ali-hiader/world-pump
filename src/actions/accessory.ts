@@ -2,45 +2,138 @@
 
 import { eq } from 'drizzle-orm'
 
+import { DatabaseError, NotFoundError, ValidationError } from '@/lib/errors'
+import { logger } from '@/lib/logger'
+import {
+   accessoryIdSchema,
+   accessorySlugSchema,
+   updateAccessoryProductsSchema,
+} from '@/lib/validations'
 import { db } from '@/db'
-import { accessoryTable } from '@/db/schema'
+import { accessoryTable, productAccessoryTable } from '@/db/schema'
+
+/**
+ * ============================================================================
+ * ACCESSORY QUERIES
+ * ============================================================================
+ */
 
 export async function fetchAllAccessories() {
-  try {
-    const accessories = await db.select().from(accessoryTable)
-    return accessories
-  } catch (error) {
-    console.error('Error fetching accessories:', error)
-    throw new Error('Failed to fetch accessories')
-  }
+   try {
+      const accessories = await db.select().from(accessoryTable)
+      return accessories
+   } catch (error) {
+      logger.error('Failed to fetch accessories', error)
+      throw new DatabaseError('query', 'Failed to fetch accessories')
+   }
 }
 
 export async function fetchAccessoryById(id: number) {
-  try {
-    const [accessory] = await db.select().from(accessoryTable).where(eq(accessoryTable.id, id))
-    return accessory || null
-  } catch (error) {
-    console.error('Error fetching accessory:', error)
-    throw new Error('Failed to fetch accessory')
-  }
+   const validated = accessoryIdSchema.safeParse(id)
+   if (!validated.success) {
+      throw new ValidationError(validated.error.issues[0]?.message || 'Invalid accessory ID')
+   }
+
+   try {
+      const [accessory] = await db
+         .select()
+         .from(accessoryTable)
+         .where(eq(accessoryTable.id, validated.data))
+      if (!accessory) {
+         throw new NotFoundError('Accessory not found')
+      }
+      return accessory
+   } catch (error) {
+      if (error instanceof NotFoundError) throw error
+      logger.error('Failed to fetch accessory by ID', error, { id })
+      throw new DatabaseError('query', 'Failed to fetch accessory by ID')
+   }
 }
 
 export async function fetchAccessoryBySlug(slug: string) {
-  try {
-    const [accessory] = await db.select().from(accessoryTable).where(eq(accessoryTable.slug, slug))
-    return accessory || null
-  } catch (error) {
-    console.error('Error fetching accessory:', error)
-    throw new Error('Failed to fetch accessory')
-  }
+   const validated = accessorySlugSchema.safeParse(slug)
+   if (!validated.success) {
+      throw new ValidationError(validated.error.issues[0]?.message || 'Invalid slug')
+   }
+
+   try {
+      const [accessory] = await db
+         .select()
+         .from(accessoryTable)
+         .where(eq(accessoryTable.slug, validated.data))
+      if (!accessory) {
+         throw new NotFoundError('Accessory not found')
+      }
+      return accessory
+   } catch (error) {
+      if (error instanceof NotFoundError) throw error
+      logger.error('Failed to fetch accessory by slug', error, { slug })
+      throw new DatabaseError('query', 'Failed to fetch accessory by slug')
+   }
 }
 
 export async function deleteAccessory(id: number) {
-  try {
-    const deleted = await db.delete(accessoryTable).where(eq(accessoryTable.id, id))
-    return deleted
-  } catch (error) {
-    console.error('Error deleting accessory:', error)
-    throw new Error('Failed to delete accessory')
-  }
+   const validated = accessoryIdSchema.safeParse(id)
+   if (!validated.success) {
+      throw new ValidationError(validated.error.issues[0]?.message || 'Invalid accessory ID')
+   }
+
+   try {
+      const deleted = await db.delete(accessoryTable).where(eq(accessoryTable.id, validated.data))
+      return deleted
+   } catch (error) {
+      logger.error('Failed to delete accessory', error, { id })
+      throw new DatabaseError('delete', 'Failed to delete accessory')
+   }
+}
+
+/**
+ * ============================================================================
+ * PRODUCT-ACCESSORY RELATIONS
+ * ============================================================================
+ */
+
+export async function fetchAccessoryProductIds(accessoryId: number) {
+   const validated = accessoryIdSchema.safeParse(accessoryId)
+   if (!validated.success) {
+      throw new ValidationError(validated.error.issues[0]?.message || 'Invalid accessory ID')
+   }
+
+   try {
+      const relations = await db
+         .select({ productId: productAccessoryTable.productId })
+         .from(productAccessoryTable)
+         .where(eq(productAccessoryTable.accessoryId, validated.data))
+      return relations.map((r) => r.productId)
+   } catch (error) {
+      logger.error('Failed to fetch accessory product relations', error, {
+         accessoryId: validated.data,
+      })
+      throw new DatabaseError('query', 'Failed to fetch accessory product relations')
+   }
+}
+
+export async function updateAccessoryProducts(accessoryId: number, productIds: number[]) {
+   const validated = updateAccessoryProductsSchema.safeParse({ accessoryId, productIds })
+   if (!validated.success) {
+      throw new ValidationError(validated.error.issues[0]?.message || 'Invalid input')
+   }
+
+   try {
+      await db
+         .delete(productAccessoryTable)
+         .where(eq(productAccessoryTable.accessoryId, validated.data.accessoryId))
+
+      if (validated.data.productIds.length) {
+         await db.insert(productAccessoryTable).values(
+            validated.data.productIds.map((productId) => ({
+               productId,
+               accessoryId: validated.data.accessoryId,
+            })),
+         )
+      }
+   } catch (error) {
+      logger.error('Failed to update accessory products', error)
+      throw new DatabaseError('update', 'Failed to update accessory products')
+   }
 }

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
+import { logger } from '@/lib/logger'
 import { formatPKR, isValidId } from '@/lib/utils'
 import { AdminPageLayout } from '@/components/admin/admin-page-layout'
 import { AdminLoadingState, AdminNotFoundState } from '@/components/admin/admin-states'
@@ -101,7 +102,7 @@ function AdminOrderDetailsPage({ params }: Props) {
                })
             }
          } catch (error) {
-            console.error('Error fetching order details:', error)
+            logger.error('Error fetching order details', error)
             showAlert({ message: 'Failed to fetch order details', variant: 'error' })
          } finally {
             setLoading(false)
@@ -146,7 +147,7 @@ function AdminOrderDetailsPage({ params }: Props) {
             })
          }
       } catch (error) {
-         console.error('Error updating payment status:', error)
+         logger.error('Error updating payment status', error)
          showAlert({ message: 'Failed to update payment status', variant: 'error' })
       } finally {
          setUpdating(false)
@@ -185,7 +186,7 @@ function AdminOrderDetailsPage({ params }: Props) {
             showAlert({ message: data.error || 'Failed to update order status', variant: 'error' })
          }
       } catch (error) {
-         console.error('Error updating order status:', error)
+         logger.error('Error updating order status', error)
          showAlert({ message: 'Failed to update order status', variant: 'error' })
       } finally {
          setUpdatingStatus(false)

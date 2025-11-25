@@ -1,58 +1,16 @@
 import Link from 'next/link'
 
-import { desc, eq, sql } from 'drizzle-orm'
-
 import { formatPKR, getOrderStatusBadgeVariant, getPaymentStatusBadgeVariant } from '@/lib/utils'
+import { fetchAllOrdersWithDetails } from '@/actions/order'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { db } from '@/db'
-import { orderItemTable, orderTable, user } from '@/db/schema'
 import { CartIcon } from '@/icons/cart'
 
 export const dynamic = 'force-dynamic'
 
-interface OrderWithDetails {
-   id: number
-   userEmail: string
-   userName: string | null
-   status: string
-   paymentStatus: string
-   totalAmount: number
-   createdAt: Date
-   itemCount: number
-}
-
 async function AdminOrdersPage() {
-   // Fetch orders with user details and item counts
-   const orders = await db
-      .select({
-         id: orderTable.id,
-         userEmail: orderTable.userEmail,
-         userName: user.name,
-         status: orderTable.status,
-         paymentStatus: orderTable.paymentStatus,
-         totalAmount: orderTable.totalAmount,
-         createdAt: orderTable.createdAt,
-      })
-      .from(orderTable)
-      .leftJoin(user, eq(user.email, orderTable.userEmail))
-      .orderBy(desc(orderTable.createdAt))
-
-   // Get item counts for each order
-   const ordersWithItemCount: OrderWithDetails[] = await Promise.all(
-      orders.map(async (order) => {
-         const itemCount = await db
-            .select({ count: sql<number>`count(*)` })
-            .from(orderItemTable)
-            .where(eq(orderItemTable.orderId, order.id))
-
-         return {
-            ...order,
-            itemCount: itemCount[0]?.count || 0,
-         }
-      }),
-   )
+   const ordersWithItemCount = await fetchAllOrdersWithDetails()
 
    return (
       <main className="p-6 max-w-7xl mx-auto">
@@ -64,7 +22,7 @@ async function AdminOrdersPage() {
             <div className="text-sm text-gray-500">Total Orders: {ordersWithItemCount.length}</div>
          </div>
 
-         {orders.length === 0 ? (
+         {ordersWithItemCount.length === 0 ? (
             <Card className="flex flex-col items-center justify-center mt-12 gap-0">
                <CartIcon className="size-12" />
                <h3 className="text-lg font-medium text-gray-900 mb-2 mt-2">No Orders Found</h3>

@@ -1,9 +1,12 @@
 import { headers } from 'next/headers'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 import { z } from 'zod'
 
 import { auth } from '@/lib/auth/auth'
+import { emailHelpers } from '@/lib/email/helpers'
+import { logger } from '@/lib/logger'
+import { checkTypedRateLimit, createRateLimitHeaders, getClientIp } from '@/lib/rate-limit'
 
 const signUpSchema = z.object({
    name: z.string().min(1, { message: 'Name is required' }),
@@ -20,8 +23,28 @@ export interface SignUpResponseI {
    generalError?: string
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
    try {
+      // Check rate limit
+      const clientIp = getClientIp(req.headers)
+      const rateLimitResult = checkTypedRateLimit(clientIp, 'signup')
+
+      const rateLimitHeaders = createRateLimitHeaders(rateLimitResult, 10)
+
+      if (!rateLimitResult.allowed) {
+         return NextResponse.json(
+            {
+               success: false,
+               userId: undefined,
+               generalError: 'Too many signup attempts. Please try again later.',
+            },
+            {
+               status: 429,
+               headers: rateLimitHeaders,
+            },
+         )
+      }
+
       const body = await req.json()
       const parsed = signUpSchema.safeParse(body)
 
@@ -34,7 +57,10 @@ export async function POST(req: Request) {
                emailError: z.flattenError(parsed.error).fieldErrors.email,
                passwordError: z.flattenError(parsed.error).fieldErrors.password,
             },
-            { status: 400 },
+            {
+               status: 400,
+               headers: rateLimitHeaders,
+            },
          )
       }
 
@@ -51,7 +77,6 @@ export async function POST(req: Request) {
       })
 
       if (!signUpResponse.ok) {
-         console.log('response')
          return NextResponse.json(
             {
                success: false,
@@ -63,19 +88,44 @@ export async function POST(req: Request) {
       }
       const betterAuthResponse = await signUpResponse.json()
 
-      const response = NextResponse.json({
-         success: true,
-         userId: betterAuthResponse.user.id,
-      })
+      const response = NextResponse.json(
+         {
+            success: true,
+            userId: betterAuthResponse.user.id,
+         },
+         { headers: rateLimitHeaders },
+      )
 
       signUpResponse.headers.forEach((value, key) => {
          response.headers.set(key, value)
       })
 
-      console.log('✅ User signed up')
+      logger.success('User signed up', {
+         userId: betterAuthResponse.user.id,
+         email: parsed.data.email,
+      })
+
+      // Send welcome email (non-blocking, don't fail registration if email fails)
+      emailHelpers
+         .sendWelcomeEmail(
+            {
+               name: parsed.data.name,
+               email: parsed.data.email,
+            },
+            {
+               discountCode: 'WELCOME15',
+            },
+         )
+         .then(() => {
+            logger.debug('Welcome email sent', { email: parsed.data.email })
+         })
+         .catch((error) => {
+            logger.warn('Failed to send welcome email', { error, email: parsed.data.email })
+         })
+
       return response
    } catch (error: unknown) {
-      console.error('❌ Signup error:', error)
+      logger.error('Signup error', error)
       return NextResponse.json(
          {
             success: false,

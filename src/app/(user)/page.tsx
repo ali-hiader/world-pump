@@ -7,8 +7,8 @@ import { toBase64 } from '@/lib/utils'
 import { fetchFeaturedProducts } from '@/actions/product'
 import Heading from '@/components/client/heading'
 import NewsletterSignUp from '@/components/client/newsletter'
-import ProductCard from '@/components/client/product_card'
-import ServiceCard from '@/components/client/service_card'
+import ProductCard from '@/components/client/product-card'
+import ServiceCard from '@/components/client/service-card'
 import {
    Carousel,
    CarouselContent,

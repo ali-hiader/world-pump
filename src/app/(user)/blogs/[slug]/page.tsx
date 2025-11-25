@@ -3,7 +3,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { getAllPostSlugs, getPostBySlug, getRelatedPosts } from '@/lib/blog'
-import DisplayAlert from '@/components/client/display_alert'
+import DisplayAlert from '@/components/client/display-alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'

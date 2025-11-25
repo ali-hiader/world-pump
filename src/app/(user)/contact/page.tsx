@@ -9,8 +9,6 @@ import { Button } from '@/components/ui/button'
 import ContactInput from '@/components/ui/contact-input'
 import CustomTextarea from '@/components/ui/custom-textarea'
 
-export const dynamic = 'force-dynamic'
-
 export default function ContactPage() {
    const [form, setForm] = useState({
       name: '',

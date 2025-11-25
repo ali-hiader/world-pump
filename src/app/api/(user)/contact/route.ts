@@ -1,8 +1,14 @@
 import { NextResponse } from 'next/server'
 
+import { render } from '@react-email/render'
 import { z } from 'zod'
 
-import { sendEmail } from '@/lib/emails/mailer'
+import { apiValidationError } from '@/lib/api/response'
+import { sendEmail } from '@/lib/email/email-service'
+import { checkTypedRateLimit as checkRateLimit, createRateLimitHeaders, getClientIp } from '@/lib/rate-limit'
+import { logger } from '@/lib/logger'
+import ContactConfirmation from '@/emails/ContactConfirmation'
+import ContactFormNotification from '@/emails/ContactFormNotification'
 
 const schema = z.object({
   name: z.string().min(1),
@@ -14,29 +20,73 @@ const schema = z.object({
 
 export async function POST(req: Request) {
   try {
+    // Check rate limit
+    const clientIp = getClientIp(req.headers)
+    const rateLimitResult = checkRateLimit(clientIp, 'contact')
+
+    const rateLimitHeaders = createRateLimitHeaders(rateLimitResult)
+
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        { error: 'Too many contact requests. Please try again later.' },
+        {
+          status: 429,
+          headers: rateLimitHeaders,
+        },
+      )
+    }
+
     const body = await req.json()
     const parsed = schema.safeParse(body)
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input' }, { status: 400 })
+      const response = apiValidationError('Invalid input', parsed.error)
+      Object.entries(rateLimitHeaders).forEach(([key, value]) => response.headers.set(key, value))
+      return response
     }
     const { name, email, phone, subject, message } = parsed.data
 
     const to = process.env.CONTACT_TO || process.env.SMTP_FROM || 'info@worldpumps.com'
-    const html = `
-      <div style="font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;">
-        <h2 style="margin:0 0 8px 0;">New Contact Message</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
-        <p style="margin-top:12px;"><strong>Subject:</strong> ${subject}</p>
-        <p style="white-space: pre-wrap;">${message}</p>
-      </div>
-    `
 
-    await sendEmail({ to, subject: `[Contact] ${subject}`, html })
-    return NextResponse.json({ ok: true })
+    // Render notification email for admin
+    const adminHtml = await render(
+      ContactFormNotification({
+        name,
+        email,
+        phone,
+        subject,
+        message,
+        submittedAt: new Date(),
+        ipAddress: clientIp,
+      }),
+    )
+
+    // Send notification to admin
+    await sendEmail({ to, subject: `[Contact] ${subject}`, html: adminHtml })
+
+    // Send confirmation email to customer (non-blocking)
+    const customerHtml = await render(
+      ContactConfirmation({
+        customerName: name,
+        subject,
+      }),
+    )
+
+    sendEmail({
+      to: email,
+      subject: `We received your message - ${subject}`,
+      html: customerHtml,
+    })
+      .then(() => {
+        logger.debug('Contact confirmation sent', { email })
+      })
+      .catch((error) => {
+        logger.warn('Failed to send contact confirmation', { error, email })
+        // Don't fail the request if confirmation email fails
+      })
+
+    return NextResponse.json({ ok: true }, { headers: rateLimitHeaders })
   } catch (err) {
-    console.error('Contact error:', err)
+    logger.error('Contact error', err)
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
 }

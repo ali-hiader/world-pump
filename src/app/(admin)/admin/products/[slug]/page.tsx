@@ -135,7 +135,6 @@ function ProductDetailsPage({ params }: Props) {
     if (!product) return
     setDeleting(true)
 
-    console.log('productId - ', product.id)
     try {
       const res = await fetch(`/api/admin/products/${product.id}`, {
         method: 'DELETE',
@@ -404,12 +403,6 @@ function ProductDetailsPage({ params }: Props) {
                     <p className="text-xs text-gray-400 mt-1">
                       Add specifications when editing this product
                     </p>
-                    {/* {product.specs && (
-                      <div className="mt-2 text-xs text-red-500">
-                        Debug: Specs data exists but couldn&apos;t be parsed:{' '}
-                        {JSON.stringify(product.specs)}
-                      </div>
-                    )} */}
                   </div>
                 )
               })()}

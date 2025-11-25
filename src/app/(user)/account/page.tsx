@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import React from 'react'
 
 import { auth } from '@/lib/auth/auth'
-import SignOutBtn from '@/components/client/sign_out'
+import SignOutBtn from '@/components/client/sign-out'
 
 async function UserAccountPage() {
    const session = await auth.api.getSession({

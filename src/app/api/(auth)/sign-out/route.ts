@@ -25,6 +25,5 @@ export async function GET() {
    }
 
    response.cookies.delete({ name: 'better-auth.session_token', path: '/' })
-   console.log('response ---', response, await response.cookies.getAll())
    return response
 }

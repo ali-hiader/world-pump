@@ -1,14 +1,11 @@
 import Link from 'next/link'
 import { Suspense } from 'react'
 
-import { sql } from 'drizzle-orm'
-
+import { getTableCount } from '@/actions/stats'
 import AddItemBtn from '@/components/admin/add-item-btn'
 import Heading from '@/components/client/heading'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { db } from '@/db'
-import { accessoryTable, orderTable, productTable, user } from '@/db/schema'
 import { CartIcon } from '@/icons/cart'
 import { PlusIcon } from '@/icons/plus'
 import { ProductsIcon } from '@/icons/products'
@@ -141,16 +138,7 @@ type StatsCardProps = StatusCardTable & {
 }
 
 async function StatsCard({ title, table, icon: Icon, description }: StatsCardProps) {
-  const cardTable =
-    table === 'product'
-      ? productTable
-      : table === 'accessory'
-        ? accessoryTable
-        : table === 'user'
-          ? user
-          : orderTable
-
-  const [result] = await db.select({ count: sql<number>`count(*)` }).from(cardTable)
+  const count = await getTableCount(table)
 
   return (
     <Card className="py-4 gap-3">
@@ -162,9 +150,9 @@ async function StatsCard({ title, table, icon: Icon, description }: StatsCardPro
         <div className="text-sm flex items-center justify-between">
           <p className="text-muted-foreground underline">{description}</p>
           <span
-            className={`${result?.count > 0 ? 'text-emerald-800 bg-emerald-100' : 'text-rose-600 bg-rose-100'} size-6 flex items-center justify-center rounded-md `}
+            className={`${count > 0 ? 'text-emerald-800 bg-emerald-100' : 'text-rose-600 bg-rose-100'} size-6 flex items-center justify-center rounded-md `}
           >
-            {result?.count || 0}
+            {count || 0}
           </span>
         </div>
       </CardContent>

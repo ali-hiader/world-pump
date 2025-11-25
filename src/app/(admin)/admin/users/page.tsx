@@ -1,53 +1,14 @@
 import Link from 'next/link'
 
-import { desc, eq, sql } from 'drizzle-orm'
-
+import { fetchAllUsersWithStats } from '@/actions/user'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { db } from '@/db'
-import { orderTable, user } from '@/db/schema'
 
 export const dynamic = 'force-dynamic'
 
-interface UserWithStats {
-  id: string
-  name: string
-  email: string
-  emailVerified: boolean
-  createdAt: Date
-  updatedAt: Date
-  orderCount: number
-}
-
 async function AdminUsersPage() {
-  // Fetch all users
-  const users = await db
-    .select({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      emailVerified: user.emailVerified,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    })
-    .from(user)
-    .orderBy(desc(user.createdAt))
-
-  // Get order counts for each user
-  const usersWithStats: UserWithStats[] = await Promise.all(
-    users.map(async (userData) => {
-      const orderCount = await db
-        .select({ count: sql<number>`count(*)` })
-        .from(orderTable)
-        .where(eq(orderTable.userEmail, userData.email))
-
-      return {
-        ...userData,
-        orderCount: orderCount[0]?.count || 0,
-      }
-    }),
-  )
+  const usersWithStats = await fetchAllUsersWithStats()
 
   return (
     <main className="p-6 max-w-7xl mx-auto">

@@ -1,43 +1,42 @@
-import { headers } from 'next/headers'
-import { NextResponse } from 'next/server'
+import { eq, inArray } from 'drizzle-orm'
 
-import { eq } from 'drizzle-orm'
-
-import { auth } from '@/lib/auth/auth'
+import { apiSuccess, handleApiError } from '@/lib/api/response'
+import { requireAuth } from '@/lib/auth/auth'
+import { logger } from '@/lib/logger'
 import { db } from '@/db'
 import { orderItemTable, orderTable } from '@/db/schema'
 
 export async function GET() {
-  try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    })
+   return handleApiError(async () => {
+      const session = await requireAuth()
 
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+      logger.debug('Fetching orders for user', { email: session.user.email })
 
-    const orders = await db
-      .select()
-      .from(orderTable)
-      .where(eq(orderTable.userEmail, session.user.email))
+      const orders = await db
+         .select()
+         .from(orderTable)
+         .where(eq(orderTable.userEmail, session.user.email))
 
-    const orderItems = await Promise.all(
-      orders.map(async (order) => {
-        const items = await db
-          .select()
-          .from(orderItemTable)
-          .where(eq(orderItemTable.orderId, order.id))
-        return {
-          order,
-          items,
-        }
-      }),
-    )
+      if (orders.length === 0) {
+         return apiSuccess({ orderItems: [] })
+      }
 
-    return NextResponse.json({ orderItems })
-  } catch (error) {
-    console.error('Error fetching orders:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-  }
+      const orderIds = orders.map((order) => order.id)
+      const allItems = await db
+         .select()
+         .from(orderItemTable)
+         .where(inArray(orderItemTable.orderId, orderIds))
+
+      const orderItems = orders.map((order) => ({
+         order,
+         items: allItems.filter((item) => item.orderId === order.id),
+      }))
+
+      logger.success('Orders fetched successfully', {
+         orderCount: orders.length,
+         itemCount: allItems.length,
+      })
+
+      return apiSuccess({ orderItems })
+   })
 }

@@ -1,0 +1,5 @@
+{
+   "dir": "src/emails",
+   "port": 3001,
+   "host": "localhost"
+}

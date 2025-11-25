@@ -5,9 +5,7 @@ import React from 'react'
 
 import { services } from '@/lib/constants'
 import Heading from '@/components/client/heading'
-import ServiceCard from '@/components/client/service_card'
-
-export const dynamic = 'force-dynamic'
+import ServiceCard from '@/components/client/service-card'
 
 const metaTitle = `Services | World Pumps`
 const metaDescription =

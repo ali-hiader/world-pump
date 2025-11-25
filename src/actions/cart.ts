@@ -7,127 +7,215 @@ import { redirect } from 'next/navigation'
 import { and, desc, eq, getTableColumns } from 'drizzle-orm'
 
 import { auth } from '@/lib/auth/auth'
+import { ValidationError } from '@/lib/errors'
+import { logger } from '@/lib/logger'
+import { cartProductSchema, userIdSchema } from '@/lib/validations'
 import { db } from '@/db'
 import { cartTable, productTable } from '@/db/schema'
 
-export async function getCartDB(userId: string) {
-  try {
-    const cart = await db
-      .select({
-        cartId: cartTable.id,
-        quantity: cartTable.quantity,
-        addedBy: cartTable.createdBy,
+export type CartItemWithProduct = {
+   cartId: number
+   quantity: number
+   addedBy: string
+} & typeof productTable.$inferSelect
 
-        ...getTableColumns(productTable),
-      })
-      .from(cartTable)
-      .innerJoin(productTable, eq(cartTable.productId, productTable.id))
-      .where(and(eq(cartTable.createdBy, userId)))
-      .orderBy(desc(cartTable.id))
-
-    return cart
-  } catch (error) {
-    console.error('Error fetching cart:', error)
-    throw error
-  }
+async function findCartByUserId(userId: string): Promise<CartItemWithProduct[]> {
+   try {
+      return await db
+         .select({
+            cartId: cartTable.id,
+            quantity: cartTable.quantity,
+            addedBy: cartTable.createdBy,
+            ...getTableColumns(productTable),
+         })
+         .from(cartTable)
+         .innerJoin(productTable, eq(cartTable.productId, productTable.id))
+         .where(eq(cartTable.createdBy, userId))
+         .orderBy(desc(cartTable.id))
+   } catch (error) {
+      logger.error('Failed to fetch cart items', error, { userId })
+      throw error
+   }
 }
 
-export async function getSingleCartProductDB(productId: number, userId: string) {
-  const products = await db
-    .select()
-    .from(cartTable)
-    .where(and(eq(cartTable.productId, productId), eq(cartTable.createdBy, userId)))
-  return products[0]
+async function findCartItem(
+   productId: number,
+   userId: string,
+): Promise<typeof cartTable.$inferSelect | undefined> {
+   try {
+      const items = await db
+         .select()
+         .from(cartTable)
+         .where(and(eq(cartTable.productId, productId), eq(cartTable.createdBy, userId)))
+      return items[0]
+   } catch (error) {
+      logger.error('Failed to find cart item', error, { productId, userId })
+      throw error
+   }
 }
 
-// utilty function to get single product with cart details
-export async function getSingleProductForCart(productId: number) {
-  const products = await db
-    .select({
-      cartId: cartTable.id,
-      quantity: cartTable.quantity,
-      addedBy: cartTable.createdBy,
-      ...getTableColumns(productTable),
-    })
-    .from(cartTable)
-    .innerJoin(productTable, eq(cartTable.productId, productTable.id))
-    .where(eq(cartTable.productId, productId))
-  return products[0]
+export async function fetchUserCart(userId: string) {
+   try {
+      return await findCartByUserId(userId)
+   } catch (error) {
+      logger.error('Failed to fetch cart', error)
+      throw error
+   }
 }
 
-export async function addToCartDB(productId: number, userId: string) {
-  const exsistingProduct = await getSingleCartProductDB(productId, userId)
 
-  if (!exsistingProduct) {
-    const newCartProduct = await db
-      .insert(cartTable)
-      .values({
-        createdBy: userId,
-        productId: productId,
-        quantity: 1,
-      })
-      .returning()
-    revalidatePath('/cart')
-    return await getSingleProductForCart(newCartProduct[0].productId)
-  } else {
-    const increasedQtyCartProduct = await increaseQtyDB(productId, userId)
-    revalidatePath('/cart')
-    return await getSingleProductForCart(increasedQtyCartProduct[0].productId)
-  }
+
+export async function addToCart(productId: number, userId: string) {
+   const validated = cartProductSchema.safeParse({ productId, userId })
+   if (!validated.success) {
+      throw new ValidationError(validated.error.issues[0]?.message || 'Invalid input')
+   }
+
+   try {
+      const existingItem = await findCartItem(validated.data.productId, validated.data.userId)
+
+      if (existingItem) {
+         await increaseQuantity(validated.data.productId, validated.data.userId)
+      } else {
+         await db.insert(cartTable).values({
+            createdBy: validated.data.userId,
+            productId: validated.data.productId,
+            quantity: 1,
+         })
+         logger.success('Item added to cart', { productId, userId })
+      }
+
+      revalidatePath('/cart')
+
+      const cart = await findCartByUserId(validated.data.userId)
+      const addedItem = cart.find((item) => item.id === validated.data.productId)
+      return addedItem
+   } catch (error) {
+      logger.error('Failed to add item to cart', error)
+      throw error
+   }
 }
 
-export async function increaseQtyDB(productId: number, userId: string) {
-  const exsistingProduct = await getSingleCartProductDB(productId, userId)
-  revalidatePath('/cart')
+export async function increaseQuantity(productId: number, userId: string) {
+   const validated = cartProductSchema.safeParse({ productId, userId })
+   if (!validated.success) {
+      throw new ValidationError(validated.error.issues[0]?.message || 'Invalid input')
+   }
 
-  return await db
-    .update(cartTable)
-    .set({
-      quantity: exsistingProduct.quantity + 1,
-    })
-    .where(and(eq(cartTable.productId, productId), eq(cartTable.createdBy, userId)))
-    .returning()
+   try {
+      const existingItem = await findCartItem(validated.data.productId, validated.data.userId)
+
+      if (!existingItem) {
+         throw new Error('Cart item not found')
+      }
+
+      const [updatedItem] = await db
+         .update(cartTable)
+         .set({ quantity: existingItem.quantity + 1 })
+         .where(and(eq(cartTable.productId, productId), eq(cartTable.createdBy, userId)))
+         .returning()
+
+      logger.debug('Cart item quantity increased', { productId, userId })
+      revalidatePath('/cart')
+      return updatedItem
+   } catch (error) {
+      logger.error('Failed to increase quantity', error)
+      throw error
+   }
 }
 
-export async function decreaseQtyDB(productId: number, userId: string) {
-  const exsistingProduct = await getSingleCartProductDB(productId, userId)
+export async function decreaseQuantity(productId: number, userId: string) {
+   const validated = cartProductSchema.safeParse({ productId, userId })
+   if (!validated.success) {
+      throw new ValidationError(validated.error.issues[0]?.message || 'Invalid input')
+   }
 
-  if (exsistingProduct.quantity === 1) {
-    await removeFromCartDB(productId, userId)
-    revalidatePath('/cart')
+   try {
+      const existingItem = await findCartItem(validated.data.productId, validated.data.userId)
 
-    return 'success'
-  } else {
-    revalidatePath('/cart')
-    return await db
-      .update(cartTable)
-      .set({
-        quantity: exsistingProduct.quantity - 1,
-      })
-      .where(
-        and(eq(cartTable.productId, exsistingProduct.productId), eq(cartTable.createdBy, userId)),
-      )
-      .returning()
-  }
+      if (!existingItem) {
+         throw new Error('Cart item not found')
+      }
+
+      if (existingItem.quantity === 1) {
+         await db
+            .delete(cartTable)
+            .where(
+               and(
+                  eq(cartTable.productId, validated.data.productId),
+                  eq(cartTable.createdBy, validated.data.userId),
+               ),
+            )
+         logger.debug('Cart item removed (quantity was 1)', { productId, userId })
+         revalidatePath('/cart')
+         return 'success'
+      }
+
+      const [updatedItem] = await db
+         .update(cartTable)
+         .set({ quantity: existingItem.quantity - 1 })
+         .where(
+            and(
+               eq(cartTable.productId, validated.data.productId),
+               eq(cartTable.createdBy, validated.data.userId),
+            ),
+         )
+         .returning()
+
+      logger.debug('Cart item quantity decreased', { productId, userId })
+      revalidatePath('/cart')
+      return updatedItem ?? 'success'
+   } catch (error) {
+      logger.error('Failed to decrease quantity', error)
+      throw error
+   }
 }
 
-export async function removeFromCartDB(productId: number, userId: string) {
-  revalidatePath('/cart')
-  await db
-    .delete(cartTable)
-    .where(and(eq(cartTable.productId, productId), eq(cartTable.createdBy, userId)))
+export async function removeFromCart(productId: number, userId: string) {
+   const validated = cartProductSchema.safeParse({ productId, userId })
+   if (!validated.success) {
+      throw new ValidationError(validated.error.issues[0]?.message || 'Invalid input')
+   }
 
-  const cartProducts = await getCartDB(userId)
-  return cartProducts
+   try {
+      await db
+         .delete(cartTable)
+         .where(
+            and(
+               eq(cartTable.productId, validated.data.productId),
+               eq(cartTable.createdBy, validated.data.userId),
+            ),
+         )
+
+      logger.success('Item removed from cart', { productId, userId })
+      revalidatePath('/cart')
+      return await findCartByUserId(validated.data.userId)
+   } catch (error) {
+      logger.error('Failed to remove item from cart', error)
+      throw error
+   }
 }
 
-export async function clearCartDB(userId: string) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  })
-  if (!session) {
-    return redirect('/sign-in')
-  }
+export async function clearCart(userId: string) {
+   const validated = userIdSchema.safeParse(userId)
+   if (!validated.success) {
+      throw new ValidationError(validated.error.issues[0]?.message || 'Invalid user ID')
+   }
 
-  await db.delete(cartTable).where(eq(cartTable.createdBy, userId))
+   const session = await auth.api.getSession({
+      headers: await headers(),
+   })
+
+   if (!session) {
+      return redirect('/sign-in')
+   }
+
+   try {
+      await db.delete(cartTable).where(eq(cartTable.createdBy, validated.data))
+      logger.success('Cart cleared', { userId })
+      revalidatePath('/cart')
+   } catch (error) {
+      logger.error('Failed to clear cart', error)
+      throw error
+   }
 }

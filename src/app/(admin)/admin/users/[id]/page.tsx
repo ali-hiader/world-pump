@@ -1,13 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { eq } from "drizzle-orm";
-
+import { fetchUserById } from '@/actions/user';
+import { countOrdersByUserEmail } from '@/actions/order';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { db } from "@/db";
-import { orderTable,user } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -21,29 +19,13 @@ async function UserDetailsPage({ params }: Props) {
   const resolvedParams = await params;
   const userId = resolvedParams.id;
 
-  // Fetch user details
-  const [userData] = await db
-    .select({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      emailVerified: user.emailVerified,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    })
-    .from(user)
-    .where(eq(user.id, userId))
-    .limit(1);
+  const userData = await fetchUserById(userId);
 
   if (!userData) {
     notFound();
   }
 
-  // Get order count
-  const orderCount = await db
-    .select()
-    .from(orderTable)
-    .where(eq(orderTable.userEmail, userData.email));
+  const orderCount = await countOrdersByUserEmail(userData.email);
 
   return (
     <main className="p-6 max-w-4xl mx-auto">
@@ -108,8 +90,8 @@ async function UserDetailsPage({ params }: Props) {
             <div>
               <p className="text-sm font-medium text-gray-500">Total Orders</p>
               <div className="flex items-center gap-2">
-                <p className="text-lg font-semibold">{orderCount.length}</p>
-                {orderCount.length > 0 && (
+                <p className="text-lg font-semibold">{orderCount}</p>
+                {orderCount > 0 && (
                   <Link href={`/admin/users/${userData.id}/orders`}>
                     <Button variant="outline" size="sm">
                       View Orders
@@ -149,7 +131,7 @@ async function UserDetailsPage({ params }: Props) {
           <div className="flex flex-wrap gap-3">
             <Link href={`/admin/users/${userData.id}/orders`}>
               <Button variant="outline">
-                View User Orders ({orderCount.length})
+                View User Orders ({orderCount})
               </Button>
             </Link>
             <Button

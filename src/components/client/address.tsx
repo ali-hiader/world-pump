@@ -1,4 +1,4 @@
-import React from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { checkoutAddressFields } from '@/lib/constants'
 import { cn } from '@/lib/utils'
@@ -33,9 +33,9 @@ interface Props {
 }
 
 function Address({ userName, onAddressesChange }: Props) {
-  const [billingSelection, setBillingSelection] = React.useState<'same' | 'different'>('same')
+  const [billingSelection, setBillingSelection] = useState<'same' | 'different'>('same')
 
-  const initialAddress: AddressValues = React.useMemo(
+  const initialAddress: AddressValues = useMemo(
     () => ({
       fullName: userName || '',
       phone: '',
@@ -49,10 +49,10 @@ function Address({ userName, onAddressesChange }: Props) {
     [userName],
   )
 
-  const [shipping, setShipping] = React.useState<AddressValues>(initialAddress)
-  const [billing, setBilling] = React.useState<AddressValues>(initialAddress)
+  const [shipping, setShipping] = useState<AddressValues>(initialAddress)
+  const [billing, setBilling] = useState<AddressValues>(initialAddress)
 
-  React.useEffect(() => {
+  useEffect(() => {
     const payload: AddressesData = {
       shipping,
       billingSameAsShipping: billingSelection === 'same',
@@ -61,7 +61,7 @@ function Address({ userName, onAddressesChange }: Props) {
     onAddressesChange?.(payload)
   }, [shipping, billing, billingSelection, onAddressesChange])
 
-  const billingAddressFields = React.useMemo(
+  const billingAddressFields = useMemo(
     () =>
       checkoutAddressFields.map((field) => ({
         ...field,

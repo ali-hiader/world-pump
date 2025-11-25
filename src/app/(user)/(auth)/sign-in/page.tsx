@@ -1,18 +1,21 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 
-import { SignInResponseI } from '@/app/api/(auth)/sign-in/route'
+import { signIn } from '@/lib/auth/auth-client'
+import { logger } from '@/lib/logger'
 import { showAlert } from '@/components/ui/alert'
-import ContactInput from '@/components/ui/contact-input'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import Spinner from '@/icons/spinner'
-import { useAuthStore } from '@/stores/auth_store'
 
 export default function SignInPage() {
    const router = useRouter()
-   const { setUserIdAuthS: setSession } = useAuthStore()
+   const searchParams = useSearchParams()
+   const redirectTo = searchParams.get('redirect') || '/'
 
    const [loading, setLoading] = useState(false)
 
@@ -25,34 +28,29 @@ export default function SignInPage() {
       e.preventDefault()
       setLoading(true)
 
-      const previousPage = document.referrer
-      const nextPath = previousPage ? new URL(previousPage).pathname : '/'
-
       const { email, password } = form
 
       try {
-         const res = await fetch('/api/sign-in', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
-            cache: 'no-store',
+         const result = await signIn.email({
+            email,
+            password,
+            callbackURL: redirectTo,
          })
 
-         const data = (await res.json()) as SignInResponseI
-         setSession(data.userId)
-
-         if (!res.ok) {
-            if (data.emailError) showAlert({ message: data.emailError, variant: 'error' })
-            if (data.passwordError) showAlert({ message: data.passwordError, variant: 'error' })
-            if (data.generalError) showAlert({ message: data.generalError, variant: 'error' })
-
+         if (result.error) {
+            showAlert({ message: result.error.message || 'Invalid credentials', variant: 'error' })
             return
          }
 
          showAlert({ message: 'Signed in successfully!', variant: 'success' })
-         router.push(nextPath || '/')
+         router.push(redirectTo)
+         router.refresh()
       } catch (err: unknown) {
-         console.log(err)
+         if (err instanceof Error) {
+            logger.error(err.message)
+         } else {
+            logger.error('An unexpected error occurred.')
+         }
          showAlert({ message: 'An unexpected error occurred. Please try again.', variant: 'error' })
       } finally {
          setLoading(false)
@@ -60,53 +58,79 @@ export default function SignInPage() {
    }
 
    return (
-      <main className="flex flex-col items-center justify-center h-[calc(100vh-115px)]">
-         <h1 className="text-5xl font-bold headingFont mb-8 text-secondary">Sign In</h1>
+      <>
+         <div className="mb-8">
+            <h1 className="mb-2 text-2xl headingFont font-semibold tracking-tight">
+               Sign In to World Pumps
+            </h1>
+            <p className="text-muted-foreground text-sm">Sign in with email and password</p>
+         </div>
+         <div className="flex flex-col space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
+               <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                     id="email"
+                     placeholder={'name@example.com'}
+                     type="email"
+                     autoCapitalize="none"
+                     autoComplete="email"
+                     autoCorrect="off"
+                     disabled={loading}
+                     value={form.email}
+                     onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
+                     required
+                     className="w-full py-6"
+                  />
+               </div>
 
-         <form
-            onSubmit={handleSubmit}
-            className="flex flex-col min-w-full sm:min-w-lg md:min-w-xl px-4"
-         >
-            <div className="mb-4">
-               <ContactInput
-                  name="email"
-                  type="email"
-                  placeholder="Email"
-                  value={form.email}
-                  onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
-                  required
-               />
-            </div>
-            <div className="mb-4">
-               <ContactInput
-                  name="password"
-                  type="password"
-                  placeholder="Password"
-                  value={form.password}
-                  onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))}
-                  required
-               />
-            </div>
+               <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                     id="password"
+                     placeholder="••••••••"
+                     type="password"
+                     autoComplete="current-password"
+                     disabled={loading}
+                     value={form.password}
+                     onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))}
+                     required
+                     className="w-full py-6"
+                  />
+               </div>
 
-            <p className="mt-4">
-               Don&apos;t have an account?{' '}
-               <Link
-                  className="text-secondary underline hover:text-primary/90 transition-all"
-                  href="/sign-up"
+               <div className="flex items-center justify-between text-sm">
+                  <div />
+                  <Link
+                     href="/forgot-password"
+                     className="text-claibe-dark underline underline-offset-4"
+                  >
+                     Forgot password?
+                  </Link>
+               </div>
+
+               <Button
+                  type="submit"
+                  variant={'secondary'}
+                  disabled={loading || !form.email || !form.password}
+                  className="w-full py-6"
                >
-                  Sign up
-               </Link>
-            </p>
-            <button
-               className="rounded-full px-4 py-2  bg-secondary mt-6 hover:bg-transparent border border-secondary transition-all hover:text-secondary text-white cursor-pointer group relative disabled:cursor-not-allowed disabled:opacity-50 group"
-               disabled={loading}
-            >
-               {loading && (
-                  <Spinner className="absolute top-2.5 left-2.5 animate-spin size-5 stroke-white group-hover:stroke-black" />
-               )}{' '}
-               Sign In
-            </button>
-         </form>
-      </main>
+                  {loading ? (
+                     <>
+                        <Spinner className="mr-2 size-4" />
+                        Signing in...
+                     </>
+                  ) : (
+                     'Sign In'
+                  )}
+               </Button>
+            </form>
+         </div>
+         <div className="mt-6 text-center">
+            <Link href="/sign-up" className="text-claibe-dark text-sm underline underline-offset-4">
+               Sign Up
+            </Link>
+         </div>
+      </>
    )
 }

@@ -10,12 +10,15 @@ const cormorant = Cormorant_Garamond({
    subsets: ['latin'],
    weight: ['400', '500', '600', '700'],
    variable: '--font-cormorant',
+   fallback: ['Georgia', 'Times New Roman', 'serif'],
 })
 
 const outfit = Outfit({
-   subsets: ['latin'],
-   weight: ['300', '400', '700', '900'],
    variable: '--font-outfit',
+   subsets: ['latin'],
+   display: 'swap',
+   preload: true,
+   fallback: ['system-ui', '-apple-system', 'sans-serif'],
 })
 
 export const metadata: Metadata = {

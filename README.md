@@ -9,7 +9,6 @@ A comprehensive e-commerce platform for water pumps and related equipment, built
 - Product catalog with categories and filtering
 - Shopping cart functionality
 - Secure checkout process
-- PayFast payment integration
 - Order management and tracking
 - User authentication and profiles
 
@@ -58,7 +57,6 @@ A comprehensive e-commerce platform for water pumps and related equipment, built
 
 ### **Payments & Email**
 
-- **PayFast** - Payment processing for South Africa
 - **Nodemailer** - Email functionality
 - **React Email** - Email templates
 
@@ -114,11 +112,6 @@ SMTP_USER="your-email@gmail.com"
 SMTP_PASS="your-app-password"
 SMTP_FROM="no-reply@worldpumps.com"
 CONTACT_TO="info@worldpumps.com"
-
-# PayFast (for payments requries a merchant acc on payfast)
-PAYFAST_MODE="sandbox"
-PAYFAST_MERCHANT_ID="your-merchant-id"
-PAYFAST_MERCHANT_KEY="your-merchant-key"
 
 # Application URLs
 NEXT_PUBLIC_BASE_URL="http://localhost:3000"
@@ -198,14 +191,11 @@ pnpm run lint         # Run ESLint
 - Protected admin routes
 - Session persistence
 
-## 💳 Payment Integration
+## 💳 Payment Methods
 
-### PayFast (Primary)
-
-- Secure payment processing for South African market
-- Sandbox and production modes
-- Automated payment verification
-- Order status updates
+The platform supports:
+- **Cash on Delivery (COD)** - Pay when you receive your order
+- **Bank Transfer** - Manual bank deposit with verification
 
 ## 📧 Email System
 
@@ -256,7 +246,6 @@ Built with Shadcn UI and includes:
 1. Set up production database (Neon, Vercel Postgres, etc.)
 2. Configure Cloudinary for image storage
 3. Set up email service (Gmail, SendGrid, etc.)
-4. Configure PayFast merchant account
 
 ### Vercel Deployment (Recommended)
 
