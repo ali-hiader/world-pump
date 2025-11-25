@@ -5,8 +5,8 @@ import { z } from 'zod'
 
 import { apiValidationError } from '@/lib/api/response'
 import { sendEmail } from '@/lib/email/email-service'
-import { checkTypedRateLimit as checkRateLimit, createRateLimitHeaders, getClientIp } from '@/lib/rate-limit'
 import { logger } from '@/lib/logger'
+import { checkTypedRateLimit as checkRateLimit, createRateLimitHeaders, getClientIp } from '@/lib/rate-limit'
 import ContactConfirmation from '@/emails/ContactConfirmation'
 import ContactFormNotification from '@/emails/ContactFormNotification'
 

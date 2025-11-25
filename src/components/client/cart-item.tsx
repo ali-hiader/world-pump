@@ -4,13 +4,13 @@ import Image from 'next/image'
 import { Minus, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { useSession } from '@/lib/auth/auth-client'
 import { CartItemType } from '@/lib/types'
 import { formatPKR } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import Spinner from '@/icons/spinner'
-import { useSession } from '@/lib/auth/auth-client'
 import { useCart } from '@/hooks/use-cart'
+import Spinner from '@/icons/spinner'
 
 interface Props {
    product: CartItemType

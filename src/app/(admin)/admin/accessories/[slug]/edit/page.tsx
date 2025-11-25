@@ -3,15 +3,15 @@
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
+import { logger } from '@/lib/logger'
+import { AccessoryType } from '@/lib/types'
 import { fetchAccessoryBySlug } from '@/actions/accessory'
+import AccessoryForm from '@/components/admin/accessory-form'
 import {
   AdminErrorState,
   AdminLoadingState,
   AdminNotFoundState,
 } from '@/components/admin/admin-states'
-import AccessoryForm from '@/components/admin/accessory-form'
-import { logger } from '@/lib/logger'
-import { AccessoryType } from '@/lib/types'
 
 export default function EditAccessoryPage() {
   const params = useParams()

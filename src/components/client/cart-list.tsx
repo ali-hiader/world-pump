@@ -2,10 +2,10 @@
 
 import Link from 'next/link'
 
+import { useSession } from '@/lib/auth/auth-client'
 import { formatPKR } from '@/lib/utils'
 import DisplayAlert from '@/components/client/display-alert'
 import { Button } from '@/components/ui/button'
-import { useSession } from '@/lib/auth/auth-client'
 import useCartStore from '@/stores/cart-store'
 
 import CartItem from './cart-item'

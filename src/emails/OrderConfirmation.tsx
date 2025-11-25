@@ -61,7 +61,7 @@ export default function OrderConfirmation({
             </Text>
 
             <Text style={{ marginBottom: '24px' }}>
-               We've received your order and will notify you when it ships.
+               We&apos;ve received your order and will notify you when it ships.
             </Text>
 
             <Section

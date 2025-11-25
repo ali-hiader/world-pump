@@ -5,7 +5,6 @@ import { redirect } from 'next/navigation'
 import { auth } from '@/lib/auth/auth'
 import { logger } from '@/lib/logger'
 import { clearCart } from '@/actions/cart'
-import { fetchOrderById } from '@/actions/order'
 
 interface SuccessPageProps {
    searchParams: {

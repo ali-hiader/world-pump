@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { fetchUserById } from '@/actions/user';
 import { countOrdersByUserEmail } from '@/actions/order';
+import { fetchUserById } from '@/actions/user';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
