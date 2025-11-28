@@ -145,9 +145,6 @@ function Analytics() {
                            <OrderItem key={item.id} item={item} />
                         ))}
                      </section>
-                     {/* <div className="mt-2">
-                <ResendEmailButton orderId={orderData.order.id} />
-              </div> */}
                   </li>
                ))
             )}

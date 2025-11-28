@@ -9,24 +9,26 @@ import { logger } from '@/lib/logger'
 import { db } from '@/db'
 import { account, user, verification } from '@/db/schema'
 
-export const runtime = 'nodejs'
-
 const schema = z.object({
    token: z.string().min(10),
-   password: z.string().min(8),
+   newPassword: z.string().min(8),
 })
 
 export async function POST(req: NextRequest) {
    try {
       const body = await req.json()
-      const { token, password } = schema.parse(body)
+      const { token, newPassword } = schema.parse(body)
+      const password = newPassword
 
+      logger.info('Password reset request received', { token, password })
       // Find token in verification table
       const [resetRecord] = await db
          .select()
          .from(verification)
          .where(and(eq(verification.value, token), gt(verification.expiresAt, new Date())))
          .limit(1)
+
+      logger.debug('Reset record found', { resetRecord })
 
       if (!resetRecord) {
          return NextResponse.json({ error: 'Invalid or expired token' }, { status: 400 })

@@ -2,8 +2,7 @@ import type { NextRequest } from 'next/server'
 
 import { NextResponse } from 'next/server'
 
-import { getAdminCookieName } from '@/lib/auth/admin-auth'
-import { getUserSessionCookieName } from '@/lib/auth/auth'
+import { getAdminCookieName, getUserSessionCookieName } from '@/lib/auth/cookie-names'
 
 export function middleware(req: NextRequest) {
    const { pathname } = req.nextUrl

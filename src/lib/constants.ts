@@ -38,8 +38,8 @@ export const SOCIAL_LINKS = {
 } as const
 
 export const EMAIL_CONFIG = {
-   senderName: process.env.NEXT_PUBLIC_STORE_NAME || 'World Pumps',
-   senderEmail: process.env.FROM_EMAIL || 'noreply@worldpumps.com',
+   senderName: 'World Pumps',
+   senderEmail: process.env.FROM_EMAIL,
    timeout: {
       total: 45000,
       connection: 10000,
@@ -74,7 +74,10 @@ export const SESSION = {
       USER: 'better-auth.session_token',
       ADMIN: 'admin_session',
    },
-   MAX_AGE: 60 * 60 * 24, // 1 day
+   MAX_AGE: {
+      USER: 60 * 60 * 24 * 30, // 30 days (1 month)
+      ADMIN: 60 * 60 * 24, // 1 day
+   },
 } as const
 
 export const ORDER = {
@@ -149,20 +152,12 @@ export const SERVICES = [
    },
 ] as const
 
-// ============================================================================
-// Form Fields - Contact
-// ============================================================================
-
 export const CONTACT_FIELDS = [
    { name: 'name', placeholder: 'Your Name', type: 'text', required: true },
    { name: 'email', placeholder: 'Your Email', type: 'email', required: true },
    { name: 'phone', placeholder: 'Phone (optional)', type: 'text', required: false },
    { name: 'subject', placeholder: 'Subject', type: 'text', required: true },
 ] as const
-
-// ============================================================================
-// Form Fields - Checkout Address
-// ============================================================================
 
 export const CHECKOUT_ADDRESS_FIELDS = [
    {
@@ -224,10 +219,6 @@ export const CHECKOUT_ADDRESS_FIELDS = [
    },
 ] as const
 
-// ============================================================================
-// Legacy Exports (for backwards compatibility with config.ts structure)
-// ============================================================================
-
 export const storeConfig = {
    storeName: process.env.NEXT_PUBLIC_STORE_NAME || APP_INFO.name,
    storeSlug: APP_INFO.slug,
@@ -250,7 +241,6 @@ export const storeConfig = {
    },
 } as const
 
-// Backwards compatibility: old config.ts exports
 export const carouselImages = CAROUSEL_IMAGES
 export const brandLogos = BRAND_LOGOS
 export const services = SERVICES

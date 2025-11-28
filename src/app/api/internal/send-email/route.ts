@@ -1,36 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { sendEmail } from '@/lib/email/email-service'
-import { logger } from '@/lib/logger'
+import sendMail from '@/lib/email/send-mail'
 
-// Force Node.js runtime for nodemailer compatibility
 export const runtime = 'nodejs'
 
 export async function POST(request: NextRequest) {
+   console.log('📮 [Internal Email API] Request received')
    try {
       const { to, subject, html } = await request.json()
+      console.log('📮 [Internal Email API] Parsed request:', {
+         to,
+         subject: subject.substring(0, 50) + '...',
+      })
 
       if (!to || !subject || !html) {
-         logger.warn('Internal email API: Missing required fields', {
-            hasTo: !!to,
-            hasSubject: !!subject,
-            hasHtml: !!html,
-         })
-         return NextResponse.json(
-            { error: 'Missing required fields: to, subject, html' },
-            { status: 400 },
-         )
+         console.error('📮 [Internal Email API] Missing required fields')
+         return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
       }
 
-      const result = await sendEmail({ to, subject, html })
+      console.log('📮 [Internal Email API] Calling sendMail function...')
+
+      const result = await sendMail(to, subject, html)
+
+      console.log('📮 [Internal Email API] sendMail completed:', result)
 
       return NextResponse.json({
          success: true,
-         messageId: result?.id,
-         message: 'Email sent successfully',
+         messageId: result?.id || 'sent',
       })
    } catch (error) {
-      logger.error('Internal email API failed', error)
+      console.error('📮 [Internal Email API] Error:', error)
+      if (error instanceof Error) {
+         console.error('📮 [Internal Email API] Error message:', error.message)
+         console.error('📮 [Internal Email API] Error stack:', error.stack)
+      }
       return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
    }
 }

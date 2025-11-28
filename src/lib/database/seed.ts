@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt'
 import fs from 'fs'
 import path from 'path'
 
-import { accessoriesSeed, categoriesSeedData } from '@/lib/data/seed-data'
+import { accessoriesSeed, categoriesSeedData } from '@/lib/database/seed-data'
 import { logger } from '@/lib/logger'
 import { SpecField } from '@/lib/types'
 import { db } from '@/db'

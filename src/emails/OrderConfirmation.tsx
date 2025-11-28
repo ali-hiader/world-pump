@@ -6,7 +6,7 @@ import { storeConfig } from '@/lib/constants'
 
 import Layout from './components/Layout'
 
-interface OrderItem {
+export interface OrderItem {
    id: string
    name: string
    price: number
@@ -14,7 +14,17 @@ interface OrderItem {
    image?: string
 }
 
-interface OrderConfirmationProps {
+export interface ShippingAddress {
+   fullName: string
+   addressLine1: string
+   addressLine2?: string
+   city: string
+   state: string
+   postalCode: string
+   country: string
+}
+
+export interface OrderConfirmationEmailProps {
    customerName: string
    orderNumber: string
    orderDate: Date
@@ -23,15 +33,7 @@ interface OrderConfirmationProps {
    shipping: number
    tax: number
    total: number
-   shippingAddress: {
-      fullName: string
-      addressLine1: string
-      addressLine2?: string
-      city: string
-      state: string
-      postalCode: string
-      country: string
-   }
+   shippingAddress: ShippingAddress
    trackingUrl?: string
 }
 
@@ -46,7 +48,7 @@ export default function OrderConfirmation({
    total,
    shippingAddress,
    trackingUrl,
-}: OrderConfirmationProps) {
+}: OrderConfirmationEmailProps) {
    const formatCurrency = (amount: number) =>
       new Intl.NumberFormat('en-US', {
          style: 'currency',

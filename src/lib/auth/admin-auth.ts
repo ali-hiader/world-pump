@@ -1,16 +1,9 @@
-/**
- * Admin Authentication Module
- * Centralized admin authentication using JWT
- *
- * This provides a separate admin authentication system from Better-Auth
- * For future: Consider migrating to Better-Auth with role-based access
- */
-
 import { cookies } from 'next/headers'
 
 import { eq } from 'drizzle-orm'
 import jwt from 'jsonwebtoken'
 
+import { SESSION } from '@/lib/constants'
 import { logger } from '@/lib/logger'
 import { adminTable, db } from '@/db'
 
@@ -135,7 +128,7 @@ export async function setAdminSession(admin: {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24, // 1 day
+      maxAge: SESSION.MAX_AGE.ADMIN,
       path: '/',
    })
 

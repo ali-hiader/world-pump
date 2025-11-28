@@ -2,7 +2,7 @@ import type { UploadApiResponse } from 'cloudinary'
 
 import slugify from 'slugify'
 
-import { uploadImage } from '@/lib/cloudinary/cloudinary'
+import { uploadImage } from '@/lib/cloudinary'
 
 export function createSlug(text: string): string {
    return slugify(text, { lower: true, trim: true, strict: true })

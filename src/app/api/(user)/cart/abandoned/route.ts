@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { render } from '@react-email/render'
 
-import { sendEmail } from '@/lib/email/email-service'
+import sendMailEdge from '@/lib/email/send-mail-edge'
 import { logger } from '@/lib/logger'
 import {
    checkTypedRateLimit as checkRateLimit,
@@ -10,8 +10,6 @@ import {
    getClientIp,
 } from '@/lib/rate-limit'
 import AbandonedCart from '@/emails/AbandonedCart'
-
-export const runtime = 'nodejs'
 
 interface AbandonedCartData {
    customerName: string
@@ -61,11 +59,7 @@ export async function POST(req: NextRequest) {
 
       const html = await render(AbandonedCart(cartData))
 
-      await sendEmail({
-         to: cartData.customerEmail,
-         subject: "Don't forget your items!",
-         html,
-      })
+      await sendMailEdge(cartData.customerEmail, "Don't forget your items!", html)
 
       return NextResponse.json({ success: true })
    } catch (error) {

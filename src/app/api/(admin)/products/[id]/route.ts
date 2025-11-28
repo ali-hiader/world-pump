@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm'
 
 import { apiBadRequest } from '@/lib/api/response'
 import { getAdminSession } from '@/lib/auth/admin-auth'
-import { deleteImage, extractCloudinaryPublicId } from '@/lib/cloudinary/cloudinary'
+import { deleteImage, extractCloudinaryPublicId } from '@/lib/cloudinary'
 import { logger } from '@/lib/logger'
 import { createSlug, uploadFormImage } from '@/lib/server'
 import { db } from '@/db'

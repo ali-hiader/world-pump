@@ -1,13 +1,12 @@
-import type { OrderItem, ShippingAddress } from '@/lib/email/helpers'
-
 import { headers } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 
+import { render } from '@react-email/render'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 
 import { auth } from '@/lib/auth/auth'
-import { emailHelpers } from '@/lib/email/helpers'
+import sendMailEdge from '@/lib/email/send-mail-edge'
 import { logger } from '@/lib/logger'
 import { checkTypedRateLimit, createRateLimitHeaders, getClientIp } from '@/lib/rate-limit'
 import { db } from '@/db'
@@ -18,6 +17,11 @@ import {
    paymentTable,
    user as userTable,
 } from '@/db/schema'
+import OrderConfirmation, {
+   OrderConfirmationEmailProps,
+   OrderItem,
+   ShippingAddress,
+} from '@/emails/OrderConfirmation'
 
 const addressSchema = z.object({
    fullName: z.string().min(1),
@@ -219,52 +223,56 @@ export async function POST(req: NextRequest) {
                  .limit(1)
             : []
 
-         emailHelpers
-            .sendOrderConfirmationEmail({
-               customerName: addresses?.shipping.fullName || session.user.name || 'Customer',
-               customerEmail: userEmail,
-               orderNumber,
-               orderDate: new Date(),
-               items: products.map(
-                  (p): OrderItem => ({
-                     id: p.id.toString(),
-                     name: p.title,
-                     price: p.price,
-                     quantity: p.quantity,
-                     image: p.imageUrl,
-                  }),
-               ),
-               subtotal: totalAmount,
-               shipping: 0, // Add shipping calculation if needed
-               tax: 0, // Add tax calculation if needed
-               total: totalAmount,
-               shippingAddress: shippingAddr[0]
-                  ? ({
-                       fullName: shippingAddr[0].fullName,
-                       addressLine1: shippingAddr[0].addressLine1,
-                       addressLine2: shippingAddr[0].addressLine2 || undefined,
-                       city: shippingAddr[0].city,
-                       state: shippingAddr[0].state || '',
-                       postalCode: shippingAddr[0].postalCode || '',
-                       country: shippingAddr[0].country,
-                    } as ShippingAddress)
-                  : ({
-                       fullName: addresses?.shipping.fullName || '',
-                       addressLine1: addresses?.shipping.addressLine1 || '',
-                       addressLine2: addresses?.shipping.addressLine2 || undefined,
-                       city: addresses?.shipping.city || '',
-                       state: addresses?.shipping.state || '',
-                       postalCode: addresses?.shipping.postalCode || '',
-                       country: addresses?.shipping.country || '',
-                    } as ShippingAddress),
-            })
-            .then(() => {
-               logger.debug('Order confirmation email sent', { orderNumber })
-            })
-            .catch((error) => {
-               logger.warn('Failed to send order confirmation email', { error, orderNumber })
-               // Don't throw - order was created successfully
-            })
+         const orderData: OrderConfirmationEmailProps & { customerEmail: string } = {
+            customerName: addresses?.shipping.fullName || session.user.name || 'Customer',
+            customerEmail: userEmail,
+            orderNumber,
+            orderDate: new Date(),
+            items: products.map(
+               (p): OrderItem => ({
+                  id: p.id.toString(),
+                  name: p.title,
+                  price: p.price,
+                  quantity: p.quantity,
+                  image: p.imageUrl,
+               }),
+            ),
+            subtotal: totalAmount,
+            shipping: 0,
+            tax: 0,
+            total: totalAmount,
+            shippingAddress: shippingAddr[0]
+               ? ({
+                    fullName: shippingAddr[0].fullName,
+                    addressLine1: shippingAddr[0].addressLine1,
+                    addressLine2: shippingAddr[0].addressLine2 || undefined,
+                    city: shippingAddr[0].city,
+                    state: shippingAddr[0].state || '',
+                    postalCode: shippingAddr[0].postalCode || '',
+                    country: shippingAddr[0].country,
+                 } as ShippingAddress)
+               : ({
+                    fullName: addresses?.shipping.fullName || '',
+                    addressLine1: addresses?.shipping.addressLine1 || '',
+                    addressLine2: addresses?.shipping.addressLine2 || undefined,
+                    city: addresses?.shipping.city || '',
+                    state: addresses?.shipping.state || '',
+                    postalCode: addresses?.shipping.postalCode || '',
+                    country: addresses?.shipping.country || '',
+                 } as ShippingAddress),
+         }
+
+         try {
+            const html = await render(OrderConfirmation(orderData))
+            await sendMailEdge(
+               orderData.customerEmail,
+               `Order Confirmation #${orderData.orderNumber}`,
+               html,
+            )
+            logger.debug('Order confirmation email sent', { orderNumber })
+         } catch (error) {
+            logger.warn('Failed to send order confirmation email', { error, orderNumber })
+         }
       }
 
       return NextResponse.json({ orderId, status: 'pending' }, { headers: rateLimitHeaders })

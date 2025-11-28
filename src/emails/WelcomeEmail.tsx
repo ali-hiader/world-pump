@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { Button, Html, Section, Text } from '@react-email/components'
+import { Button, Html, Text } from '@react-email/components'
 
 import { storeConfig } from '@/lib/constants'
 
@@ -12,11 +12,7 @@ interface WelcomeEmailProps {
    discountCode?: string
 }
 
-export default function WelcomeEcommerce({
-   customerName,
-   accountUrl,
-   discountCode,
-}: WelcomeEmailProps) {
+export default function WelcomeEmail({ customerName, accountUrl }: WelcomeEmailProps) {
    return (
       <Html>
          <Layout previewText={`Welcome to ${storeConfig.storeName}!`}>
@@ -28,37 +24,6 @@ export default function WelcomeEcommerce({
                Thank you for creating an account with us. We&apos;re excited to have you as part of
                our community!
             </Text>
-
-            {discountCode && (
-               <Section
-                  style={{
-                     backgroundColor: '#dcfce7',
-                     padding: '24px',
-                     borderRadius: '8px',
-                     textAlign: 'center',
-                     marginBottom: '24px',
-                  }}
-               >
-                  <Text style={{ fontWeight: '600', marginBottom: '8px' }}>🎉 Welcome Offer!</Text>
-                  <Text style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '8px' }}>
-                     Get 15% off your first order
-                  </Text>
-                  <Text
-                     style={{
-                        display: 'inline-block',
-                        border: '2px dashed #16a34a',
-                        backgroundColor: 'white',
-                        padding: '8px 12px',
-                        fontFamily: 'monospace',
-                        fontSize: '20px',
-                        marginBottom: '8px',
-                     }}
-                  >
-                     {discountCode}
-                  </Text>
-                  <Text style={{ fontSize: '14px' }}>Use this code at checkout</Text>
-               </Section>
-            )}
 
             <div style={{ textAlign: 'center', marginBottom: '24px' }}>
                <Button

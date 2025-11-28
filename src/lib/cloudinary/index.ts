@@ -9,10 +9,9 @@ cloudinary.config({
    secure: true,
 })
 
-export const uploadImage = async (
-   file: Buffer,
-   cb: (result: UploadApiResponse | undefined) => void,
-) => {
+type UploadImageCallback = (result: UploadApiResponse | undefined) => void
+
+export const uploadImage = async (file: Buffer, cb: UploadImageCallback) => {
    cloudinary.uploader
       .upload_stream((error, uploadResult) => {
          if (error) {
@@ -29,8 +28,7 @@ export const deleteImage = async (publicId: string) => {
    return await cloudinary.uploader.destroy(publicId)
 }
 
-// Utility function to extract Cloudinary public ID
-export function extractCloudinaryPublicId(url: string): string | null {
+export const extractCloudinaryPublicId = (url: string) => {
    try {
       if (!url.includes('res.cloudinary.com')) {
          return null

@@ -1,12 +1,15 @@
 import { headers } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 
+import { render } from '@react-email/render'
 import { z } from 'zod'
 
 import { auth } from '@/lib/auth/auth'
-import { emailHelpers } from '@/lib/email/helpers'
+import { storeConfig } from '@/lib/constants'
+import sendMailEdge from '@/lib/email/send-mail-edge'
 import { logger } from '@/lib/logger'
 import { checkTypedRateLimit, createRateLimitHeaders, getClientIp } from '@/lib/rate-limit'
+import WelcomeEmail from '@/emails/WelcomeEmail'
 
 const signUpSchema = z.object({
    name: z.string().min(1, { message: 'Name is required' }),
@@ -106,22 +109,18 @@ export async function POST(req: NextRequest) {
       })
 
       // Send welcome email (non-blocking, don't fail registration if email fails)
-      emailHelpers
-         .sendWelcomeEmail(
-            {
-               name: parsed.data.name,
-               email: parsed.data.email,
-            },
-            {
-               discountCode: 'WELCOME15',
-            },
+      try {
+         const html = await render(
+            WelcomeEmail({
+               customerName: parsed.data.name,
+               accountUrl: `${process.env.NEXT_PUBLIC_APP_URL}/account`,
+            }),
          )
-         .then(() => {
-            logger.debug('Welcome email sent', { email: parsed.data.email })
-         })
-         .catch((error) => {
-            logger.warn('Failed to send welcome email', { error, email: parsed.data.email })
-         })
+         await sendMailEdge(parsed.data.email, `Welcome to ${storeConfig.storeName}!`, html)
+         logger.debug('Welcome email sent', { email: parsed.data.email })
+      } catch (error) {
+         logger.warn('Failed to send welcome email', { error, email: parsed.data.email })
+      }
 
       return response
    } catch (error: unknown) {

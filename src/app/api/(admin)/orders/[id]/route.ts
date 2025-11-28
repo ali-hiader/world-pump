@@ -1,13 +1,18 @@
-import type { OrderItem, ShippingAddress } from '@/lib/email/helpers'
-
 import { NextRequest, NextResponse } from 'next/server'
 
+import { render } from '@react-email/render'
 import { eq } from 'drizzle-orm'
 
-import { emailHelpers } from '@/lib/email/helpers'
+import sendMailEdge from '@/lib/email/send-mail-edge'
 import { logger } from '@/lib/logger'
 import { db } from '@/db'
 import { addressTable, orderItemTable, orderTable, productTable, user } from '@/db/schema'
+import OrderConfirmation, {
+   OrderConfirmationEmailProps,
+   OrderItem,
+   ShippingAddress,
+} from '@/emails/OrderConfirmation'
+import ShippingNotification from '@/emails/ShippingNotification'
 
 interface Props {
    params: Promise<{
@@ -189,22 +194,27 @@ export async function PATCH(request: NextRequest, { params }: Props) {
          if (orderDetails && orderDetails.userEmail) {
             if (status === 'shipped') {
                // Send shipping notification
-               emailHelpers
-                  .sendShippingNotificationEmail({
-                     customerName: orderDetails.userName || 'Customer',
-                     customerEmail: orderDetails.userEmail,
-                     orderNumber: orderDetails.orderNumber || `#${orderId}`,
-                     trackingNumber: 'TRK-' + orderId, // Replace with actual tracking number
-                     trackingUrl: `${process.env.NEXT_PUBLIC_APP_URL}/orders/${orderId}`,
-                     carrier: 'Standard Shipping', // Replace with actual carrier
-                     estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-                  })
-                  .then(() => {
-                     logger.success('Shipping notification email sent', { orderId })
-                  })
-                  .catch((error) => {
-                     logger.warn('Failed to send shipping notification', { error })
-                  })
+               const shippingData = {
+                  customerName: orderDetails.userName || 'Customer',
+                  customerEmail: orderDetails.userEmail,
+                  orderNumber: orderDetails.orderNumber || `#${orderId}`,
+                  trackingNumber: 'TRK-' + orderId,
+                  trackingUrl: `${process.env.NEXT_PUBLIC_APP_URL}/orders/${orderId}`,
+                  carrier: 'Standard Shipping',
+                  estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+               }
+
+               try {
+                  const html = await render(ShippingNotification(shippingData))
+                  await sendMailEdge(
+                     shippingData.customerEmail,
+                     `Your order #${shippingData.orderNumber} has shipped!`,
+                     html,
+                  )
+                  logger.success('Shipping notification email sent', { orderId })
+               } catch (error) {
+                  logger.warn('Failed to send shipping notification', { error })
+               }
             }
 
             if (status === 'completed' && currentOrder.status !== 'completed') {
@@ -253,50 +263,55 @@ export async function PATCH(request: NextRequest, { params }: Props) {
                     .limit(1)
                : []
 
-            emailHelpers
-               .sendOrderConfirmationEmail({
-                  customerName: orderDetails.userName || 'Customer',
-                  customerEmail: orderDetails.userEmail,
-                  orderNumber: orderDetails.orderNumber || `#${orderId}`,
-                  orderDate: orderDetails.createdAt || new Date(),
-                  items: items.map(
-                     (item): OrderItem => ({
-                        id: item.id.toString(),
-                        name: item.productName,
-                        price: item.unitPrice,
-                        quantity: item.quantity,
-                        image: item.productImage || undefined,
-                     }),
-                  ),
-                  subtotal: orderDetails.totalAmount,
-                  shipping: 0,
-                  tax: 0,
-                  total: orderDetails.totalAmount,
-                  shippingAddress: shippingAddr[0]
-                     ? ({
-                          fullName: shippingAddr[0].fullName,
-                          addressLine1: shippingAddr[0].addressLine1,
-                          addressLine2: shippingAddr[0].addressLine2 || undefined,
-                          city: shippingAddr[0].city,
-                          state: shippingAddr[0].state || '',
-                          postalCode: shippingAddr[0].postalCode || '',
-                          country: shippingAddr[0].country,
-                       } as ShippingAddress)
-                     : ({
-                          fullName: 'Customer',
-                          addressLine1: '',
-                          city: '',
-                          state: '',
-                          postalCode: '',
-                          country: '',
-                       } as ShippingAddress),
-               })
-               .then(() => {
-                  logger.success('Payment confirmation email sent', { orderId })
-               })
-               .catch((error) => {
-                  logger.warn('Failed to send payment confirmation', { error })
-               })
+            const confirmationData: OrderConfirmationEmailProps & { customerEmail: string } = {
+               customerName: orderDetails.userName || 'Customer',
+               customerEmail: orderDetails.userEmail,
+               orderNumber: orderDetails.orderNumber || `#${orderId}`,
+               orderDate: orderDetails.createdAt || new Date(),
+               items: items.map(
+                  (item): OrderItem => ({
+                     id: item.id.toString(),
+                     name: item.productName,
+                     price: item.unitPrice,
+                     quantity: item.quantity,
+                     image: item.productImage || undefined,
+                  }),
+               ),
+               subtotal: orderDetails.totalAmount,
+               shipping: 0,
+               tax: 0,
+               total: orderDetails.totalAmount,
+               shippingAddress: shippingAddr[0]
+                  ? ({
+                       fullName: shippingAddr[0].fullName,
+                       addressLine1: shippingAddr[0].addressLine1,
+                       addressLine2: shippingAddr[0].addressLine2 || undefined,
+                       city: shippingAddr[0].city,
+                       state: shippingAddr[0].state || '',
+                       postalCode: shippingAddr[0].postalCode || '',
+                       country: shippingAddr[0].country,
+                    } as ShippingAddress)
+                  : ({
+                       fullName: 'Customer',
+                       addressLine1: '',
+                       city: '',
+                       state: '',
+                       postalCode: '',
+                       country: '',
+                    } as ShippingAddress),
+            }
+
+            try {
+               const html = await render(OrderConfirmation(confirmationData))
+               await sendMailEdge(
+                  confirmationData.customerEmail,
+                  `Order Confirmation #${confirmationData.orderNumber}`,
+                  html,
+               )
+               logger.success('Payment confirmation email sent', { orderId })
+            } catch (error) {
+               logger.warn('Failed to send payment confirmation', { error })
+            }
          }
       }
 

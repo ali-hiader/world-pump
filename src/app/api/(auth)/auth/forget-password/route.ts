@@ -4,14 +4,12 @@ import { render } from '@react-email/components'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 
-import { sendEmail } from '@/lib/email/email-service'
+import sendMailEdge from '@/lib/email/send-mail-edge'
 import { logger } from '@/lib/logger'
 import { db } from '@/db'
 import { user } from '@/db/schema'
 import { passwordResetTokens } from '@/db/schema'
 import PasswordResetSimple from '@/emails/PasswordResetSimple'
-
-export const runtime = 'nodejs'
 
 const schema = z.object({ email: z.email() })
 
@@ -54,11 +52,7 @@ export async function POST(req: NextRequest) {
             expiresAt,
          }),
       )
-      await sendEmail({
-         to: normalizedEmail,
-         subject: 'Reset your password',
-         html,
-      })
+      await sendMailEdge(normalizedEmail, 'Reset your password', html)
 
       return NextResponse.json({ ok: true })
    } catch (error) {

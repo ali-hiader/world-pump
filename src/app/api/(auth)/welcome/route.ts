@@ -2,11 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { render } from '@react-email/render'
 
-import { sendEmail } from '@/lib/email/email-service'
+import sendMailEdge from '@/lib/email/send-mail-edge'
 import { logger } from '@/lib/logger'
-import WelcomeEcommerce from '@/emails/WelcomeEcommerce'
-
-export const runtime = 'nodejs'
+import WelcomeEmail from '@/emails/WelcomeEmail'
 
 interface WelcomeEmailData {
    customerName: string
@@ -30,18 +28,14 @@ export async function POST(req: NextRequest) {
       const accountUrl = welcomeData.accountUrl || `${process.env.NEXT_PUBLIC_APP_URL}/account`
 
       const html = await render(
-         WelcomeEcommerce({
+         WelcomeEmail({
             customerName: welcomeData.customerName,
             accountUrl,
             discountCode: welcomeData.discountCode || 'WELCOME15',
          }),
       )
 
-      await sendEmail({
-         to: welcomeData.customerEmail,
-         subject: `Welcome to World Pumps!`,
-         html,
-      })
+      await sendMailEdge(welcomeData.customerEmail, `Welcome to World Pumps!`, html)
 
       return NextResponse.json({ success: true })
    } catch (error) {
