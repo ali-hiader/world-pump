@@ -8,7 +8,7 @@ import { deleteImage, extractCloudinaryPublicId } from '@/lib/cloudinary'
 import { logger } from '@/lib/logger'
 import { createSlug, uploadFormImage } from '@/lib/server'
 import { db } from '@/db'
-import { productTable } from '@/db/schema'
+import { pumpTable } from '@/db/schema'
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
    try {
@@ -43,7 +43,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
          imageUrl = await uploadFormImage(image)
       }
 
-      const updateData: Partial<typeof productTable.$inferInsert> = {
+      const updateData: Partial<typeof pumpTable.$inferInsert> = {
          title,
          slug: createSlug(title),
          categoryId: Number(categoryId),
@@ -63,9 +63,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       }
 
       await db
-         .update(productTable)
+         .update(pumpTable)
          .set(updateData)
-         .where(eq(productTable.id, Number(productId)))
+         .where(eq(pumpTable.id, Number(productId)))
 
       return NextResponse.json({ success: true })
    } catch (error) {
@@ -95,12 +95,12 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 
       const [existingProduct] = await db
          .select({
-            id: productTable.id,
-            imageUrl: productTable.imageUrl,
-            title: productTable.title,
+            id: pumpTable.id,
+            imageUrl: pumpTable.imageUrl,
+            title: pumpTable.title,
          })
-         .from(productTable)
-         .where(eq(productTable.id, productId))
+         .from(pumpTable)
+         .where(eq(pumpTable.id, productId))
 
       if (!existingProduct) {
          return NextResponse.json({ error: 'Product not found' }, { status: 404 })
@@ -121,7 +121,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
          }
       }
 
-      await db.delete(productTable).where(eq(productTable.id, productId))
+      await db.delete(pumpTable).where(eq(pumpTable.id, productId))
 
       return NextResponse.json({
          success: true,

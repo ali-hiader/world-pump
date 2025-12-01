@@ -17,7 +17,6 @@ async function UserLayout({ children }: PropsWithChildren) {
 
    const categories = await fetchAllCategories()
 
-   console.log('categories', categories)
    let cart: CartItemType[] = []
    if (session) {
       cart = await fetchUserCart(session.user.id)

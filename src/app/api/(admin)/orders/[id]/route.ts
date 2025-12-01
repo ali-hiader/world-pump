@@ -3,10 +3,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { render } from '@react-email/render'
 import { eq } from 'drizzle-orm'
 
+import { auth, isSuperAdmin } from '@/lib/auth/auth'
 import sendMailEdge from '@/lib/email/send-mail-edge'
 import { logger } from '@/lib/logger'
 import { db } from '@/db'
-import { addressTable, orderItemTable, orderTable, productTable, user } from '@/db/schema'
+import { addressTable, orderItemTable, orderTable, pumpTable, user } from '@/db/schema'
 import OrderConfirmation, {
    OrderConfirmationEmailProps,
    OrderItem,
@@ -20,7 +21,6 @@ interface Props {
    }>
 }
 
-// Get order details (for admin)
 export async function GET(request: NextRequest, { params }: Props) {
    try {
       const resolvedParams = await params
@@ -59,12 +59,12 @@ export async function GET(request: NextRequest, { params }: Props) {
             id: orderItemTable.id,
             quantity: orderItemTable.quantity,
             unitPrice: orderItemTable.unitPrice,
-            productTitle: productTable.title,
-            productSlug: productTable.slug,
-            productImage: productTable.imageUrl,
+            productTitle: pumpTable.title,
+            productSlug: pumpTable.slug,
+            productImage: pumpTable.imageUrl,
          })
          .from(orderItemTable)
-         .leftJoin(productTable, eq(productTable.id, orderItemTable.productId))
+         .leftJoin(pumpTable, eq(pumpTable.id, orderItemTable.productId))
          .where(eq(orderItemTable.orderId, orderId))
 
       // Fetch addresses
@@ -98,9 +98,20 @@ export async function GET(request: NextRequest, { params }: Props) {
    }
 }
 
-// Update order status (for admin)
+// Update order status
 export async function PATCH(request: NextRequest, { params }: Props) {
    try {
+      const session = await auth.api.getSession({ headers: request.headers })
+      const isAdmin = await isSuperAdmin(session?.user?.email || '')
+
+      if (!isAdmin) {
+         logger.warn('Unauthorized order update attempt', {
+            userId: session?.user?.id,
+            email: session?.user?.email,
+         })
+         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+
       const resolvedParams = await params
       const orderId = parseInt(resolvedParams.id)
 
@@ -248,10 +259,10 @@ export async function PATCH(request: NextRequest, { params }: Props) {
                   productName: orderItemTable.productName,
                   quantity: orderItemTable.quantity,
                   unitPrice: orderItemTable.unitPrice,
-                  productImage: productTable.imageUrl,
+                  productImage: pumpTable.imageUrl,
                })
                .from(orderItemTable)
-               .leftJoin(productTable, eq(productTable.id, orderItemTable.productId))
+               .leftJoin(pumpTable, eq(pumpTable.id, orderItemTable.productId))
                .where(eq(orderItemTable.orderId, orderId))
 
             // Fetch shipping address

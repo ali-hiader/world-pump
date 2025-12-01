@@ -7,14 +7,14 @@ import { DatabaseError, ValidationError } from '@/lib/errors'
 import { logger } from '@/lib/logger'
 import { statsTableSchema } from '@/lib/validations'
 import { db } from '@/db'
-import { accessoryTable, orderTable, productTable, user } from '@/db/schema'
+import { accessoryTable, orderTable, pumpTable, user } from '@/db/schema'
 
 type StatsTable = 'product' | 'accessory' | 'user' | 'order'
 
 function getTable(table: StatsTable): PgTable {
    switch (table) {
       case 'product':
-         return productTable
+         return pumpTable
       case 'accessory':
          return accessoryTable
       case 'user':

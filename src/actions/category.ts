@@ -7,7 +7,7 @@ import { ValidationError } from '@/lib/errors'
 import { logger } from '@/lib/logger'
 import { categorySlugSchema } from '@/lib/validations'
 import { db } from '@/db'
-import { categoryTable, productTable } from '@/db/schema'
+import { categoryTable, pumpTable } from '@/db/schema'
 
 export async function fetchAllCategories() {
    try {
@@ -49,15 +49,15 @@ export async function fetchCategoryBrands(slug: string) {
 
    try {
       const base = db
-         .select({ brand: productTable.brand })
-         .from(productTable)
-         .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id))
+         .select({ brand: pumpTable.brand })
+         .from(pumpTable)
+         .innerJoin(categoryTable, eq(pumpTable.categoryId, categoryTable.id))
 
       const rows =
          validated.data === 'all'
-            ? await base.where(eq(productTable.status, 'active'))
+            ? await base.where(eq(pumpTable.status, 'active'))
             : await base.where(
-                 and(eq(categoryTable.slug, validated.data), eq(productTable.status, 'active')),
+                 and(eq(categoryTable.slug, validated.data), eq(pumpTable.status, 'active')),
               )
 
       const set = new Set(rows.map((r) => r.brand).filter((b): b is string => Boolean(b)))

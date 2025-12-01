@@ -78,7 +78,7 @@ function AdminOrderDetailsPage({ params }: Props) {
 
    useEffect(() => {
       if (!isValidId(params.id)) {
-         router.push('/admin/orders')
+         router.push('/super-admin/orders')
          return
       }
 

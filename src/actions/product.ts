@@ -5,7 +5,7 @@ import { and, asc, desc, eq, getTableColumns, gte, lte, sql } from 'drizzle-orm'
 import { DatabaseError, NotFoundError, ValidationError } from '@/lib/errors'
 import { logger } from '@/lib/logger'
 import { db } from '@/db'
-import { categoryTable, productTable } from '@/db/schema'
+import { categoryTable, pumpTable } from '@/db/schema'
 
 export type ProductFilters = {
    minPrice?: number
@@ -20,10 +20,10 @@ function baseProductQuery() {
       .select({
          categorySlug: categoryTable.slug,
          categoryName: categoryTable.name,
-         ...getTableColumns(productTable),
+         ...getTableColumns(pumpTable),
       })
-      .from(productTable)
-      .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id))
+      .from(pumpTable)
+      .innerJoin(categoryTable, eq(pumpTable.categoryId, categoryTable.id))
 }
 
 export async function fetchAllProducts() {
@@ -41,7 +41,7 @@ export async function fetchProductBySlug(slug: string) {
    }
 
    try {
-      const products = await baseProductQuery().where(eq(productTable.slug, slug))
+      const products = await baseProductQuery().where(eq(pumpTable.slug, slug))
       if (!products[0]) {
          throw new NotFoundError('Product', slug)
       }
@@ -61,7 +61,7 @@ export async function fetchProductById(id: number) {
    }
 
    try {
-      const products = await baseProductQuery().where(eq(productTable.id, id))
+      const products = await baseProductQuery().where(eq(pumpTable.id, id))
       if (!products[0]) {
          throw new NotFoundError('Product', id)
       }
@@ -82,8 +82,8 @@ export async function fetchFeaturedProducts(limit: number = 6) {
 
    try {
       return await baseProductQuery()
-         .where(and(eq(productTable.isFeatured, true), eq(productTable.status, 'active')))
-         .orderBy(desc(productTable.createdAt))
+         .where(and(eq(pumpTable.isFeatured, true), eq(pumpTable.status, 'active')))
+         .orderBy(desc(pumpTable.createdAt))
          .limit(limit)
    } catch (error) {
       logger.error('Failed to fetch featured products', error, { limit })
@@ -100,7 +100,7 @@ export async function fetchRelatedProducts(categoryId: number, limit: number = 4
    }
 
    try {
-      return await baseProductQuery().where(eq(productTable.categoryId, categoryId)).limit(limit)
+      return await baseProductQuery().where(eq(pumpTable.categoryId, categoryId)).limit(limit)
    } catch (error) {
       logger.error('Failed to fetch related products', error, { categoryId, limit })
       throw new DatabaseError('query', 'Failed to fetch related products')
@@ -126,32 +126,32 @@ export async function fetchProductsByCategoryPaginated(
    try {
       const orderBy =
          filters.sort === 'price_asc'
-            ? asc(productTable.price)
+            ? asc(pumpTable.price)
             : filters.sort === 'price_desc'
-              ? desc(productTable.price)
-              : desc(productTable.createdAt)
+              ? desc(pumpTable.price)
+              : desc(pumpTable.createdAt)
 
-      const whereClauses = [eq(productTable.status, 'active')]
+      const whereClauses = [eq(pumpTable.status, 'active')]
 
       if (categorySlug !== 'all') {
          whereClauses.push(eq(categoryTable.slug, categorySlug))
       }
 
       if (typeof filters.minPrice === 'number') {
-         whereClauses.push(gte(productTable.price, filters.minPrice))
+         whereClauses.push(gte(pumpTable.price, filters.minPrice))
       }
 
       if (typeof filters.maxPrice === 'number') {
-         whereClauses.push(lte(productTable.price, filters.maxPrice))
+         whereClauses.push(lte(pumpTable.price, filters.maxPrice))
       }
 
       if (filters.brand?.trim()) {
-         whereClauses.push(eq(sql`LOWER(${productTable.brand})`, filters.brand.toLowerCase()))
+         whereClauses.push(eq(sql`LOWER(${pumpTable.brand})`, filters.brand.toLowerCase()))
       }
 
       if (filters.horsepower?.trim()) {
          whereClauses.push(
-            sql`LOWER(${productTable.specs}->>'horsepower') = ${filters.horsepower.toLowerCase()}`,
+            sql`LOWER(${pumpTable.specs}->>'horsepower') = ${filters.horsepower.toLowerCase()}`,
          )
       }
 
@@ -165,8 +165,8 @@ export async function fetchProductsByCategoryPaginated(
             .offset(offset),
          db
             .select({ count: sql<number>`count(*)::int` })
-            .from(productTable)
-            .innerJoin(categoryTable, eq(productTable.categoryId, categoryTable.id))
+            .from(pumpTable)
+            .innerJoin(categoryTable, eq(pumpTable.categoryId, categoryTable.id))
             .where(and(...whereClauses)),
       ])
 

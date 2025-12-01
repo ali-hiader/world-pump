@@ -1,21 +1,15 @@
 import { InferSelectModel } from 'drizzle-orm'
 
-import {
-   accessoryTable,
-   categoryTable,
-   orderItemTable,
-   orderTable,
-   productTable,
-} from '@/db/schema'
+import { accessoryTable, categoryTable, orderItemTable, orderTable, pumpTable } from '@/db/schema'
 
-export type ProductType = InferSelectModel<typeof productTable> & {
+export type ProductType = InferSelectModel<typeof pumpTable> & {
    categorySlug: string
    categoryName: string
 }
 
 export type AccessoryType = InferSelectModel<typeof accessoryTable>
 
-export type CartItemType = InferSelectModel<typeof productTable> & {
+export type CartItemType = InferSelectModel<typeof pumpTable> & {
    cartId: number
    quantity: number
    addedBy: string

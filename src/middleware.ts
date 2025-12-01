@@ -1,43 +1,64 @@
 import type { NextRequest } from 'next/server'
 
+import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 
-import { getAdminCookieName, getUserSessionCookieName } from '@/lib/auth/cookie-names'
+import { auth, isSuperAdmin } from './lib/auth/auth'
+import { logger } from './lib/logger'
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
    const { pathname } = req.nextUrl
-   const userSession = req.cookies.get(getUserSessionCookieName())
-   const adminSession = req.cookies.get(getAdminCookieName())
+
+   const session = await auth.api.getSession({
+      headers: await headers(),
+   })
 
    // Redirect authenticated users away from auth pages
-   if (pathname === '/sign-in' || pathname === '/sign-up') {
-      if (userSession?.value) {
+   if (
+      pathname === '/sign-in' ||
+      pathname === '/sign-up' ||
+      pathname === '/forget-password' ||
+      pathname === '/reset-password'
+   ) {
+      if (session?.user) {
          return NextResponse.redirect(new URL('/', req.url))
       }
       return NextResponse.next()
    }
 
-   // Redirect authenticated admins away from login page
-   if (pathname === '/admin-log-in') {
-      if (adminSession?.value) {
-         return NextResponse.redirect(new URL('/admin', req.url))
-      }
-      return NextResponse.next()
-   }
+   if (req.nextUrl.pathname.startsWith('/super-admin')) {
+      const email = session?.user?.email || ''
+      const hasAccess = await isSuperAdmin(email)
 
-   // Protect admin routes
-   if (pathname.startsWith('/admin')) {
-      if (!adminSession?.value) {
-         return NextResponse.redirect(new URL('/admin-log-in', req.url))
+      if (!hasAccess) {
+         logger.warn('Unauthorized super admin access attempt', {
+            userId: session?.user?.id,
+            email,
+         })
+         return NextResponse.redirect(new URL('/', req.url))
       }
+
+      logger.info('Super admin access', {
+         userId: session?.user?.id,
+         email,
+      })
+
+      // Allow access to super admin pages
       return NextResponse.next()
    }
 
    // Protect user account and checkout routes
-   if (pathname.startsWith('/account') || pathname.startsWith('/checkout')) {
-      if (!userSession?.value) {
+   if (
+      pathname.startsWith('/account') ||
+      pathname.startsWith('/checkout') ||
+      pathname.startsWith('/cart')
+   ) {
+      if (!session?.user) {
          const url = new URL('/sign-in', req.url)
          url.searchParams.set('redirect', pathname)
+
+         logger.warn('Unauthorized access attempt to protected route', { pathname })
+         console.log(url)
          return NextResponse.redirect(url)
       }
       return NextResponse.next()
@@ -50,9 +71,9 @@ export const config = {
    matcher: [
       '/sign-in',
       '/sign-up',
-      '/admin-log-in',
-      '/admin/:path*',
+      '/super-admin/:path*',
       '/account/:path*',
+      '/cart/:path*',
       '/checkout/:path*',
    ],
 }

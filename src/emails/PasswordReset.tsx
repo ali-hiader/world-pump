@@ -4,7 +4,7 @@ import { Button, Html, Text } from '@react-email/components'
 
 import { storeConfig } from '@/lib/constants'
 
-import Layout from "./components/Layout"
+import Layout from './components/Layout'
 
 interface PasswordResetProps {
    customerName?: string
@@ -12,7 +12,11 @@ interface PasswordResetProps {
    expiresAt: Date
 }
 
-export default function PasswordReset({ customerName, resetUrl, expiresAt }: PasswordResetProps) {
+export default function PasswordResetEmail({
+   customerName,
+   resetUrl,
+   expiresAt,
+}: PasswordResetProps) {
    const timeUntilExpiration = Math.floor((expiresAt.getTime() - Date.now()) / (1000 * 60))
 
    return (

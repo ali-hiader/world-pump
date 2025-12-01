@@ -2,16 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { eq } from 'drizzle-orm'
 
-import { getAdminSession } from '@/lib/auth/admin-auth'
+import { auth, isSuperAdmin } from '@/lib/auth/auth'
 import { logger } from '@/lib/logger'
 import { createSlug, uploadFormImage } from '@/lib/server'
 import { db } from '@/db'
-import { productTable } from '@/db/schema'
+import { pumpTable } from '@/db/schema'
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
    try {
-      const admin = await getAdminSession()
-      if (!admin) {
+      const session = await auth.api.getSession({ headers: request.headers })
+      const hasAccess = await isSuperAdmin(session?.user?.email || '')
+
+      if (!hasAccess) {
          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
       }
 
@@ -46,7 +48,7 @@ export async function POST(request: Request) {
 
       const imageUrl = await uploadFormImage(image)
 
-      await db.insert(productTable).values({
+      await db.insert(pumpTable).values({
          title,
          slug: createSlug(title),
          categoryId: Number(categoryId),
@@ -59,7 +61,6 @@ export async function POST(request: Request) {
          status: (status as 'active' | 'inactive' | 'discontinued') || 'active',
          isFeatured,
          specs: parsedSpecs,
-         createdBy: admin.id,
       })
 
       return NextResponse.json({ success: true })
@@ -72,8 +73,10 @@ export async function POST(request: Request) {
 // Toggle product status
 export async function PUT(request: NextRequest) {
    try {
-      const admin = await getAdminSession()
-      if (!admin) {
+      const session = await auth.api.getSession({ headers: request.headers })
+      const hasAccess = await isSuperAdmin(session?.user?.email || '')
+
+      if (!hasAccess) {
          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
       }
 
@@ -84,7 +87,7 @@ export async function PUT(request: NextRequest) {
          return NextResponse.json({ error: 'Product id is required' }, { status: 400 })
       }
 
-      const [existing] = await db.select().from(productTable).where(eq(productTable.id, +productId))
+      const [existing] = await db.select().from(pumpTable).where(eq(pumpTable.id, +productId))
       if (!existing) {
          return NextResponse.json({ error: 'Product not found' }, { status: 404 })
       }
@@ -94,10 +97,10 @@ export async function PUT(request: NextRequest) {
 
       // perform update and return the updated status (so client can read updated.status)
       const updatedRows = await db
-         .update(productTable)
+         .update(pumpTable)
          .set({ status: nextStatus, updatedAt: new Date() })
-         .where(eq(productTable.id, +productId))
-         .returning({ id: productTable.id, status: productTable.status })
+         .where(eq(pumpTable.id, +productId))
+         .returning({ id: pumpTable.id, status: pumpTable.status })
 
       const updated = updatedRows?.[0] ?? null
       if (!updated) {

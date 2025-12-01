@@ -1,14 +1,14 @@
 import { eq, inArray } from 'drizzle-orm'
 
 import { apiSuccess, handleApiError } from '@/lib/api/response'
-import { requireAuth } from '@/lib/auth/auth'
+import { userAuth } from '@/lib/auth/auth'
 import { logger } from '@/lib/logger'
 import { db } from '@/db'
 import { orderItemTable, orderTable } from '@/db/schema'
 
 export async function GET() {
    return handleApiError(async () => {
-      const session = await requireAuth()
+      const session = await userAuth()
 
       logger.debug('Fetching orders for user', { email: session.user.email })
 

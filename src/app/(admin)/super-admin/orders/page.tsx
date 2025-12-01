@@ -78,7 +78,7 @@ async function AdminOrdersPage() {
                               Order Date: {new Date(order.createdAt).toLocaleDateString()} at{' '}
                               {new Date(order.createdAt).toLocaleTimeString()}
                            </p>
-                           <Link href={`/admin/orders/${order.id}`}>
+                           <Link href={`/super-admin/orders/${order.id}`}>
                               <Button variant="outline" size="sm">
                                  View Details
                               </Button>

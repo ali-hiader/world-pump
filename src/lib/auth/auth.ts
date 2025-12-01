@@ -9,7 +9,7 @@ import { UnauthorizedError } from '@/lib/errors'
 import { logger } from '@/lib/logger'
 import { db } from '@/db'
 import * as schema from '@/db/schema'
-import PasswordResetSimple from '@/emails/PasswordResetSimple'
+import PasswordResetEmail from '@/emails/PasswordReset'
 
 import sendMailEdge from '../email/send-mail-edge'
 
@@ -30,14 +30,13 @@ export const auth = betterAuth({
    emailAndPassword: {
       enabled: true,
       requireEmailVerification: false,
-      async sendResetPassword({ user, token }) {
-         const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`
+      async sendResetPassword({ user, url }) {
          const expiresAt = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
 
          const html = await render(
-            PasswordResetSimple({
+            PasswordResetEmail({
                customerName: user.name,
-               resetUrl,
+               resetUrl: url,
                expiresAt,
             }),
          )
@@ -59,7 +58,7 @@ export const auth = betterAuth({
 export type Session = typeof auth.$Infer.Session
 
 // Session helpers
-export async function requireAuth() {
+export async function userAuth() {
    try {
       const session = await auth.api.getSession({
          headers: await headers(),
@@ -76,15 +75,6 @@ export async function requireAuth() {
    }
 }
 
-export async function getOptionalSession() {
-   try {
-      const session = await auth.api.getSession({
-         headers: await headers(),
-      })
-
-      return session
-   } catch (error) {
-      logger.error('Session retrieval failed', error)
-      return null
-   }
+export async function isSuperAdmin(email: string) {
+   return process.env.SUPER_ADMIN_EMAILS?.split(',').includes(email)
 }

@@ -11,13 +11,13 @@ import { ValidationError } from '@/lib/errors'
 import { logger } from '@/lib/logger'
 import { cartProductSchema, userIdSchema } from '@/lib/validations'
 import { db } from '@/db'
-import { cartTable, productTable } from '@/db/schema'
+import { cartTable, pumpTable } from '@/db/schema'
 
 export type CartItemWithProduct = {
    cartId: number
    quantity: number
    addedBy: string
-} & typeof productTable.$inferSelect
+} & typeof pumpTable.$inferSelect
 
 async function findCartByUserId(userId: string): Promise<CartItemWithProduct[]> {
    try {
@@ -25,12 +25,12 @@ async function findCartByUserId(userId: string): Promise<CartItemWithProduct[]> 
          .select({
             cartId: cartTable.id,
             quantity: cartTable.quantity,
-            addedBy: cartTable.createdBy,
-            ...getTableColumns(productTable),
+            addedBy: cartTable.addedBy,
+            ...getTableColumns(pumpTable),
          })
          .from(cartTable)
-         .innerJoin(productTable, eq(cartTable.productId, productTable.id))
-         .where(eq(cartTable.createdBy, userId))
+         .innerJoin(pumpTable, eq(cartTable.productId, pumpTable.id))
+         .where(eq(cartTable.addedBy, userId))
          .orderBy(desc(cartTable.id))
    } catch (error) {
       logger.error('Failed to fetch cart items', error, { userId })
@@ -46,7 +46,7 @@ async function findCartItem(
       const items = await db
          .select()
          .from(cartTable)
-         .where(and(eq(cartTable.productId, productId), eq(cartTable.createdBy, userId)))
+         .where(and(eq(cartTable.productId, productId), eq(cartTable.addedBy, userId)))
       return items[0]
    } catch (error) {
       logger.error('Failed to find cart item', error, { productId, userId })
@@ -63,8 +63,6 @@ export async function fetchUserCart(userId: string) {
    }
 }
 
-
-
 export async function addToCart(productId: number, userId: string) {
    const validated = cartProductSchema.safeParse({ productId, userId })
    if (!validated.success) {
@@ -78,7 +76,7 @@ export async function addToCart(productId: number, userId: string) {
          await increaseQuantity(validated.data.productId, validated.data.userId)
       } else {
          await db.insert(cartTable).values({
-            createdBy: validated.data.userId,
+            addedBy: validated.data.userId,
             productId: validated.data.productId,
             quantity: 1,
          })
@@ -112,7 +110,7 @@ export async function increaseQuantity(productId: number, userId: string) {
       const [updatedItem] = await db
          .update(cartTable)
          .set({ quantity: existingItem.quantity + 1 })
-         .where(and(eq(cartTable.productId, productId), eq(cartTable.createdBy, userId)))
+         .where(and(eq(cartTable.productId, productId), eq(cartTable.addedBy, userId)))
          .returning()
 
       logger.debug('Cart item quantity increased', { productId, userId })
@@ -143,7 +141,7 @@ export async function decreaseQuantity(productId: number, userId: string) {
             .where(
                and(
                   eq(cartTable.productId, validated.data.productId),
-                  eq(cartTable.createdBy, validated.data.userId),
+                  eq(cartTable.addedBy, validated.data.userId),
                ),
             )
          logger.debug('Cart item removed (quantity was 1)', { productId, userId })
@@ -157,7 +155,7 @@ export async function decreaseQuantity(productId: number, userId: string) {
          .where(
             and(
                eq(cartTable.productId, validated.data.productId),
-               eq(cartTable.createdBy, validated.data.userId),
+               eq(cartTable.addedBy, validated.data.userId),
             ),
          )
          .returning()
@@ -183,7 +181,7 @@ export async function removeFromCart(productId: number, userId: string) {
          .where(
             and(
                eq(cartTable.productId, validated.data.productId),
-               eq(cartTable.createdBy, validated.data.userId),
+               eq(cartTable.addedBy, validated.data.userId),
             ),
          )
 
@@ -211,7 +209,7 @@ export async function clearCart(userId: string) {
    }
 
    try {
-      await db.delete(cartTable).where(eq(cartTable.createdBy, validated.data))
+      await db.delete(cartTable).where(eq(cartTable.addedBy, validated.data))
       logger.success('Cart cleared', { userId })
       revalidatePath('/cart')
    } catch (error) {

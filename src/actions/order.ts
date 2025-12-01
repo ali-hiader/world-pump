@@ -37,7 +37,7 @@ export async function fetchOrders(filters: OrderFilters = {}) {
 
    try {
       const baseQuery = db.select().from(orderTable)
-      
+
       let whereCondition
       if (userId) {
          whereCondition = eq(orderTable.userId, userId)
@@ -47,7 +47,7 @@ export async function fetchOrders(filters: OrderFilters = {}) {
          whereCondition = eq(orderTable.id, orderId)
       }
 
-      const orderedQuery = whereCondition 
+      const orderedQuery = whereCondition
          ? baseQuery.where(whereCondition).orderBy(desc(orderTable.createdAt))
          : baseQuery.orderBy(desc(orderTable.createdAt))
 
@@ -55,19 +55,16 @@ export async function fetchOrders(filters: OrderFilters = {}) {
 
       return await finalQuery
    } catch (error) {
-      logger.error('Failed to fetch orders', error, { 
+      logger.error('Failed to fetch orders', error, {
          userId: filters.userId,
          userEmail: filters.userEmail,
          orderId: filters.orderId,
-         limit: filters.limit
+         limit: filters.limit,
       })
       throw new DatabaseError('query', 'Failed to fetch orders')
    }
 }
 
-/**
- * Count orders by user email
- */
 export async function countOrdersByUserEmail(userEmail: string): Promise<number> {
    if (!userEmail) {
       throw new ValidationError('User email is required')
@@ -86,9 +83,6 @@ export async function countOrdersByUserEmail(userEmail: string): Promise<number>
    }
 }
 
-/**
- * Fetch all orders with user details and item counts (for admin)
- */
 export async function fetchAllOrdersWithDetails(): Promise<OrderWithDetails[]> {
    try {
       const orders = await db
@@ -123,9 +117,6 @@ export async function fetchAllOrdersWithDetails(): Promise<OrderWithDetails[]> {
    }
 }
 
-/**
- * Fetch single order by ID
- */
 export async function fetchOrderById(orderId: number) {
    if (!orderId || orderId <= 0) {
       throw new ValidationError('Invalid order ID')

@@ -124,7 +124,8 @@ export default function ProductTable<T extends ProductItem>({
    }
 
    if (items.length === 0) {
-      const addHref = itemType === 'product' ? '/admin/add-product' : '/admin/add-accessory'
+      const addHref =
+         itemType === 'product' ? '/super-admin/add-product' : '/super-admin/add-accessory'
       const buttonText = itemType === 'product' ? 'Add Product' : 'Add Accessory'
       const messageText =
          itemType === 'product'

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { eq } from 'drizzle-orm'
 
+import { auth, isSuperAdmin } from '@/lib/auth/auth'
 import { logger } from '@/lib/logger'
 import { uploadFormImage } from '@/lib/server'
 import { fetchAccessoryById, fetchAllAccessories } from '@/actions/accessory'
@@ -41,9 +42,15 @@ export async function GET(req: Request) {
    }
 }
 
-// ===================== POST: Create accessory =====================
 export async function POST(req: Request) {
    try {
+      const session = await auth.api.getSession({ headers: req.headers })
+      const hasAccess = await isSuperAdmin(session?.user?.email || '')
+
+      if (!hasAccess) {
+         return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+      }
+
       const formData = await req.formData()
       const title = formData.get('title') as string
       const price = Number(formData.get('price'))
@@ -155,7 +162,6 @@ export async function POST(req: Request) {
       }
 
       // Create accessory
-      // TODO: Replace 'createdBy' with the actual user ID from your authentication/session logic
       const [accessory] = await db
          .insert(accessoryTable)
          .values({
@@ -168,7 +174,6 @@ export async function POST(req: Request) {
             status: status as 'active' | 'inactive' | 'discontinued',
             description,
             specs: parsedSpecs,
-            createdBy: 1, // Replace with actual user ID
          })
          .returning()
 
@@ -190,9 +195,15 @@ export async function POST(req: Request) {
    }
 }
 
-// PUT: Toggle accessory status
 export async function PUT(request: Request) {
    try {
+      const session = await auth.api.getSession({ headers: request.headers })
+      const hasAccess = await isSuperAdmin(session?.user?.email || '')
+
+      if (!hasAccess) {
+         return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+      }
+
       const { searchParams } = new URL(request.url)
       const accessoryId = searchParams.get('id')
 

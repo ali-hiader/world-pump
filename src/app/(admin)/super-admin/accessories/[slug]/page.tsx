@@ -175,7 +175,7 @@ export default function AccessoryDetailPage() {
                      )}
                      {retrying ? 'Retrying...' : 'Try Again'}
                   </Button>
-                  <Link href="/admin/accessories">
+                  <Link href="/super-admin/accessories">
                      <Button variant="outline">Back to Accessories</Button>
                   </Link>
                </div>
@@ -190,7 +190,7 @@ export default function AccessoryDetailPage() {
          <AdminPageLayout>
             <div className="text-center py-12">
                <p className="text-gray-600 mb-4">Accessory not found</p>
-               <Link href="/admin/accessories">
+               <Link href="/super-admin/accessories">
                   <Button>Back to Accessories</Button>
                </Link>
             </div>
@@ -202,7 +202,7 @@ export default function AccessoryDetailPage() {
       <AdminPageLayout className="max-w-7xl">
          {/* Header */}
          <div className="mb-6">
-            <Link href="/admin/accessories">
+            <Link href="/super-admin/accessories">
                <Button variant="ghost" className="mb-4">
                   ← Back to Accessories
                </Button>
@@ -222,7 +222,7 @@ export default function AccessoryDetailPage() {
                   >
                      {accessory.status}
                   </span>
-                  <Link href={`/admin/accessories/${accessory.slug}/edit`}>
+                  <Link href={`/super-admin/accessories/${accessory.slug}/edit`}>
                      <Button variant="outline">Edit Accessory</Button>
                   </Link>
                </div>
@@ -344,7 +344,7 @@ export default function AccessoryDetailPage() {
             <div className="bg-white col-span-2 rounded-lg shadow p-4 mt-6">
                <h2 className="text-lg font-semibold mb-2">Quick Actions</h2>
                <div className="flex flex-wrap gap-3 mb-4">
-                  <Link href={`/admin/accessories/${accessory.slug}/edit`}>
+                  <Link href={`/super-admin/accessories/${accessory.slug}/edit`}>
                      <Button>Edit Accessory</Button>
                   </Link>
                </div>
