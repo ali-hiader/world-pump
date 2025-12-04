@@ -1,22 +1,24 @@
 'use server'
 
 import { eq } from 'drizzle-orm'
+import { z } from 'zod'
 
 import { DatabaseError, NotFoundError, ValidationError } from '@/lib/errors'
 import { logger } from '@/lib/logger'
-import {
-   accessoryIdSchema,
-   accessorySlugSchema,
-   updateAccessoryProductsSchema,
-} from '@/lib/validations'
 import { db } from '@/db'
 import { accessoryTable, productAccessoryTable } from '@/db/schema'
 
-/**
- * ============================================================================
- * ACCESSORY QUERIES
- * ============================================================================
- */
+const accessoryIdSchema = z.number().int().positive('Must be a positive integer')
+
+const accessorySlugSchema = z
+   .string()
+   .min(1)
+   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, { message: 'Invalid slug format' })
+
+const updateAccessoryProductsSchema = z.object({
+   accessoryId: accessoryIdSchema,
+   productIds: z.array(accessoryIdSchema),
+})
 
 export async function fetchAllAccessories() {
    try {

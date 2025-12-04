@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
          discountPrice: discountPrice ? Number(discountPrice) : null,
          stock: stock ? Number(stock) : 0,
          brand: brand || null,
-         status: (status as 'active' | 'inactive' | 'discontinued') || 'active',
+         status: (status as 'active' | 'inactive') || 'active',
          isFeatured,
          specs: parsedSpecs,
       })

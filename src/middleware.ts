@@ -8,12 +8,13 @@ import { logger } from './lib/logger'
 
 // Constants
 const ALLOWED_ORIGINS = new Set([
+   'http://localhost:3000',
+   'https://world-pump.vercel.app',
    'https://worldpumps.com.pk',
    'https://www.worldpumps.com.pk',
-   'http://localhost:3000',
 ])
 
-const AUTH_ROUTES = new Set(['/sign-in', '/sign-up', '/forget-password', '/reset-password'])
+const AUTH_ROUTES = new Set(['/sign-in', '/sign-up', '/forgot-password', '/reset-password'])
 
 const PROTECTED_ROUTE_PREFIXES = ['/account', '/checkout', '/cart']
 

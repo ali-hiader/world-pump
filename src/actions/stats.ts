@@ -2,12 +2,14 @@
 
 import { sql } from 'drizzle-orm'
 import { PgTable } from 'drizzle-orm/pg-core'
+import { z } from 'zod'
 
 import { DatabaseError, ValidationError } from '@/lib/errors'
 import { logger } from '@/lib/logger'
-import { statsTableSchema } from '@/lib/validations'
 import { db } from '@/db'
 import { accessoryTable, orderTable, pumpTable, user } from '@/db/schema'
+
+const statsTableSchema = z.enum(['product', 'accessory', 'user', 'order'])
 
 type StatsTable = 'product' | 'accessory' | 'user' | 'order'
 

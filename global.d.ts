@@ -5,7 +5,8 @@ declare namespace NodeJS {
     BETTER_AUTH_URL: string
     BETTER_AUTH_SECRET: string
 
-    NEXT_PUBLIC_BASE_URL: string
+    NEXT_PUBLIC_APP_URL: string
+    NEXT_PUBLIC_BASE_URL?: string // Deprecated, use NEXT_PUBLIC_APP_URL
 
     CLOUDINARY_CLOUD_NAME: string
     CLOUDINARY_API_KEY: string
@@ -18,5 +19,16 @@ declare namespace NodeJS {
     SMTP_USER: string
     SMTP_PASS: string
     SMTP_FROM: string
+    FROM_EMAIL?: string
+
+    // Admin
+    SUPER_ADMIN_EMAILS?: string // Comma-separated list of admin emails
+
+    // Company Info (optional)
+    COMPANY_NAME?: string
+    COMPANY_ADDRESS?: string
+    COMPANY_EMAIL?: string
+    COMPANY_PHONE?: string
+    SUPPORT_EMAIL?: string
   }
 }

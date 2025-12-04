@@ -5,13 +5,20 @@ import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import { and, desc, eq, getTableColumns } from 'drizzle-orm'
+import { z } from 'zod'
 
 import { auth } from '@/lib/auth/auth'
 import { ValidationError } from '@/lib/errors'
 import { logger } from '@/lib/logger'
-import { cartProductSchema, userIdSchema } from '@/lib/validations'
 import { db } from '@/db'
 import { cartTable, pumpTable } from '@/db/schema'
+
+const userIdSchema = z.string().min(1, 'User ID is required')
+
+const cartProductSchema = z.object({
+   productId: z.number().int().positive('Must be a positive integer'),
+   userId: userIdSchema,
+})
 
 export type CartItemWithProduct = {
    cartId: number

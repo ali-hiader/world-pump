@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server'
 import { eq } from 'drizzle-orm'
 
 import { apiBadRequest } from '@/lib/api/response'
-import { getAdminSession } from '@/lib/auth/admin-auth'
 import { deleteImage, extractCloudinaryPublicId } from '@/lib/cloudinary'
 import { logger } from '@/lib/logger'
 import { createSlug, uploadFormImage } from '@/lib/server'
@@ -12,11 +11,6 @@ import { pumpTable } from '@/db/schema'
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
    try {
-      const admin = await getAdminSession()
-      if (!admin) {
-         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-      }
-
       const { id } = await params
       const productId = id
       const formData = await request.formData()
@@ -52,7 +46,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
          discountPrice: discountPrice ? Number(discountPrice) : null,
          stock: stock ? Number(stock) : 0,
          brand: brand || null,
-         status: status as 'active' | 'inactive' | 'discontinued',
+         status: status as 'active' | 'inactive',
          isFeatured,
          specs: specs ? JSON.parse(specs) : null,
          updatedAt: new Date(),
@@ -76,11 +70,6 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
    try {
-      const admin = await getAdminSession()
-      if (!admin) {
-         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-      }
-
       const { id } = await params
       logger.debug('Deleting product', { id })
 

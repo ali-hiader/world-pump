@@ -55,12 +55,7 @@ function Analytics() {
                     ...orderData,
                     order: {
                        ...orderData.order,
-                       status: newStatus as
-                          | 'pending'
-                          | 'paid'
-                          | 'shipped'
-                          | 'completed'
-                          | 'cancelled',
+                       status: newStatus as 'pending' | 'shipped' | 'cancelled',
                     },
                  }
                : orderData,

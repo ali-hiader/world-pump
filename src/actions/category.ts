@@ -5,9 +5,13 @@ import { z } from 'zod'
 
 import { ValidationError } from '@/lib/errors'
 import { logger } from '@/lib/logger'
-import { categorySlugSchema } from '@/lib/validations'
 import { db } from '@/db'
 import { categoryTable, pumpTable } from '@/db/schema'
+
+const categorySlugSchema = z
+   .string()
+   .min(1)
+   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, { message: 'Invalid slug format' })
 
 export async function fetchAllCategories() {
    try {

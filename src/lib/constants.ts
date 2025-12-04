@@ -71,12 +71,12 @@ export const RATE_LIMITS = {
 
 export const SESSION = {
    COOKIE_NAME: {
+      // Note: This should match better-auth's cookie name
+      // If better-auth changes this, update getUserSessionCookieName() in auth.ts
       USER: 'better-auth.session_token',
-      ADMIN: 'admin_session',
    },
    MAX_AGE: {
       USER: 60 * 60 * 24 * 30, // 30 days (1 month)
-      ADMIN: 60 * 60 * 24, // 1 day
    },
 } as const
 

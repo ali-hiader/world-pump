@@ -16,14 +16,17 @@ function SignOutBtn() {
                   router.push('/')
                   router.refresh()
                },
+               onError: (ctx) => {
+                  logger.error('Sign out error', ctx.error)
+                  // Still redirect on error to clear client state
+                  router.push('/')
+                  router.refresh()
+               },
             },
          })
       } catch (error) {
-         logger.error('Sign out error', error)
-         // Fallback to manual sign out
-         await fetch('/api/sign-out', {
-            cache: 'no-store',
-         })
+         logger.error('Unexpected sign out error', error)
+         // Clear client state even if sign-out fails
          router.push('/')
          router.refresh()
       }

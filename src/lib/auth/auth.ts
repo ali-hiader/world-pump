@@ -24,8 +24,8 @@ export const auth = betterAuth({
    }),
    baseURL: process.env.NEXT_PUBLIC_APP_URL || 'https://worldpumps.com.pk/',
    session: {
-      expiresIn: SESSION.MAX_AGE.USER,
-      updateAge: SESSION.MAX_AGE.USER / 2,
+      expiresIn: SESSION.MAX_AGE.USER, // 30 days - session expires after this period of inactivity
+      updateAge: SESSION.MAX_AGE.USER / 2, // 15 days - session refreshes if used within this window
    },
    emailAndPassword: {
       enabled: true,
@@ -51,7 +51,8 @@ export const auth = betterAuth({
    trustedOrigins: [
       'http://localhost:3000',
       'https://world-pump.vercel.app',
-      'https://www.worldpumps.com.pk/',
+      'https://worldpumps.com.pk',
+      'https://www.worldpumps.com.pk',
    ],
 })
 

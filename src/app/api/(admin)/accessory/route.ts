@@ -171,7 +171,7 @@ export async function POST(req: Request) {
             price,
             discountPrice,
             stock,
-            status: status as 'active' | 'inactive' | 'discontinued',
+            status: status as 'active' | 'inactive',
             description,
             specs: parsedSpecs,
          })

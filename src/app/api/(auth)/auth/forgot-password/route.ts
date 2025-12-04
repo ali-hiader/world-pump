@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 import { auth } from '@/lib/auth/auth'
 import { logger } from '@/lib/logger'
+import { checkTypedRateLimit, createRateLimitHeaders, getClientIp } from '@/lib/rate-limit'
 import { db } from '@/db'
 import { user } from '@/db/schema'
 
@@ -12,6 +13,23 @@ const schema = z.object({ email: z.email() })
 
 export async function POST(req: NextRequest) {
    try {
+      // Check rate limit
+      const clientIp = getClientIp(req.headers)
+      const rateLimitResult = checkTypedRateLimit(clientIp, 'password-reset')
+      const rateLimitHeaders = createRateLimitHeaders(rateLimitResult, 5)
+
+      if (!rateLimitResult.allowed) {
+         return NextResponse.json(
+            {
+               error: 'Too many password reset requests. Please try again later.',
+            },
+            {
+               status: 429,
+               headers: rateLimitHeaders,
+            },
+         )
+      }
+
       const body = await req.json()
       const { email } = schema.parse(body)
       const normalizedEmail = email.trim().toLowerCase()
@@ -23,12 +41,13 @@ export async function POST(req: NextRequest) {
          .limit(1)
 
       if (!existingUser) {
-         return NextResponse.json({ ok: true }) // Always return OK to avoid email enumeration
+         // Always return OK to avoid email enumeration
+         return NextResponse.json({ ok: true }, { headers: rateLimitHeaders })
       }
 
-      const url = new URL(req.url)
-      const base = `${url.protocol}//${url.host}`
-      const resetUrl = `${base}/reset-password`
+      // Use environment variable to prevent Host header injection attacks
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+      const resetUrl = `${baseUrl}/reset-password`
 
       const data = await auth.api.requestPasswordReset({
          body: {
@@ -39,7 +58,7 @@ export async function POST(req: NextRequest) {
 
       logger.info('Auth Password Reset Response', data)
 
-      return NextResponse.json({ ok: true })
+      return NextResponse.json({ ok: true }, { headers: rateLimitHeaders })
    } catch (error) {
       logger.error('Password reset request error', error)
 

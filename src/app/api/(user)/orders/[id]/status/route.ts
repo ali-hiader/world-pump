@@ -65,7 +65,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       await db
          .update(orderTable)
          .set({
-            status: 'completed',
+            status: 'delivered',
             updatedAt: new Date(),
          })
          .where(eq(orderTable.id, orderId))

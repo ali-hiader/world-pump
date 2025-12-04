@@ -122,8 +122,8 @@ export async function POST(req: NextRequest) {
       const totalAmount = products.reduce((sum, p) => sum + p.price * p.quantity, 0)
 
       // Insert addresses
-      let shippingAddressId: string | null = null
-      let billingAddressId: string | null = null
+      let shippingAddressId: number | null = null
+      let billingAddressId: number | null = null
 
       if (addresses) {
          const shippingInsert = await db
@@ -198,7 +198,6 @@ export async function POST(req: NextRequest) {
                orderId,
                productId: p.id,
                productName: p.title,
-               sku: null,
                quantity: p.quantity,
                unitPrice: p.price,
             })),

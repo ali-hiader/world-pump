@@ -179,7 +179,7 @@ export async function PATCH(request: NextRequest, { params }: Props) {
       const updateData: {
          updatedAt: Date
          paymentStatus?: 'pending' | 'successful' | 'failed' | 'refunded'
-         status?: 'pending' | 'paid' | 'shipped' | 'completed' | 'cancelled'
+         status?: 'pending' | 'shipped' | 'cancelled'
       } = { updatedAt: new Date() }
       if (paymentStatus) updateData.paymentStatus = paymentStatus
       if (status) updateData.status = status
@@ -228,7 +228,7 @@ export async function PATCH(request: NextRequest, { params }: Props) {
                }
             }
 
-            if (status === 'completed' && currentOrder.status !== 'completed') {
+            if (status === 'delivered' && currentOrder.status !== 'delivered') {
                logger.debug('Order marked as completed', { orderId })
                // Could send delivery confirmation email here if needed
             }
