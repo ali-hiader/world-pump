@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { PropsWithChildren, useEffect, useState } from 'react'
@@ -50,13 +51,20 @@ export default function NavBar({ categories }: { categories?: CategoryType[] }) 
             {/* Logo */}
             <Link
                href={'/'}
-               className="headingFont text-2xl sm:text-3xl font-extrabold cursor-pointer"
+               className="headingFont text-2xl sm:text-3xl font-extrabold cursor-pointer flex items-center gap-1 relative ml-12"
             >
+               <Image
+                  src={'/logo.jpg'}
+                  alt="Logo"
+                  width={40}
+                  height={40}
+                  className="w-12 absolute h-auto -left-12"
+               />
                World Pumps
             </Link>
 
             {/* Desktop Nav */}
-            <ul className="hidden md:flex items-center gap-6">
+            <ul className="hidden lg:flex items-center gap-6">
                {navLinks.map((link, index) => (
                   <React.Fragment key={link.href}>
                      <NavLink href={link.href} pathName={pathName}>
@@ -72,7 +80,7 @@ export default function NavBar({ categories }: { categories?: CategoryType[] }) 
             </ul>
 
             {/* Desktop Right Side */}
-            <ul className="hidden md:flex items-center justify-between gap-6 mr-2">
+            <ul className="hidden lg:flex items-center justify-between gap-6 mr-2">
                {session?.user ? (
                   <NavLink pathName={pathName} href={'/account'}>
                      Account
@@ -92,7 +100,7 @@ export default function NavBar({ categories }: { categories?: CategoryType[] }) 
                </NavLink>
             </ul>
 
-            <section className="md:hidden">
+            <section className="lg:hidden">
                <Dialog open={open} onOpenChange={setOpen}>
                   <DialogTrigger asChild>
                      <button className="relative cursor-pointer" aria-label="Open menu">

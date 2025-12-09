@@ -27,7 +27,7 @@ export default function Footer() {
                      </Link>
                   </li>
                   <li>
-                     <Link href="/about" className="hover:text-white">
+                     <Link href="/about-us" className="hover:text-white">
                         About Us
                      </Link>
                   </li>
@@ -37,7 +37,7 @@ export default function Footer() {
                      </Link>
                   </li>
                   <li>
-                     <Link href="/products" className="hover:text-white">
+                     <Link href="/pumps/all" className="hover:text-white">
                         Products
                      </Link>
                   </li>
@@ -73,7 +73,11 @@ export default function Footer() {
                   </li>
                   <li className="flex items-center gap-2">
                      <Facebook className="w-4 h-4 text-white" />
-                     <Link href="https://facebook.com" target="_blank" className="hover:text-white">
+                     <Link
+                        href="https://web.facebook.com/WorldPumpspk"
+                        target="_blank"
+                        className="hover:text-white"
+                     >
                         Facebook
                      </Link>
                   </li>
