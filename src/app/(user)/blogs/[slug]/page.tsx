@@ -102,7 +102,7 @@ export default async function BlogPage({ params }: BlogPageProps) {
                <Button
                   // onClick={() =>
                   //    navigator.clipboard.writeText(
-                  //       `${process.env.NEXT_PUBLIC_BASE_URL}/blogs/${params.slug}`,
+                  //       `${process.env.NEXT_PUBLIC_APP_URL}/blogs/${params.slug}`,
                   //    )
                   // }
                   variant="outline"
