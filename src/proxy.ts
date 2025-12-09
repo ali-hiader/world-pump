@@ -6,46 +6,12 @@ import { NextResponse } from 'next/server'
 import { auth, isSuperAdmin } from './lib/auth/auth'
 import { logger } from './lib/logger'
 
-// Constants
-const ALLOWED_ORIGINS = new Set([
-   'http://localhost:3000',
-   'https://world-pump.vercel.app',
-   'https://worldpumps.com.pk',
-   'https://www.worldpumps.com.pk',
-])
-
 const AUTH_ROUTES = new Set(['/sign-in', '/sign-up', '/forgot-password', '/reset-password'])
 
 const PROTECTED_ROUTE_PREFIXES = ['/account', '/checkout', '/cart']
 
 export async function proxy(req: NextRequest) {
    const { pathname } = req.nextUrl
-   const origin = req.headers.get('origin')
-
-   // Handle CORS preflight requests
-   if (req.method === 'OPTIONS') {
-      if (origin && ALLOWED_ORIGINS.has(origin)) {
-         return new NextResponse(null, {
-            status: 200,
-            headers: {
-               'Access-Control-Allow-Origin': origin,
-               'Access-Control-Allow-Credentials': 'true',
-               'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
-               'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-            },
-         })
-      }
-      return new NextResponse(null, { status: 204 })
-   }
-
-   // Set CORS headers for actual requests
-   const response = NextResponse.next()
-   if (origin && ALLOWED_ORIGINS.has(origin)) {
-      response.headers.set('Access-Control-Allow-Origin', origin)
-      response.headers.set('Access-Control-Allow-Credentials', 'true')
-      response.headers.set('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
-      response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-   }
 
    // Get session only for routes that need authentication
    const session = await auth.api.getSession({
@@ -111,5 +77,6 @@ export const config = {
       '/cart/:path*',
       '/checkout/:path*',
       '/api/:path*',
+      '/((?!_next/static|_next/image|favicon.ico).*)',
    ],
 }
