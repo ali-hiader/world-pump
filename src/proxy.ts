@@ -18,11 +18,9 @@ const AUTH_ROUTES = new Set(['/sign-in', '/sign-up', '/forgot-password', '/reset
 
 const PROTECTED_ROUTE_PREFIXES = ['/account', '/checkout', '/cart']
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
    const { pathname } = req.nextUrl
 
-   // Handle CORS for API routes only
-   if (pathname.startsWith('/api/')) {
       const origin = req.headers.get('origin')
       const response = NextResponse.next()
 
@@ -33,13 +31,7 @@ export async function middleware(req: NextRequest) {
          response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
       }
 
-      // Handle preflight requests
-      if (req.method === 'OPTIONS') {
-         return new NextResponse(null, { status: 204, headers: response.headers })
-      }
-
-      return response
-   }
+   
 
    // Get session only for routes that need authentication
    const session = await auth.api.getSession({
