@@ -9,7 +9,7 @@ import Spinner from '@/icons/spinner'
 
 interface OrderActionsProps {
    order: OrderType
-   onStatusUpdate: (orderId: number, newStatus: string) => void
+   onStatusUpdate: (orderId: string, newStatus: string) => void
 }
 
 export default function OrderActions({ order, onStatusUpdate }: OrderActionsProps) {

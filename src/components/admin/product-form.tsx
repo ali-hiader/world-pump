@@ -9,8 +9,7 @@ import { ArrowLeft, ImageIcon, Plus, X } from 'lucide-react'
 
 import { logger } from '@/lib/logger'
 import { ProductType, SpecField } from '@/lib/types'
-import { getAdminContainerClasses, parseSpecsToArray } from '@/lib/utils'
-import Heading from '@/components/client/heading'
+import { parseSpecsToArray } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import ContactInput from '@/components/ui/contact-input'
@@ -27,7 +26,7 @@ import {
 import Spinner from '@/icons/spinner'
 
 interface Category {
-   id: number
+   id: string
    name: string
    slug: string
 }
@@ -120,7 +119,7 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
       formData.set('specs', JSON.stringify(specsArray))
 
       try {
-         const url = isEditing ? `/api/admin/products/${product?.id}` : '/api/admin/products'
+         const url = isEditing ? `/api/products/${product?.id}` : '/api/products'
          const method = isEditing ? 'PUT' : 'POST'
 
          const response = await fetch(url, {
@@ -129,7 +128,7 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
          })
 
          if (response.ok) {
-            router.push('/admin/products')
+            router.push('/super-admin/products')
          } else {
             const data = await response.json()
             setError(data.error || `Failed to ${isEditing ? 'update' : 'create'} product`)
@@ -143,15 +142,14 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
    }
 
    return (
-      <main className={getAdminContainerClasses()}>
+      <main>
          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-4 sm:mb-6">
-            <Link href="/admin/products">
-               <Button variant="ghost" size="sm">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back
+            <Link href="/super-admin/products">
+               <Button variant="ghostOutline" size="sm">
+                  <ArrowLeft className="size-4" />
                </Button>
             </Link>
-            <Heading title={pageTitle} />
+            <h2 className="text-3xl font-bold tracking-tight headingFont">{pageTitle}</h2>
          </div>
 
          <Card className="p-3 sm:p-6">
@@ -339,7 +337,7 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-3 sm:p-6 bg-gray-50/50">
                      <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
                         {/* Image Preview Section */}
-                        <div className="flex-shrink-0 w-full sm:w-auto">
+                        <div className="shrink-0 w-full sm:w-auto">
                            <div className="w-full h-40 sm:w-32 sm:h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden transition-colors hover:border-gray-400">
                               {!imageUrl ? (
                                  <div className="text-center">

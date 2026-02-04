@@ -3,16 +3,13 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 
 import { ArrowLeft, ImageIcon, Plus, X } from 'lucide-react'
 
 import { logger } from '@/lib/logger'
 import { AccessoryType, ProductType, SpecField } from '@/lib/types'
-import { getAdminContainerClasses, parseSpecsToArray } from '@/lib/utils'
-import { fetchAccessoryProductIds } from '@/actions/accessory'
-import { fetchAllProducts } from '@/actions/product'
-import Heading from '@/components/client/heading'
+import { parseSpecsToArray } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Combobox } from '@/components/ui/combobox'
@@ -31,9 +28,15 @@ import Spinner from '@/icons/spinner'
 
 interface AccessoryFormProps {
    accessory?: AccessoryType
+   products: ProductType[]
+   selectedProductIds: string[]
 }
 
-export default function AccessoryForm({ accessory }: AccessoryFormProps) {
+export default function AccessoryForm({
+   accessory,
+   products,
+   selectedProductIds,
+}: AccessoryFormProps) {
    const router = useRouter()
    const imageRef = useRef<HTMLInputElement | null>(null)
    const isEditing = Boolean(accessory)
@@ -44,9 +47,7 @@ export default function AccessoryForm({ accessory }: AccessoryFormProps) {
 
    const [imageName, setImageName] = useState<string | undefined>(undefined)
    const [imageUrl, setImageUrl] = useState<string | undefined>(accessory?.imageUrl)
-   const [products, setProducts] = useState<ProductType[]>([])
-   const [selectedProducts, setSelectedProducts] = useState<number[]>([])
-   const [loading, setLoading] = useState(false)
+   const [selectedProducts, setSelectedProducts] = useState<string[]>(selectedProductIds)
    const [submitting, setSubmitting] = useState(false)
    const [error, setError] = useState<string>('')
    const [specs, setSpecs] = useState<SpecField[]>(() => {
@@ -56,28 +57,6 @@ export default function AccessoryForm({ accessory }: AccessoryFormProps) {
       }
       return [{ id: '1', field: '', value: '' }]
    })
-
-   useEffect(() => {
-      const fetchData = async () => {
-         setLoading(true)
-         try {
-            const [allProducts, attachedProductIds] = await Promise.all([
-               fetchAllProducts(),
-               isEditing && accessory?.id
-                  ? fetchAccessoryProductIds(accessory.id)
-                  : Promise.resolve([]),
-            ])
-            setProducts(allProducts)
-            setSelectedProducts(attachedProductIds)
-         } catch (error) {
-            logger.error('Error fetching data', error)
-            setError('Failed to load data')
-         } finally {
-            setLoading(false)
-         }
-      }
-      fetchData()
-   }, [isEditing, accessory?.id])
 
    const displaySelectedImage = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (!e.currentTarget.files || !e.currentTarget.files[0]) return
@@ -120,9 +99,9 @@ export default function AccessoryForm({ accessory }: AccessoryFormProps) {
 
    const handleProductSelect = (value: string | string[]) => {
       if (Array.isArray(value)) {
-         setSelectedProducts(value.length ? value.map((v) => Number(v)) : [])
+         setSelectedProducts(value.length ? value : [])
       } else if (value) {
-         setSelectedProducts([Number(value)])
+         setSelectedProducts([value])
       } else {
          setSelectedProducts([])
       }
@@ -148,7 +127,7 @@ export default function AccessoryForm({ accessory }: AccessoryFormProps) {
       formData.set('productIds', JSON.stringify(selectedProducts))
 
       try {
-         const url = isEditing ? `/api/admin/accessory/${accessory?.id}` : '/api/admin/accessory'
+         const url = isEditing ? `/api/accessory/${accessory?.id}` : '/api/accessory'
          const method = isEditing ? 'PUT' : 'POST'
 
          const response = await fetch(url, {
@@ -159,7 +138,7 @@ export default function AccessoryForm({ accessory }: AccessoryFormProps) {
          if (response.ok) {
             const data = await response.json()
             if (data.success) {
-               router.push('/admin/accessories')
+               router.push('/super-admin/accessories')
             } else {
                setError(data.error || `Failed to ${isEditing ? 'update' : 'create'} accessory`)
             }
@@ -175,27 +154,15 @@ export default function AccessoryForm({ accessory }: AccessoryFormProps) {
       }
    }
 
-   if (loading) {
-      return (
-         <main className={getAdminContainerClasses()}>
-            <div className="flex items-center justify-center min-h-[400px]">
-               <Spinner className="animate-spin mr-2" />
-               <span>Loading...</span>
-            </div>
-         </main>
-      )
-   }
-
    return (
-      <main className={getAdminContainerClasses()}>
+      <main>
          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-4 sm:mb-6">
-            <Link href="/admin/accessories">
-               <Button variant="ghost" size="sm">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back
+            <Link href="/super-admin/accessories">
+               <Button variant="ghostOutline" size="sm">
+                  <ArrowLeft className="size-4" />
                </Button>
             </Link>
-            <Heading title={pageTitle} />
+            <h2 className="text-3xl font-bold tracking-tight headingFont">{pageTitle}</h2>
          </div>
 
          <Card className="p-3 sm:p-6">
@@ -358,7 +325,7 @@ export default function AccessoryForm({ accessory }: AccessoryFormProps) {
                   </label>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-3 sm:p-6 bg-gray-50/50">
                      <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
-                        <div className="flex-shrink-0 w-full sm:w-auto">
+                        <div className="shrink-0 w-full sm:w-auto">
                            <div className="w-full h-40 sm:w-32 sm:h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden transition-colors hover:border-gray-400">
                               {!imageUrl ? (
                                  <div className="text-center">

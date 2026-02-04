@@ -21,14 +21,18 @@ export function optimizeCloudinaryUrl(url: string): string {
    return `${parts[0]}/upload/q_auto/f_auto${parts[1]}`
 }
 
-export async function uploadFormImage(image: File): Promise<string> {
+export async function uploadFormImage(image: File, folder?: string): Promise<string> {
    const arrayBuffer = await image.arrayBuffer()
    const buffer = Buffer.from(arrayBuffer)
 
    const result = await new Promise<UploadApiResponse | undefined>((resolve) => {
-      uploadImage(buffer, (uploadResult) => {
-         resolve(uploadResult)
-      })
+      uploadImage(
+         buffer,
+         (uploadResult) => {
+            resolve(uploadResult)
+         },
+         folder ? { folder } : undefined,
+      )
    })
 
    if (!result?.url) {

@@ -2,10 +2,10 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { AlertCircle, RefreshCw } from 'lucide-react'
+import { ArrowLeft, RefreshCcw } from 'lucide-react'
 
 import { logger } from '@/lib/logger'
 import { SpecField } from '@/lib/types'
@@ -13,14 +13,14 @@ import { parseSpecsToArray } from '@/lib/utils'
 import { fetchAccessoryBySlug } from '@/actions/accessory'
 import { fetchAccessoryProductIds } from '@/actions/accessory'
 import { fetchAllProducts } from '@/actions/product'
-import { AdminPageLayout } from '@/components/admin/admin-page-layout'
-import { AdminLoadingState } from '@/components/admin/admin-states'
+import CustomDialog from '@/components/admin/dialog'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Spinner from '@/icons/spinner'
 
 interface Accessory {
-   id: number
+   id: string
    title: string
    slug: string
    imageUrl: string
@@ -50,13 +50,17 @@ function formatDate(date?: string | Date) {
 
 export default function AccessoryDetailPage() {
    const params = useParams()
+   const router = useRouter()
    const accessorySlug = params?.slug as string
 
    const [accessory, setAccessory] = useState<Accessory | null>(null)
    const [loading, setLoading] = useState<boolean>(true)
    const [error, setError] = useState<string | null>(null)
-   const [products, setProducts] = useState<{ id: number; title: string }[]>([])
-   const [attachedProductIds, setAttachedProductIds] = useState<number[]>([])
+   const [successMessage, setSuccessMessage] = useState<string>('')
+   const [updating, setUpdating] = useState<boolean>(false)
+   const [deleting, setDeleting] = useState<boolean>(false)
+   const [products, setProducts] = useState<{ id: string; title: string }[]>([])
+   const [attachedProductIds, setAttachedProductIds] = useState<string[]>([])
    const [retrying, setRetrying] = useState<boolean>(false)
 
    const loadData = useCallback(async () => {
@@ -145,87 +149,130 @@ export default function AccessoryDetailPage() {
       [products, attachedProductIds],
    )
 
+   const toggleAccessoryStatus = async () => {
+      if (!accessory) return
+      setUpdating(true)
+      try {
+         const res = await fetch(`/api/accessory?id=${accessory.id}`, {
+            method: 'PUT',
+         })
+         if (!res.ok) throw new Error('Failed to update status')
+         const updated = await res.json()
+         setAccessory((prev) => (prev ? { ...prev, status: updated.status } : prev))
+         setSuccessMessage('Accessory status updated successfully.')
+         setError(null)
+      } catch (err: unknown) {
+         if (err instanceof Error) {
+            setError(err.message || 'Error updating status')
+         } else {
+            setError('Error updating status')
+         }
+         setSuccessMessage('')
+      } finally {
+         setUpdating(false)
+      }
+   }
+
+   const deleteAccessory = async () => {
+      if (!accessory) return
+      setDeleting(true)
+
+      try {
+         const res = await fetch(`/api/accessory/${accessory.id}`, {
+            method: 'DELETE',
+         })
+         if (!res.ok) throw new Error('Failed to delete accessory')
+         router.push('/super-admin/products')
+      } catch (err: unknown) {
+         if (err instanceof Error) {
+            setError(err.message || 'Error deleting accessory')
+         } else {
+            setError('Error deleting accessory')
+         }
+         setSuccessMessage('')
+      } finally {
+         setDeleting(false)
+      }
+   }
+
    // Loading state
    if (loading) {
-      return <AdminLoadingState message="Loading accessory details..." />
+      return <div className="text-center">Loading accessory details... </div>
    }
 
    // Error state
-   if (error) {
+   if (error || !accessory) {
       return (
-         <AdminPageLayout>
-            <div className="text-center py-12">
-               <div className="flex justify-center mb-4">
-                  <AlertCircle className="h-12 w-12 text-red-500" />
-               </div>
-               <h1 className="text-xl font-semibold text-gray-900 mb-2">
-                  Oops! Something went wrong
-               </h1>
-               <p className="text-red-600 mb-6 max-w-md mx-auto">{error}</p>
-               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Button
-                     onClick={handleRetry}
-                     disabled={retrying}
-                     className="flex items-center gap-2"
-                  >
-                     {retrying ? (
-                        <Spinner className="animate-spin h-4 w-4" />
-                     ) : (
-                        <RefreshCw className="h-4 w-4" />
-                     )}
-                     {retrying ? 'Retrying...' : 'Try Again'}
-                  </Button>
-                  <Link href="/super-admin/accessories">
-                     <Button variant="outline">Back to Accessories</Button>
-                  </Link>
-               </div>
-            </div>
-         </AdminPageLayout>
-      )
-   }
-
-   // Not found state (shouldn't happen if error handling is working)
-   if (!accessory) {
-      return (
-         <AdminPageLayout>
-            <div className="text-center py-12">
-               <p className="text-gray-600 mb-4">Accessory not found</p>
+         <div className="flex flex-col items-center gap-4">
+            <p className="text-rose-600 text-xl">Failed to load accessory</p>
+            <div className="flex flex-wrap gap-3">
+               <Button variant="outline" onClick={handleRetry} disabled={retrying}>
+                  {retrying ? (
+                     <Spinner className="mr-2 size-4 animate-spin" />
+                  ) : (
+                     <RefreshCcw className="mr-2 size-4" />
+                  )}
+                  {retrying ? 'Refreshing...' : 'Refresh'}
+               </Button>
                <Link href="/super-admin/accessories">
-                  <Button>Back to Accessories</Button>
+                  <Button variant="secondary">
+                     <ArrowLeft className="mr-2 size-4" />
+                     Back to Accessories
+                  </Button>
                </Link>
             </div>
-         </AdminPageLayout>
+         </div>
       )
    }
 
    return (
-      <AdminPageLayout className="max-w-7xl">
-         {/* Header */}
-         <div className="mb-6">
-            <Link href="/super-admin/accessories">
-               <Button variant="ghost" className="mb-4">
-                  ← Back to Accessories
+      <main>
+         {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+               {error}
+            </div>
+         )}
+         {successMessage && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
+               {successMessage}
+            </div>
+         )}
+
+         {/* Breadcrumb */}
+         <div className="flex items-center space-x-2 text-sm text-gray-500 mb-4">
+            <Link href="/super-admin/products">
+               <Button className="aspect-square" variant={'ghostOutline'}>
+                  <ArrowLeft className="size-3" />
                </Button>
             </Link>
+            <Link href="/super-admin" className="hover:text-gray-700">
+               Admin
+            </Link>
+            <span>/</span>
+            <Link href="/super-admin/accessories" className="hover:text-gray-700">
+               Accessories
+            </Link>
+            <span>/</span>
+            <span className="text-gray-900 font-medium">{accessory.title}</span>
+         </div>
+
+         <div className="mb-6">
             <div className="flex items-center justify-between">
                <div>
-                  <h1 className="text-3xl font-bold text-gray-900">{accessory.title}</h1>
-                  <p className="text-gray-600 mt-1">Accessory ID: {accessory.id}</p>
+                  <div className="flex gap-2 items-center">
+                     <h1 className="text-2xl font-bold text-gray-900">{accessory.title}</h1>
+                     <Badge
+                        variant={accessory.status === 'active' ? 'secondary' : 'destructive'}
+                        className="h-fit"
+                     >
+                        {accessory.status}
+                     </Badge>
+                  </div>
+                  <p className="text-gray-600 text-sm mt-1">Product ID: {accessory.id}</p>
                </div>
-               <div className="flex gap-2">
-                  <span
-                     className={`px-2 py-1 rounded text-xs ${
-                        accessory.status === 'active'
-                           ? 'bg-green-100 text-green-700'
-                           : 'bg-gray-200 text-gray-600'
-                     }`}
-                  >
-                     {accessory.status}
-                  </span>
-                  <Link href={`/super-admin/accessories/${accessory.slug}/edit`}>
-                     <Button variant="outline">Edit Accessory</Button>
-                  </Link>
-               </div>
+               <Link href={`/super-admin/accessories/${accessory.slug}/edit`}>
+                  <Button variant="outline">Edit Accessory</Button>
+               </Link>
             </div>
          </div>
 
@@ -345,8 +392,39 @@ export default function AccessoryDetailPage() {
                <h2 className="text-lg font-semibold mb-2">Quick Actions</h2>
                <div className="flex flex-wrap gap-3 mb-4">
                   <Link href={`/super-admin/accessories/${accessory.slug}/edit`}>
-                     <Button>Edit Accessory</Button>
+                     <Button disabled={updating || deleting}>Edit Accessory</Button>
                   </Link>
+                  <Link href={`/accessories/${accessory.slug}`} target="_blank">
+                     <Button variant="outline" disabled={updating || deleting}>
+                        View on Website
+                     </Button>
+                  </Link>
+                  <Button
+                     variant={accessory.status === 'active' ? 'secondary' : 'default'}
+                     onClick={toggleAccessoryStatus}
+                     disabled={updating || deleting}
+                  >
+                     {updating ? (
+                        <>
+                           <Spinner className="animate-spin mr-1 h-3 w-3" />
+                           Updating...
+                        </>
+                     ) : (
+                        <>{accessory.status === 'active' ? 'Deactivate' : 'Activate'} Accessory</>
+                     )}
+                  </Button>
+                  <CustomDialog isAccessory onContinue={deleteAccessory}>
+                     <Button variant="destructive" disabled={updating || deleting}>
+                        {deleting ? (
+                           <>
+                              <Spinner className="animate-spin mr-1 h-3 w-3" />
+                              Deleting...
+                           </>
+                        ) : (
+                           'Delete Accessory'
+                        )}
+                     </Button>
+                  </CustomDialog>
                </div>
                {/* Metadata */}
                <div className="pt-4 border-t border-gray-200">
@@ -357,6 +435,6 @@ export default function AccessoryDetailPage() {
                </div>
             </div>
          </section>
-      </AdminPageLayout>
+      </main>
    )
 }

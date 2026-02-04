@@ -51,15 +51,9 @@ export default function NavBar({ categories }: { categories?: CategoryType[] }) 
             {/* Logo */}
             <Link
                href={'/'}
-               className="headingFont text-2xl sm:text-3xl font-extrabold cursor-pointer flex items-center gap-1 relative ml-12"
+               className="headingFont text-2xl sm:text-3xl font-extrabold cursor-pointer flex items-center gap-1"
             >
-               <Image
-                  src={'/logo.jpg'}
-                  alt="Logo"
-                  width={40}
-                  height={40}
-                  className="w-12 absolute h-auto -left-12"
-               />
+               <Image src={'/logo.jpg'} alt="Logo" width={40} height={40} className="w-8 h-auto" />
                World Pumps
             </Link>
 

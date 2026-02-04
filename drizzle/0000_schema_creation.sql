@@ -4,7 +4,7 @@ CREATE TYPE "public"."payment_method" AS ENUM('bank', 'cod');--> statement-break
 CREATE TYPE "public"."payment_status" AS ENUM('pending', 'successful', 'failed', 'refunded');--> statement-breakpoint
 CREATE TYPE "public"."product_status" AS ENUM('active', 'inactive');--> statement-breakpoint
 CREATE TABLE "accessory" (
-	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "accessory_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"id" text PRIMARY KEY NOT NULL,
 	"title" varchar(255) NOT NULL,
 	"slug" varchar(255) NOT NULL,
 	"description" text,
@@ -37,7 +37,7 @@ CREATE TABLE "account" (
 );
 --> statement-breakpoint
 CREATE TABLE "address" (
-	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "address_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"id" text PRIMARY KEY NOT NULL,
 	"user_id" text NOT NULL,
 	"type" "address_type" DEFAULT 'shipping' NOT NULL,
 	"full_name" text NOT NULL,
@@ -54,16 +54,16 @@ CREATE TABLE "address" (
 );
 --> statement-breakpoint
 CREATE TABLE "cart" (
-	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "cart_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"id" text PRIMARY KEY NOT NULL,
 	"addedBy" text NOT NULL,
-	"productId" integer NOT NULL,
+	"product_id" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"quantity" integer NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "category" (
-	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "category_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"id" text PRIMARY KEY NOT NULL,
 	"name" varchar(100) NOT NULL,
 	"slug" varchar(100) NOT NULL,
 	"isFeatured" boolean DEFAULT false,
@@ -76,9 +76,9 @@ CREATE TABLE "category" (
 );
 --> statement-breakpoint
 CREATE TABLE "order_item" (
-	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "order_item_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
-	"order_id" integer NOT NULL,
-	"product_id" integer NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"order_id" text NOT NULL,
+	"product_id" text NOT NULL,
 	"product_name" varchar(255) NOT NULL,
 	"quantity" integer NOT NULL,
 	"unit_price" integer NOT NULL,
@@ -87,12 +87,12 @@ CREATE TABLE "order_item" (
 );
 --> statement-breakpoint
 CREATE TABLE "order" (
-	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "order_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"id" text PRIMARY KEY NOT NULL,
 	"order_number" varchar(50) NOT NULL,
 	"user_id" text NOT NULL,
 	"user_email" varchar NOT NULL,
-	"shipping_address_id" integer,
-	"billing_address_id" integer,
+	"shipping_address_id" text,
+	"billing_address_id" text,
 	"payment_status" "payment_status" DEFAULT 'pending' NOT NULL,
 	"notes" text,
 	"total_amount" integer NOT NULL,
@@ -103,8 +103,8 @@ CREATE TABLE "order" (
 );
 --> statement-breakpoint
 CREATE TABLE "payment" (
-	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "payment_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
-	"order_id" integer NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"order_id" text NOT NULL,
 	"method" "payment_method" NOT NULL,
 	"status" "payment_status" DEFAULT 'pending' NOT NULL,
 	"merchant_payment_id" varchar,
@@ -114,18 +114,18 @@ CREATE TABLE "payment" (
 );
 --> statement-breakpoint
 CREATE TABLE "product_accessory" (
-	"product_id" integer NOT NULL,
-	"accessory_id" integer NOT NULL,
+	"product_id" text NOT NULL,
+	"accessory_id" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "product_accessory_product_id_accessory_id_pk" PRIMARY KEY("product_id","accessory_id")
 );
 --> statement-breakpoint
 CREATE TABLE "pump" (
-	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "pump_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
+	"id" text PRIMARY KEY NOT NULL,
 	"title" varchar(255) NOT NULL,
 	"slug" varchar(255) NOT NULL,
-	"categoryId" integer NOT NULL,
+	"category_id" text NOT NULL,
 	"description" text NOT NULL,
 	"imageUrl" varchar(255) NOT NULL,
 	"price" integer NOT NULL,
@@ -175,7 +175,7 @@ CREATE TABLE "verification" (
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "address" ADD CONSTRAINT "address_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "cart" ADD CONSTRAINT "cart_addedBy_user_id_fk" FOREIGN KEY ("addedBy") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "cart" ADD CONSTRAINT "cart_productId_pump_id_fk" FOREIGN KEY ("productId") REFERENCES "public"."pump"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "cart" ADD CONSTRAINT "cart_product_id_pump_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."pump"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "order_item" ADD CONSTRAINT "order_item_order_id_order_id_fk" FOREIGN KEY ("order_id") REFERENCES "public"."order"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "order_item" ADD CONSTRAINT "order_item_product_id_pump_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."pump"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "order" ADD CONSTRAINT "order_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -184,7 +184,7 @@ ALTER TABLE "order" ADD CONSTRAINT "order_billing_address_id_address_id_fk" FORE
 ALTER TABLE "payment" ADD CONSTRAINT "payment_order_id_order_id_fk" FOREIGN KEY ("order_id") REFERENCES "public"."order"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "product_accessory" ADD CONSTRAINT "product_accessory_product_id_pump_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."pump"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "product_accessory" ADD CONSTRAINT "product_accessory_accessory_id_accessory_id_fk" FOREIGN KEY ("accessory_id") REFERENCES "public"."accessory"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "pump" ADD CONSTRAINT "pump_categoryId_category_id_fk" FOREIGN KEY ("categoryId") REFERENCES "public"."category"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "pump" ADD CONSTRAINT "pump_category_id_category_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."category"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "accessory_slug_idx" ON "accessory" USING btree ("slug");--> statement-breakpoint
 CREATE INDEX "accessory_status_idx" ON "accessory" USING btree ("status");--> statement-breakpoint
@@ -194,6 +194,6 @@ CREATE INDEX "order_status_idx" ON "order" USING btree ("status");--> statement-
 CREATE INDEX "order_payment_status_idx" ON "order" USING btree ("payment_status");--> statement-breakpoint
 CREATE INDEX "order_created_at_idx" ON "order" USING btree ("created_at");--> statement-breakpoint
 CREATE INDEX "product_slug_idx" ON "pump" USING btree ("slug");--> statement-breakpoint
-CREATE INDEX "product_category_idx" ON "pump" USING btree ("categoryId");--> statement-breakpoint
+CREATE INDEX "product_category_idx" ON "pump" USING btree ("category_id");--> statement-breakpoint
 CREATE INDEX "product_status_idx" ON "pump" USING btree ("status");--> statement-breakpoint
 CREATE INDEX "product_featured_idx" ON "pump" USING btree ("isFeatured");

@@ -14,8 +14,8 @@ export async function GET(req: Request) {
       const { searchParams } = new URL(req.url)
       const idParam = searchParams.get('id')
       if (idParam) {
-         const id = Number(idParam)
-         if (isNaN(id) || id <= 0) {
+         const id = idParam
+         if (!id || !id.trim()) {
             return NextResponse.json(
                { success: false, error: 'Invalid accessory ID.' },
                { status: 400 },
@@ -53,6 +53,7 @@ export async function POST(req: Request) {
 
       const formData = await req.formData()
       const title = formData.get('title') as string
+      const brand = formData.get('brand') as string
       const price = Number(formData.get('price'))
       const discountPrice = formData.get('discountPrice')
          ? Number(formData.get('discountPrice'))
@@ -65,7 +66,7 @@ export async function POST(req: Request) {
       const productIdsRaw = formData.get('productIds') as string
 
       // Parse productIds
-      let productIds: number[] = []
+      let productIds: string[] = []
       try {
          productIds = JSON.parse(productIdsRaw)
       } catch {
@@ -126,15 +127,15 @@ export async function POST(req: Request) {
             { status: 400 },
          )
       }
-      if (!productIds.every((id) => typeof id === 'number' && id > 0)) {
+      if (!productIds.every((id) => typeof id === 'string' && id.trim().length > 0)) {
          return NextResponse.json(
-            { success: false, error: 'All product IDs must be valid numbers.' },
+            { success: false, error: 'All product IDs must be valid strings.' },
             { status: 400 },
          )
       }
 
       // Upload image to Cloudinary
-      const imageUrl = await uploadFormImage(image)
+      const imageUrl = await uploadFormImage(image, 'accessories')
 
       // Generate slug from title
       let slug = title
@@ -174,12 +175,13 @@ export async function POST(req: Request) {
             status: status as 'active' | 'inactive',
             description,
             specs: parsedSpecs,
+            brand: brand || null,
          })
          .returning()
 
-      let relations: { productId: number; accessoryId: number }[] = []
+      let relations: { productId: string; accessoryId: string }[] = []
       if (accessory && productIds && Array.isArray(productIds)) {
-         relations = productIds.map((productId: number) => ({
+         relations = productIds.map((productId: string) => ({
             productId,
             accessoryId: accessory.id,
          }))
@@ -217,7 +219,7 @@ export async function PUT(request: Request) {
       const [existing] = await db
          .select()
          .from(accessoryTable)
-         .where(eq(accessoryTable.id, +accessoryId))
+         .where(eq(accessoryTable.id, accessoryId))
       if (!existing) {
          return NextResponse.json({ success: false, error: 'Accessory not found' }, { status: 404 })
       }
@@ -229,7 +231,7 @@ export async function PUT(request: Request) {
       const updatedRows = await db
          .update(accessoryTable)
          .set({ status: nextStatus })
-         .where(eq(accessoryTable.id, +accessoryId))
+         .where(eq(accessoryTable.id, accessoryId))
          .returning({ id: accessoryTable.id, status: accessoryTable.status })
 
       const updated = updatedRows?.[0] ?? null

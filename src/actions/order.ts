@@ -8,7 +8,7 @@ import { db } from '@/db'
 import { orderItemTable, orderTable, user } from '@/db/schema'
 
 export interface OrderWithDetails {
-   id: number
+   id: string
    userEmail: string
    userName: string | null
    status: string
@@ -21,7 +21,7 @@ export interface OrderWithDetails {
 export interface OrderFilters {
    userId?: string
    userEmail?: string
-   orderId?: number
+   orderId?: string
    limit?: number
 }
 
@@ -117,9 +117,9 @@ export async function fetchAllOrdersWithDetails(): Promise<OrderWithDetails[]> {
    }
 }
 
-export async function fetchOrderById(orderId: number) {
-   if (!orderId || orderId <= 0) {
-      throw new ValidationError('Invalid order ID')
+export async function fetchOrderById(orderId: string) {
+   if (!orderId) {
+      throw new ValidationError('Order ID is required')
    }
 
    try {

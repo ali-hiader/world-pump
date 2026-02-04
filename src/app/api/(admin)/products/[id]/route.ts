@@ -34,13 +34,13 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       let imageUrl: string | null = null
 
       if (image && image.size > 0) {
-         imageUrl = await uploadFormImage(image)
+         imageUrl = await uploadFormImage(image, 'pumps')
       }
 
       const updateData: Partial<typeof pumpTable.$inferInsert> = {
          title,
          slug: createSlug(title),
-         categoryId: Number(categoryId),
+         categoryId: categoryId,
          description,
          price: Number(price),
          discountPrice: discountPrice ? Number(discountPrice) : null,
@@ -54,12 +54,27 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
       if (imageUrl) {
          updateData.imageUrl = imageUrl
+
+         const [existingProduct] = await db
+            .select({ imageUrl: pumpTable.imageUrl })
+            .from(pumpTable)
+            .where(eq(pumpTable.id, productId))
+
+         if (existingProduct?.imageUrl) {
+            const publicId = extractCloudinaryPublicId(existingProduct.imageUrl)
+            if (publicId) {
+               try {
+                  logger.debug('Deleting Cloudinary image', { publicId })
+                  const deleteResult = await deleteImage(publicId)
+                  logger.debug('Cloudinary delete result', { deleteResult })
+               } catch (imageError) {
+                  logger.warn('Failed to delete Cloudinary image', { error: imageError })
+               }
+            }
+         }
       }
 
-      await db
-         .update(pumpTable)
-         .set(updateData)
-         .where(eq(pumpTable.id, Number(productId)))
+      await db.update(pumpTable).set(updateData).where(eq(pumpTable.id, productId))
 
       return NextResponse.json({ success: true })
    } catch (error) {
@@ -70,16 +85,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
    try {
-      const { id } = await params
-      logger.debug('Deleting product', { id })
-
-      if (!id) {
+      const { id: productId } = await params
+      if (!productId) {
          return NextResponse.json({ error: 'Product ID is required' }, { status: 400 })
-      }
-
-      const productId = Number(id)
-      if (Number.isNaN(productId) || productId <= 0) {
-         return NextResponse.json({ error: 'Invalid product ID' }, { status: 400 })
       }
 
       const [existingProduct] = await db

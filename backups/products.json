@@ -1,10 +1,7 @@
 [
    {
-      "categorySlug": "centrifugal-pumps",
-      "id": 10,
       "title": "Taifu TCP130 Centrifugal Pump 0.5HP – 100% Copper Winding",
       "slug": "taifu-tcp130-centrifugal-pump-0.5hp-100percent-copper-winding",
-      "categoryId": 1,
       "description": "0.5HP Centrifugal Pump\r\nDurable and efficient for household and agricultural applications.\r\n100% copper winding ensures reliability and long life.",
       "imageUrl": "/centrifugal/Taifu TCP130.webp",
       "price": 17000,
@@ -15,23 +12,21 @@
       "isFeatured": false,
       "specs": [
          {
+            "id": 0,
             "field": "Horsepower",
             "value": "0.5HP"
          },
          {
+            "id": 1,
             "field": "Winding",
             "value": "100% Copper"
          }
       ],
-      "createdAt": "2025-09-26T12:28:59.278Z",
-      "updatedAt": "2025-09-27T05:02:37.572Z"
+      "categoryName": "Centrifugal Pumps"
    },
    {
-      "categorySlug": "centrifugal-pumps",
-      "id": 11,
       "title": "Taifu TCP158 Centrifugal Pump 1.0HP – 100% Copper Winding",
       "slug": "taifu-tcp158-centrifugal-pump-1.0hp-100percent-copper-winding",
-      "categoryId": 1,
       "description": "1.0HP Centrifugal Pump\r\nRobust construction suitable for continuous operation.\r\n100% copper winding for enhanced motor life.",
       "imageUrl": "/centrifugal/Taifu Tcp 158.webp",
       "price": 22999,
@@ -42,23 +37,21 @@
       "isFeatured": false,
       "specs": [
          {
+            "id": 0,
             "field": "Horsepower",
             "value": "1.0HP"
          },
          {
+            "id": 1,
             "field": "Winding",
             "value": "100% Copper"
          }
       ],
-      "createdAt": "2025-09-26T12:28:59.278Z",
-      "updatedAt": "2025-09-27T05:03:09.469Z"
+      "categoryName": "Centrifugal Pumps"
    },
    {
-      "categorySlug": "pressure-pumps",
-      "id": 14,
       "title": "Taifu QB70 Peripheral Pump 0.75HP – 100% Copper Winding",
       "slug": "taifu-qb70-peripheral-pump-0-75hp",
-      "categoryId": 3,
       "description": "Peripheral Pump 0.75HP\nReliable for domestic use.\n100% copper winding for longer motor life.\nCompact, durable, and efficient design.",
       "imageUrl": "/centrifugal/Taifu QB70.webp",
       "price": 16999,
@@ -69,23 +62,21 @@
       "isFeatured": false,
       "specs": [
          {
+            "id": 0,
             "field": "Horsepower",
             "value": "0.75HP"
          },
          {
+            "id": 1,
             "field": "Winding",
             "value": "100% Copper"
          }
       ],
-      "createdAt": "2025-09-26T12:28:59.278Z",
-      "updatedAt": "2025-09-26T12:28:59.278Z"
+      "categoryName": "Pressure Pumps"
    },
    {
-      "categorySlug": "centrifugal-pumps",
-      "id": 12,
       "title": "Taifu TCP200 Centrifugal Pump 2.0HP – 100% Copper Winding",
       "slug": "taifu-tcp200-centrifugal-pump-2.0hp-100percent-copper-winding",
-      "categoryId": 1,
       "description": "2.0HP Centrifugal Pump\r\nDurable design for continuous duty.\r\n100% copper winding ensures long life and efficiency.\r\nIdeal for water supply, irrigation, and pressure boosting.",
       "imageUrl": "/centrifugal/taifu_tcp200.webp",
       "price": 32999,
@@ -96,23 +87,21 @@
       "isFeatured": false,
       "specs": [
          {
+            "id": 0,
             "field": "Horsepower",
             "value": "2.0HP"
          },
          {
+            "id": 1,
             "field": "Winding",
             "value": "100% Copper"
          }
       ],
-      "createdAt": "2025-09-26T12:28:59.278Z",
-      "updatedAt": "2025-09-27T05:03:24.611Z"
+      "categoryName": "Centrifugal Pumps"
    },
    {
-      "categorySlug": "pressure-pumps",
-      "id": 13,
       "title": "Taifu QB60 Peripheral Pump 0.5HP – 100% Copper Winding",
       "slug": "taifu-qb60-peripheral-pump-0.5hp-100percent-copper-winding",
-      "categoryId": 3,
       "description": "Peripheral Pump 0.5HP\r\nReliable domestic pump for small-scale water transfer.\r\n100% copper winding for durability and efficiency.",
       "imageUrl": "/centrifugal/taifu QB60.jpg",
       "price": 11499,
@@ -123,23 +112,21 @@
       "isFeatured": false,
       "specs": [
          {
+            "id": 0,
             "field": "Horsepower",
             "value": "0.5HP"
          },
          {
+            "id": 1,
             "field": "Winding",
             "value": "100% Copper"
          }
       ],
-      "createdAt": "2025-09-26T12:28:59.278Z",
-      "updatedAt": "2025-09-27T05:03:56.864Z"
+      "categoryName": "Pressure Pumps"
    },
    {
-      "categorySlug": "pressure-pumps",
-      "id": 15,
       "title": "Taifu QB80 Peripheral Pump 1.0HP – 100% Copper Winding",
       "slug": "taifu-qb80-peripheral-pump-1.0hp-100percent-copper-winding",
-      "categoryId": 3,
       "description": "Peripheral Pump 1.0HP\r\nConnection 1\"×1\"  Max Suction: 8M  45 L/min\r\n1HP QB80 – Peripheral Pump with 100% copper winding.\r\nReliable for domestic water transfer with good suction and flow rates.",
       "imageUrl": "/centrifugal/Taifu QB80.webp",
       "price": 18499,
@@ -150,35 +137,36 @@
       "isFeatured": false,
       "specs": [
          {
+            "id": 0,
             "field": "Horsepower",
             "value": "1.0HP"
          },
          {
+            "id": 1,
             "field": "Connection",
             "value": "1\"×1\""
          },
          {
+            "id": 2,
             "field": "Max Suction",
             "value": "8M"
          },
          {
+            "id": 3,
             "field": "Flow Rate",
             "value": "45 L/min"
          },
          {
+            "id": 4,
             "field": "Winding",
             "value": "100% Copper"
          }
       ],
-      "createdAt": "2025-09-26T12:28:59.278Z",
-      "updatedAt": "2025-09-27T05:04:25.840Z"
+      "categoryName": "Pressure Pumps"
    },
    {
-      "categorySlug": "pressure-pumps",
-      "id": 16,
       "title": "Taifu QB90 Peripheral Pump 1.2HP – 100% Copper Winding",
       "slug": "taifu-qb90-peripheral-pump-1.2hp-100percent-copper-winding",
-      "categoryId": 3,
       "description": "1.2HP Peripheral Pump\r\nConnection 1\"x 1\"  Max Suction: 8M  Flow Rate: 42 L/M  Max Head: 75M\r\nProduced by advanced high-speed punching line.\r\nAdopting DE carbon mechanical seal, prolong service life 170%.\r\nClass-F copper wire, motor heat resistance up to 155°C.\r\nAnti-rust, wear-resistant and high precision.\r\n100% rotor fault detection test.\r\nWelded stainless steel rotor shaft.\r\nThickened and reinforced, stable and durable.\r\nCooling sink area increased by 20%.\r\nThickness of motor body and foot increased by 20%.\r\nAdopting Japanese-imported casting line.\r\nHigh strength and corrosion resistant.\r\n100% electrophoresis treatment for anti-rust.\r\nAnti-strike and anti-aging.\r\nReinforcing nylon material.\r\nAnti-drop test 0.8 meters withstand 500g.\r\nBrass.",
       "imageUrl": "/centrifugal/Taifu QB90.webp",
       "price": 21999,
@@ -189,39 +177,41 @@
       "isFeatured": false,
       "specs": [
          {
+            "id": 0,
             "field": "Horsepower",
             "value": "1.2HP"
          },
          {
+            "id": 1,
             "field": "Connection",
             "value": "1\"x 1\""
          },
          {
+            "id": 2,
             "field": "Max Suction",
             "value": "8M"
          },
          {
+            "id": 3,
             "field": "Flow Rate",
             "value": "42 L/M"
          },
          {
+            "id": 4,
             "field": "Max Head",
             "value": "75M"
          },
          {
+            "id": 5,
             "field": "Winding",
             "value": "100% Copper"
          }
       ],
-      "createdAt": "2025-09-26T12:28:59.278Z",
-      "updatedAt": "2025-09-27T05:04:52.308Z"
+      "categoryName": "Pressure Pumps"
    },
    {
-      "categorySlug": "self-priming-pumps",
-      "id": 17,
       "title": "Pioneer HKS60 Self Priming Pump",
       "slug": "pioneer-hks60-self-priming-pump",
-      "categoryId": 4,
       "description": "0.5HP\r\nApplication: Suitable for use with clean water that does not contain abrasive particles and liquids that are not chemically aggressive towards the materials.\r\nCompact, reliable, and easy to use for domestic applications such as water distribution, garden irrigation, and drawing water from tanks even when air or water may be present.\r\nComes complete with a flap-check valve.\r\nOperating conditions: liquid temperature up to 60℃, ambient temperature up to 40℃, total suction lift up to 9m.",
       "imageUrl": "/centrifugal/pioneer_hks60.webp",
       "price": 13500,
@@ -232,27 +222,26 @@
       "isFeatured": false,
       "specs": [
          {
+            "id": 0,
             "field": "Horsepower",
             "value": "0.5HP"
          },
          {
+            "id": 1,
             "field": "Total Head",
             "value": "30 meter"
          },
          {
+            "id": 2,
             "field": "Total Suction Lift",
             "value": "9m"
          }
       ],
-      "createdAt": "2025-09-26T12:28:59.278Z",
-      "updatedAt": "2025-09-27T05:05:28.838Z"
+      "categoryName": "Self-Priming Pumps"
    },
    {
-      "categorySlug": "self-priming-pumps",
-      "id": 18,
       "title": "Pioneer HKS70 Self Priming Pump",
       "slug": "pioneer-hks70-self-priming-pump",
-      "categoryId": 4,
       "description": "0.7HP\r\nApplication: Suitable for use with clean water that does not contain abrasive particles and liquids that are not chemically aggressive towards the materials.\r\nCompact, reliable, and easy to use in domestic applications such as water distribution, garden irrigation, and drawing water from tanks even when air may be present.\r\nComes complete with a flap-check valve.\r\nOperating conditions:\r\nLiquid temperature up to 60℃\r\nAmbient temperature up to 40℃\r\nTotal suction lift up to 9m.",
       "imageUrl": "/centrifugal/Pioneer HKS70.webp",
       "price": 18500,
@@ -263,23 +252,21 @@
       "isFeatured": false,
       "specs": [
          {
+            "id": 0,
             "field": "Horsepower",
             "value": "0.7HP"
          },
          {
+            "id": 1,
             "field": "Total Suction Lift",
             "value": "9m"
          }
       ],
-      "createdAt": "2025-09-26T12:28:59.278Z",
-      "updatedAt": "2025-09-27T05:05:46.603Z"
+      "categoryName": "Self-Priming Pumps"
    },
    {
-      "categorySlug": "centrifugal-pumps",
-      "id": 19,
       "title": "Pedrollo PKm 60 (Made in Italy)",
       "slug": "pedrollo-pkm-60-made-in-italy",
-      "categoryId": 1,
       "description": "Peripheral impeller pump\nDesigned to transfer clean water free from abrasive particles and liquids that will not damage the pump’s components.\nReliable, easy to operate, and cost-effective.\nIdeal for domestic applications, specifically for gardens and orchards, in combination with small autoclave tanks.",
       "imageUrl": "/centrifugal/Pedrollo PKm 60.webp",
       "price": 28500,
@@ -290,63 +277,71 @@
       "isFeatured": false,
       "specs": [
          {
+            "id": 0,
             "field": "Flow Rate",
             "value": "up to 40 l/min (2.4 m³/h)"
          },
          {
+            "id": 1,
             "field": "Maximum Head",
             "value": "up to 40m"
          },
          {
+            "id": 2,
             "field": "Manometric Suction Head",
             "value": "up to 8m"
          },
          {
+            "id": 3,
             "field": "Liquid Temperature",
             "value": "-10°C to +60°C"
          },
          {
+            "id": 4,
             "field": "Ambient Temperature",
             "value": "up to +50°C"
          },
          {
+            "id": 5,
             "field": "Maximum Working Pressure",
             "value": "6 bar"
          },
          {
+            "id": 6,
             "field": "Motor",
             "value": "2 poles"
          },
          {
+            "id": 7,
             "field": "Ingress Protection Rating",
             "value": "IP X4"
          },
          {
+            "id": 8,
             "field": "Pump Housing",
             "value": "Cast iron"
          },
          {
+            "id": 9,
             "field": "Impeller",
             "value": "Brass"
          },
          {
+            "id": 10,
             "field": "Shaft",
             "value": "Stainless steel AISI 431"
          },
          {
+            "id": 11,
             "field": "Motor Bracket",
             "value": "Aluminium with brass cover"
          }
       ],
-      "createdAt": "2025-09-27T05:32:41.846Z",
-      "updatedAt": "2025-09-27T05:32:41.846Z"
+      "categoryName": "Centrifugal Pumps"
    },
    {
-      "categorySlug": "pressure-pumps",
-      "id": 25,
       "title": "1.0 HP Espa Prisma 15 4M Pressure Pump",
       "slug": "1-0hp-espa-prisma-15-4m-pressure-pump",
-      "categoryId": 3,
       "description": "Prisma 15 series\n4M version: Pressure range 40-5 bar. Materials same as other Prisma models.\nSelf-priming to 2 m, IPX5 protection, 1\" connections.\nMotor power P2: 0.55 kW.",
       "imageUrl": "/centrifugal/espa_0.8hp.png",
       "price": 56000,
@@ -357,47 +352,51 @@
       "isFeatured": false,
       "specs": [
          {
+            "id": 0,
             "field": "Horsepower",
             "value": "1.0HP"
          },
          {
+            "id": 1,
             "field": "Motor Power (P2)",
             "value": "0.55 kW"
          },
          {
+            "id": 2,
             "field": "Voltage",
             "value": "230 V"
          },
          {
+            "id": 3,
             "field": "Protection",
             "value": "IPX5"
          },
          {
+            "id": 4,
             "field": "Max Suction",
             "value": "2 m"
          },
          {
+            "id": 5,
             "field": "Max Working Pressure",
             "value": "6 bar"
          },
          {
+            "id": 6,
             "field": "Discharge Size",
             "value": "1″"
          },
          {
+            "id": 7,
             "field": "Suction Size",
             "value": "1″"
          }
       ],
-      "createdAt": "2025-09-27T06:03:33.618Z",
-      "updatedAt": "2025-09-27T06:03:33.618Z"
+      "categoryName": "Pressure Pumps"
    },
    {
-      "categorySlug": "centrifugal-pumps",
-      "id": 20,
       "title": "Pedrollo CP158 ST6 Centrifugal Electric Pump (Stainless Steel, 3-Phase)",
       "slug": "pedrollo-cp158-st6-centrifugal-electric-pump",
-      "categoryId": 1,
       "description": "Stainless steel centrifugal pump, 3-phase CP-ST6 series\nSuitable for clean water and non-aggressive liquids.\nAll wet parts in stainless steel AISI 316L for high corrosion resistance.\nUse: domestic, agricultural, industrial water transfer.\nManometric suction lift up to 7 m; liquid temperature -10 °C to +90 °C; ambient max +40 °C.\nProtection: IP X4. Continuous duty (S1).",
       "imageUrl": "/centrifugal/Pedrolla 158.webp",
       "price": 19000,
@@ -408,60 +407,67 @@
       "isFeatured": false,
       "specs": [
          {
+            "id": 0,
             "field": "Phase",
             "value": "3-phase"
          },
          {
+            "id": 1,
             "field": "Horsepower",
             "value": "1 HP"
          },
          {
+            "id": 2,
             "field": "FlowRate",
             "value": "10 ÷ 120 l/min"
          },
          {
+            "id": 3,
             "field": "HeadRange",
             "value": "35.5 ÷ 19 m"
          },
          {
+            "id": 4,
             "field": "Max Working Pressure",
             "value": "6 bar"
          },
          {
+            "id": 5,
             "field": "Manometric Suction",
             "value": "7 m"
          },
          {
+            "id": 6,
             "field": "Liquid Temp Range",
             "value": "-10 °C to +90 °C"
          },
          {
+            "id": 7,
             "field": "Ambient Temp Max",
             "value": "+40 °C"
          },
          {
+            "id": 8,
             "field": "Pump Housing Material",
             "value": "Stainless Steel AISI 316L"
          },
          {
+            "id": 9,
             "field": "Impeller Material",
             "value": "Stainless Steel AISI 316L"
          },
          {
+            "id": 10,
             "field": "Shaft Material",
             "value": "Stainless Steel 316L"
          }
       ],
-      "createdAt": "2025-09-27T05:32:41.846Z",
-      "updatedAt": "2025-09-27T05:32:41.846Z"
+      "categoryName": "Centrifugal Pumps"
    },
    {
-      "categorySlug": "pressure-pumps",
-      "id": 21,
       "title": "0.5 HP Espa Prisma 15 2M Pressure Pump",
       "slug": "0-5hp-espa-prisma-15-2m-pressure-pump",
-      "categoryId": 3,
-      "description": "Prisma 15 series\nHorizontal multistage centrifugal pump.\nSelf-priming up to 2 m.\nDischarge and suction connection: 1\".\nMaterials: Pump body & impellers in AISI 304, shaft in AISI 431, diffusers technopolymer, mechanical seal aluminium-graphite.\nProtection: IPX5. Max water temperature: 40°C.",
+      "description": "Prisma 15 series\nHorizontal multistage centrifugal pump.\nSelf-priming up to 2 m.\nDischarge and suction connection: 1\".\nMaterials: Pump body \u0026 impellers in AISI 304, shaft in AISI 431, diffusers technopolymer, mechanical seal aluminium-graphite.\nProtection: IPX5. Max water temperature: 40°C.",
       "imageUrl": "/centrifugal/espa_0.8hp.png",
       "price": 56000,
       "discountPrice": null,
@@ -471,47 +477,51 @@
       "isFeatured": false,
       "specs": [
          {
+            "id": 0,
             "field": "Horsepower",
             "value": "0.5HP"
          },
          {
+            "id": 1,
             "field": "Motor Power (P2)",
             "value": "0.24 kW"
          },
          {
+            "id": 2,
             "field": "Voltage",
             "value": "230 V"
          },
          {
+            "id": 3,
             "field": "Protection",
             "value": "IPX5"
          },
          {
+            "id": 4,
             "field": "Max Suction",
             "value": "2 m"
          },
          {
+            "id": 5,
             "field": "Max Working Pressure",
             "value": "6 bar"
          },
          {
+            "id": 6,
             "field": "Discharge Size",
             "value": "1″"
          },
          {
+            "id": 7,
             "field": "Suction Size",
             "value": "1″"
          }
       ],
-      "createdAt": "2025-09-27T06:03:33.618Z",
-      "updatedAt": "2025-09-27T06:03:33.618Z"
+      "categoryName": "Pressure Pumps"
    },
    {
-      "categorySlug": "pressure-pumps",
-      "id": 22,
       "title": "0.5 HP Espa Prisma 15 2M Pressure Pump (Made in China)",
       "slug": "0-5hp-espa-prisma-15-2m-pressure-pump-made-in-china",
-      "categoryId": 3,
       "description": "Prisma 15 2M (Made in China)\nSame specifications as original model but sourced from China.",
       "imageUrl": "/centrifugal/espa_0.8hp.png",
       "price": 40000,
@@ -522,51 +532,56 @@
       "isFeatured": false,
       "specs": [
          {
+            "id": 0,
             "field": "Horsepower",
             "value": "0.5HP"
          },
          {
+            "id": 1,
             "field": "Motor Power (P2)",
             "value": "0.24 kW"
          },
          {
+            "id": 2,
             "field": "Voltage",
             "value": "230 V"
          },
          {
+            "id": 3,
             "field": "Protection",
             "value": "IPX5"
          },
          {
+            "id": 4,
             "field": "Max Suction",
             "value": "2 m"
          },
          {
+            "id": 5,
             "field": "Max Working Pressure",
             "value": "6 bar"
          },
          {
+            "id": 6,
             "field": "Discharge Size",
             "value": "1″"
          },
          {
+            "id": 7,
             "field": "Suction Size",
             "value": "1″"
          },
          {
+            "id": 8,
             "field": "Origin",
             "value": "Made in China"
          }
       ],
-      "createdAt": "2025-09-27T06:03:33.618Z",
-      "updatedAt": "2025-09-27T06:03:33.618Z"
+      "categoryName": "Pressure Pumps"
    },
    {
-      "categorySlug": "pressure-pumps",
-      "id": 23,
       "title": "0.8 HP Espa Prisma 15 3M Pressure Pump",
       "slug": "0-8hp-espa-prisma-15-3m-pressure-pump",
-      "categoryId": 3,
       "description": "Prisma 15 series\n3M version: Higher head (30-5 bar range) with same materials and design features.\nSelf-priming to 2 m, IPX5, 1\" suction/discharge.\nMotor power P2: 0.37 kW.",
       "imageUrl": "/centrifugal/espa_0.8hp.png",
       "price": 56000,
@@ -577,47 +592,51 @@
       "isFeatured": false,
       "specs": [
          {
+            "id": 0,
             "field": "Horsepower",
             "value": "0.8HP"
          },
          {
+            "id": 1,
             "field": "Motor Power (P2)",
             "value": "0.37 kW"
          },
          {
+            "id": 2,
             "field": "Voltage",
             "value": "230 V"
          },
          {
+            "id": 3,
             "field": "Protection",
             "value": "IPX5"
          },
          {
+            "id": 4,
             "field": "Max Suction",
             "value": "2 m"
          },
          {
+            "id": 5,
             "field": "Max Working Pressure",
             "value": "6 bar"
          },
          {
+            "id": 6,
             "field": "Discharge Size",
             "value": "1″"
          },
          {
+            "id": 7,
             "field": "Suction Size",
             "value": "1″"
          }
       ],
-      "createdAt": "2025-09-27T06:03:33.618Z",
-      "updatedAt": "2025-09-27T06:03:33.618Z"
+      "categoryName": "Pressure Pumps"
    },
    {
-      "categorySlug": "pressure-pumps",
-      "id": 26,
       "title": "1.0 HP Espa Prisma 15 4M Pressure Pump (Made in China)",
       "slug": "1-0hp-espa-prisma-15-4m-pressure-pump-made-in-china",
-      "categoryId": 3,
       "description": "Prisma 15 4M (Made in China)\nSame performance and build specs as original 4M model.",
       "imageUrl": "/centrifugal/espa_0.8hp.png",
       "price": 40000,
@@ -628,52 +647,57 @@
       "isFeatured": false,
       "specs": [
          {
+            "id": 0,
             "field": "Horsepower",
             "value": "1.0HP"
          },
          {
+            "id": 1,
             "field": "Motor Power (P2)",
             "value": "0.55 kW"
          },
          {
+            "id": 2,
             "field": "Voltage",
             "value": "230 V"
          },
          {
+            "id": 3,
             "field": "Protection",
             "value": "IPX5"
          },
          {
+            "id": 4,
             "field": "Max Suction",
             "value": "2 m"
          },
          {
+            "id": 5,
             "field": "Max Working Pressure",
             "value": "6 bar"
          },
          {
+            "id": 6,
             "field": "Discharge Size",
             "value": "1″"
          },
          {
+            "id": 7,
             "field": "Suction Size",
             "value": "1″"
          },
          {
+            "id": 8,
             "field": "Origin",
             "value": "Made in China"
          }
       ],
-      "createdAt": "2025-09-27T06:03:33.618Z",
-      "updatedAt": "2025-09-27T06:03:33.618Z"
+      "categoryName": "Pressure Pumps"
    },
    {
-      "categorySlug": "pressure-pumps",
-      "id": 24,
       "title": "0.8 HP Espa Prisma 15 3M Pressure Pump (Made in China)",
       "slug": "0-8hp-espa-prisma-15-3m-pressure-pump-made-in-china",
-      "categoryId": 3,
-      "description": "Prisma 15 3M (Made in China)\nSame hydraulic & electrical specs as original 3M model.",
+      "description": "Prisma 15 3M (Made in China)\nSame hydraulic \u0026 electrical specs as original 3M model.",
       "imageUrl": "/centrifugal/espa_0.8hp.png",
       "price": 40000,
       "discountPrice": null,
@@ -683,43 +707,51 @@
       "isFeatured": false,
       "specs": [
          {
+            "id": 0,
             "field": "Horsepower",
             "value": "0.8HP"
          },
          {
+            "id": 1,
             "field": "Motor Power (P2)",
             "value": "0.37 kW"
          },
          {
+            "id": 2,
             "field": "Voltage",
             "value": "230 V"
          },
          {
+            "id": 3,
             "field": "Protection",
             "value": "IPX5"
          },
          {
+            "id": 4,
             "field": "Max Suction",
             "value": "2 m"
          },
          {
+            "id": 5,
             "field": "Max Working Pressure",
             "value": "6 bar"
          },
          {
+            "id": 6,
             "field": "Discharge Size",
             "value": "1″"
          },
          {
+            "id": 7,
             "field": "Suction Size",
             "value": "1″"
          },
          {
+            "id": 8,
             "field": "Origin",
             "value": "Made in China"
          }
       ],
-      "createdAt": "2025-09-27T06:03:33.618Z",
-      "updatedAt": "2025-09-27T06:03:33.618Z"
+      "categoryName": "Pressure Pumps"
    }
 ]

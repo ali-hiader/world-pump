@@ -6,9 +6,9 @@ interface CartStore {
   cartProducts: CartItemType[]
   setCartProducts: (products: CartItemType[]) => void
   optimisticAdd: (product: CartItemType, userId: string) => void
-  optimisticIncrease: (productId: number, userId: string) => void
-  optimisticDecrease: (productId: number, userId: string) => void
-  optimisticRemove: (productId: number, userId: string) => void
+  optimisticIncrease: (productId: string, userId: string) => void
+  optimisticDecrease: (productId: string, userId: string) => void
+  optimisticRemove: (productId: string, userId: string) => void
   optimisticClear: (userId: string) => void
   rollback: (products: CartItemType[]) => void
   getTotalItems: (userId: string) => number
@@ -35,14 +35,14 @@ const useCartStore = create<CartStore>((set, get) => ({
         : { cartProducts: [...state.cartProducts, product] }
     }),
 
-  optimisticIncrease: (productId: number, userId: string) =>
+  optimisticIncrease: (productId: string, userId: string) =>
     set((state) => ({
       cartProducts: state.cartProducts.map((p) =>
         p.id === productId && p.addedBy === userId ? { ...p, quantity: p.quantity + 1 } : p,
       ),
     })),
 
-  optimisticDecrease: (productId: number, userId: string) =>
+  optimisticDecrease: (productId: string, userId: string) =>
     set((state) => {
       const product = state.cartProducts.find((p) => p.id === productId && p.addedBy === userId)
       if (!product) return state
@@ -59,7 +59,7 @@ const useCartStore = create<CartStore>((set, get) => ({
           }
     }),
 
-  optimisticRemove: (productId: number, userId: string) =>
+  optimisticRemove: (productId: string, userId: string) =>
     set((state) => ({
       cartProducts: state.cartProducts.filter(
         (p) => !(p.id === productId && p.addedBy === userId),

@@ -38,7 +38,7 @@ const bodySchema = z.object({
    products: z
       .array(
          z.object({
-            id: z.number(),
+            id: z.string().min(1),
             title: z.string(),
             imageUrl: z.string().optional(),
             price: z.number().nonnegative(),
@@ -122,8 +122,8 @@ export async function POST(req: NextRequest) {
       const totalAmount = products.reduce((sum, p) => sum + p.price * p.quantity, 0)
 
       // Insert addresses
-      let shippingAddressId: number | null = null
-      let billingAddressId: number | null = null
+      let shippingAddressId: string | null = null
+      let billingAddressId: string | null = null
 
       if (addresses) {
          const shippingInsert = await db

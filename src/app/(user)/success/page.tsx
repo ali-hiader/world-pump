@@ -23,8 +23,8 @@ async function SuccessPage({ searchParams }: SuccessPageProps) {
    const orderId = searchParams.orderId
    const method = searchParams.method
 
-   let title = 'Order Confirmed!'
-   let detail = 'Your new look is on the way'
+   let title = 'Order Placed!'
+   let detail = 'We will contact you to confirm.'
    const meta: Array<{ label: string; value: string }> = []
 
    try {
@@ -44,10 +44,10 @@ async function SuccessPage({ searchParams }: SuccessPageProps) {
 
    return (
       <main className="px-4 sm:px-[5%] w-full flex flex-col items-center mt-16 max-w-[1600px] mx-auto min-h-96">
-         <h1 className="relative w-full  text-center headingFont text-4xl md:text-6xl text-gray-900 font-bold">
+         <h1 className="relative w-full  text-center headingFont text-3xl md:text-4xl text-gray-900 font-bold">
             {title}
          </h1>
-         <p className="text-xl w-full text-center mt-2">{detail}</p>
+         <p className="text-lg w-full text-center mt-2">{detail}</p>
 
          {meta.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6 max-w-3xl w-full">

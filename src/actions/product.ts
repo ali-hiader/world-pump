@@ -55,9 +55,9 @@ export async function fetchProductBySlug(slug: string) {
    }
 }
 
-export async function fetchProductById(id: number) {
-   if (!id || typeof id !== 'number' || id <= 0) {
-      throw new ValidationError('Invalid product ID')
+export async function fetchProductById(id: string) {
+   if (!id) {
+      throw new ValidationError('Product ID is required.')
    }
 
    try {
@@ -91,9 +91,9 @@ export async function fetchFeaturedProducts(limit: number = 6) {
    }
 }
 
-export async function fetchRelatedProducts(categoryId: number, limit: number = 4) {
-   if (!categoryId || categoryId <= 0) {
-      throw new ValidationError('Invalid category ID')
+export async function fetchRelatedProducts(categoryId: string, limit: number = 4) {
+   if (!categoryId) {
+      throw new ValidationError('Category ID is required.')
    }
    if (limit <= 0 || limit > 100) {
       throw new ValidationError('Limit must be between 1 and 100')

@@ -66,10 +66,10 @@ export default function Footer() {
                <h4 className="text-lg font-semibold text-white mb-4">Get in Touch</h4>
                <ul className="space-y-3 text-sm">
                   <li className="flex items-center gap-2">
-                     <Phone className="w-4 h-4 text-white" /> +92 300 1234567
+                     <Phone className="w-4 h-4 text-white" /> +92 306 4403039
                   </li>
                   <li className="flex items-center gap-2">
-                     <Mail className="w-4 h-4 text-white" /> info@worldpumps.com
+                     <Mail className="w-4 h-4 text-white" /> worldpumps321@gmail.com
                   </li>
                   <li className="flex items-center gap-2">
                      <Facebook className="w-4 h-4 text-white" />

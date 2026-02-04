@@ -24,10 +24,10 @@ interface Props {
 export async function GET(request: NextRequest, { params }: Props) {
    try {
       const resolvedParams = await params
-      const orderId = parseInt(resolvedParams.id)
+      const orderId = resolvedParams.id
 
-      if (isNaN(orderId)) {
-         return NextResponse.json({ error: 'Invalid order ID' }, { status: 400 })
+      if (!orderId) {
+         return NextResponse.json({ error: 'Order ID is required.' }, { status: 400 })
       }
 
       // Fetch order details
@@ -113,10 +113,10 @@ export async function PATCH(request: NextRequest, { params }: Props) {
       }
 
       const resolvedParams = await params
-      const orderId = parseInt(resolvedParams.id)
+      const orderId = resolvedParams.id
 
-      if (isNaN(orderId)) {
-         return NextResponse.json({ error: 'Invalid order ID' }, { status: 400 })
+      if (!orderId) {
+         return NextResponse.json({ error: 'Order ID is required.' }, { status: 400 })
       }
 
       const body = await request.json()

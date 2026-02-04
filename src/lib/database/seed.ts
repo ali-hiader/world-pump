@@ -39,7 +39,6 @@ export async function seedCategories() {
             name: category.name,
             slug: category.slug,
             isFeatured: category.isFeatured,
-            imageUrl: category.imageUrl,
             description: category.description,
          })),
       )
@@ -56,19 +55,30 @@ export async function seedCategories() {
 }
 
 export async function seedPumps() {
-   const formattedPumps = pumpsSeedData.map((pump) => ({
-      title: pump.title,
-      slug: pump.slug,
-      categoryId: pump.categoryId,
-      description: pump.description,
-      imageUrl: pump.imageUrl,
-      price: pump.price,
-      discountPrice: null,
-      stock: pump.stock ?? 0,
-      brand: pump.brand ?? null,
-      isFeatured: pump.isFeatured ?? false,
-      specs: pump.specs,
-   }))
+   const categories = await db.select().from(categoryTable)
+   const categoryIdByName = new Map(categories.map((c) => [c.name, c.id]))
+
+   const formattedPumps = pumpsSeedData.map((pump) => {
+      const categoryId = categoryIdByName.get(pump.categoryName)
+      if (!categoryId) {
+         throw new Error(`Category not found for pump: ${pump.slug} (${pump.categoryName})`)
+      }
+
+      return {
+         title: pump.title,
+         slug: pump.slug,
+         categoryId,
+         description: pump.description,
+         imageUrl: pump.imageUrl,
+         price: pump.price,
+         discountPrice: pump.discountPrice ?? null,
+         stock: pump.stock ?? 0,
+         brand: pump.brand ?? null,
+         status: (pump.status ?? 'active') as 'active' | 'inactive',
+         isFeatured: pump.isFeatured ?? false,
+         specs: pump.specs,
+      }
+   })
 
    try {
       logger.info('Seeding products', { count: formattedPumps.length })
@@ -97,12 +107,13 @@ export async function seedAccessories() {
             accessoriesSeed.map((acc) => ({
                title: acc.title,
                slug: acc.slug,
-               description: acc.description || '',
-               imageUrl: acc.imageUrl || '',
+               description: acc.description ?? '',
+               imageUrl: acc.imageUrl ?? '',
                price: acc.price,
-               discountPrice: acc.discountPrice || null,
-               stock: acc.stock || 0,
-               brand: acc.brand || null,
+               discountPrice: acc.discountPrice ?? null,
+               stock: acc.stock ?? 0,
+               brand: acc.brand ?? null,
+               status: (acc.status ?? 'active') as 'active' | 'inactive',
                specs: acc.specs,
             })),
          )
@@ -110,7 +121,7 @@ export async function seedAccessories() {
 
       logger.success('Accessories inserted', { count: insertedAccessories.length })
 
-      const relations: { productId: number; accessoryId: number }[] = []
+      const relations: { productId: string; accessoryId: string }[] = []
 
       insertedAccessories.forEach((acc, idx) => {
          const accessorySeed = accessoriesSeed[idx]
@@ -120,7 +131,7 @@ export async function seedAccessories() {
 
             if (Array.isArray(productIds) && productIds.length > 0) {
                productIds.forEach((productId) => {
-                  if (typeof productId === 'number' && productId > 0) {
+                  if (typeof productId === 'string') {
                      relations.push({ productId, accessoryId: acc.id })
                   }
                })

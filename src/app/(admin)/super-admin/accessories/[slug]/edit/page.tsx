@@ -1,70 +1,69 @@
-'use client'
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
 
-import { useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { ArrowLeft } from 'lucide-react'
 
 import { logger } from '@/lib/logger'
-import { AccessoryType } from '@/lib/types'
-import { fetchAccessoryBySlug } from '@/actions/accessory'
+import { fetchAccessoryBySlug, fetchAccessoryProductIds } from '@/actions/accessory'
+import { fetchAllProducts } from '@/actions/product'
 import AccessoryForm from '@/components/admin/accessory-form'
-import {
-   AdminErrorState,
-   AdminLoadingState,
-   AdminNotFoundState,
-} from '@/components/admin/admin-states'
+import { Button } from '@/components/ui/button'
 
-export default function EditAccessoryPage() {
-   const params = useParams()
-   const accessorySlug = params.slug as string
-   const [accessory, setAccessory] = useState<AccessoryType | null>(null)
-   const [loading, setLoading] = useState(true)
-   const [error, setError] = useState<string>('')
+interface PageProps {
+   params: Promise<{ slug: string }>
+}
 
-   useEffect(() => {
-      async function fetchAccessory() {
-         try {
-            if (!accessorySlug) return
+export async function generateMetadata({ params }: PageProps) {
+   const { slug } = await params
 
-            const accessoryData = await fetchAccessoryBySlug(accessorySlug)
-            if (!accessoryData) {
-               setError('Accessory not found!')
-               return
-            }
-
-            setAccessory(accessoryData)
-         } catch (error) {
-            logger.error('Error fetching accessory', error)
-            setError('Failed to fetch accessory')
-         } finally {
-            setLoading(false)
-         }
+   try {
+      const accessory = await fetchAccessoryBySlug(slug)
+      return {
+         title: accessory ? `Edit ${accessory.title}` : 'Accessory Not Found',
       }
-      fetchAccessory()
-   }, [accessorySlug])
-
-   if (loading) {
-      return <AdminLoadingState message="Loading accessory..." />
+   } catch {
+      return {
+         title: 'Edit Accessory',
+      }
    }
+}
 
-   if (error) {
+export default async function EditAccessoryPage({ params }: PageProps) {
+   const { slug } = await params
+
+   try {
+      const accessory = await fetchAccessoryBySlug(slug)
+
+      if (!accessory) {
+         notFound()
+      }
+
+      const [products, selectedProductIds] = await Promise.all([
+         fetchAllProducts(),
+         fetchAccessoryProductIds(accessory.id),
+      ])
+
       return (
-         <AdminErrorState
-            error={error}
-            backLink="/super-admin/accessories"
-            backLabel="Back to Accessories"
+         <AccessoryForm
+            accessory={accessory}
+            products={products}
+            selectedProductIds={selectedProductIds}
          />
       )
-   }
-
-   if (!accessory) {
+   } catch (error) {
+      logger.error('Error fetching accessory', error)
       return (
-         <AdminNotFoundState
-            message="Accessory not found"
-            backLink="/super-admin/accessories"
-            backLabel="Back to Accessories"
-         />
+         <div className="flex flex-col items-center gap-4 py-10">
+            <p className="text-rose-600 text-xl">Failed to load accessory</p>
+            <div className="flex flex-wrap gap-3">
+               <Link href="/super-admin/accessories">
+                  <Button variant="secondary">
+                     <ArrowLeft className="mr-2 size-4" />
+                     Back to Accessories
+                  </Button>
+               </Link>
+            </div>
+         </div>
       )
    }
-
-   return <AccessoryForm accessory={accessory} />
 }

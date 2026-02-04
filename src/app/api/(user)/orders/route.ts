@@ -7,7 +7,7 @@ import { db } from '@/db'
 import { orderItemTable, orderTable } from '@/db/schema'
 
 export async function GET() {
-   return handleApiError(async () => {
+   try {
       const session = await userAuth()
 
       logger.debug('Fetching orders for user', { email: session.user.email })
@@ -38,5 +38,7 @@ export async function GET() {
       })
 
       return apiSuccess({ orderItems })
-   })
+   } catch (error) {
+      return handleApiError(error)
+   }
 }

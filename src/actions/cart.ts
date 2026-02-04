@@ -16,12 +16,12 @@ import { cartTable, pumpTable } from '@/db/schema'
 const userIdSchema = z.string().min(1, 'User ID is required')
 
 const cartProductSchema = z.object({
-   productId: z.number().int().positive('Must be a positive integer'),
+   productId: z.string().min(1, 'Product ID is required'),
    userId: userIdSchema,
 })
 
 export type CartItemWithProduct = {
-   cartId: number
+   cartId: string
    quantity: number
    addedBy: string
 } & typeof pumpTable.$inferSelect
@@ -46,7 +46,7 @@ async function findCartByUserId(userId: string): Promise<CartItemWithProduct[]> 
 }
 
 async function findCartItem(
-   productId: number,
+   productId: string,
    userId: string,
 ): Promise<typeof cartTable.$inferSelect | undefined> {
    try {
@@ -70,7 +70,7 @@ export async function fetchUserCart(userId: string) {
    }
 }
 
-export async function addToCart(productId: number, userId: string) {
+export async function addToCart(productId: string, userId: string) {
    const validated = cartProductSchema.safeParse({ productId, userId })
    if (!validated.success) {
       throw new ValidationError(validated.error.issues[0]?.message || 'Invalid input')
@@ -101,7 +101,7 @@ export async function addToCart(productId: number, userId: string) {
    }
 }
 
-export async function increaseQuantity(productId: number, userId: string) {
+export async function increaseQuantity(productId: string, userId: string) {
    const validated = cartProductSchema.safeParse({ productId, userId })
    if (!validated.success) {
       throw new ValidationError(validated.error.issues[0]?.message || 'Invalid input')
@@ -129,7 +129,7 @@ export async function increaseQuantity(productId: number, userId: string) {
    }
 }
 
-export async function decreaseQuantity(productId: number, userId: string) {
+export async function decreaseQuantity(productId: string, userId: string) {
    const validated = cartProductSchema.safeParse({ productId, userId })
    if (!validated.success) {
       throw new ValidationError(validated.error.issues[0]?.message || 'Invalid input')
@@ -176,7 +176,7 @@ export async function decreaseQuantity(productId: number, userId: string) {
    }
 }
 
-export async function removeFromCart(productId: number, userId: string) {
+export async function removeFromCart(productId: string, userId: string) {
    const validated = cartProductSchema.safeParse({ productId, userId })
    if (!validated.success) {
       throw new ValidationError(validated.error.issues[0]?.message || 'Invalid input')

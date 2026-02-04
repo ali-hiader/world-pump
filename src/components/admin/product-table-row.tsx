@@ -16,8 +16,8 @@ type UnifiedItem = ProductType | AccessoryType
 interface ProductTableRowProps {
    item: UnifiedItem
    itemType: 'product' | 'accessory'
-   deleting: number | null
-   onDelete: (itemId: number) => void
+   deleting: string | null
+   onDelete: (itemId: string) => void
 }
 
 export default function ProductTableRow({
@@ -52,7 +52,7 @@ export default function ProductTableRow({
                   alt={title || `${itemType} image`}
                   width={80}
                   height={80}
-                  className="rounded-md object-cover flex-shrink-0"
+                  className="rounded-md object-cover shrink-0"
                />
                <div className="flex-1 min-w-0 space-y-2">
                   <div>
@@ -232,8 +232,8 @@ export default function ProductTableRow({
 interface ItemActionsProps {
    item: UnifiedItem
    itemType: 'product' | 'accessory'
-   deleting: number | null
-   onDelete: (itemId: number) => void
+   deleting: string | null
+   onDelete: (itemId: string) => void
 }
 
 function ItemActions({ item, itemType, deleting, onDelete }: ItemActionsProps) {
@@ -247,7 +247,7 @@ function ItemActions({ item, itemType, deleting, onDelete }: ItemActionsProps) {
                <Eye className="h-4 w-4" />
             </Button>
          </Link>
-         <Link href={`${baseUrl}/edit/${item.slug}`}>
+         <Link href={`${baseUrl}/${item.slug}/edit`}>
             <Button variant="ghost" size="sm" title={`Edit ${itemName}`}>
                <Edit className="h-4 w-4" />
             </Button>

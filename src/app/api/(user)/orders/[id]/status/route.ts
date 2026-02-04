@@ -20,9 +20,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       }
 
       const resolvedParams = await params
-      const orderId = parseInt(resolvedParams.id)
-      if (isNaN(orderId)) {
-         return NextResponse.json({ error: 'Invalid order ID' }, { status: 400 })
+      const orderId = resolvedParams.id
+      if (!orderId) {
+         return NextResponse.json({ error: 'Order ID is required.' }, { status: 400 })
       }
 
       const body = await request.json()

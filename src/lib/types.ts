@@ -10,7 +10,7 @@ export type ProductType = InferSelectModel<typeof pumpTable> & {
 export type AccessoryType = InferSelectModel<typeof accessoryTable>
 
 export type CartItemType = InferSelectModel<typeof pumpTable> & {
-   cartId: number
+   cartId: string
    quantity: number
    addedBy: string
 }

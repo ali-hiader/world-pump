@@ -46,12 +46,12 @@ export async function POST(request: NextRequest) {
          }
       }
 
-      const imageUrl = await uploadFormImage(image)
+      const imageUrl = await uploadFormImage(image, 'pumps')
 
       await db.insert(pumpTable).values({
          title,
          slug: createSlug(title),
-         categoryId: Number(categoryId),
+         categoryId: categoryId,
          description,
          imageUrl,
          price: Number(price),
@@ -87,7 +87,7 @@ export async function PUT(request: NextRequest) {
          return NextResponse.json({ error: 'Product id is required' }, { status: 400 })
       }
 
-      const [existing] = await db.select().from(pumpTable).where(eq(pumpTable.id, +productId))
+      const [existing] = await db.select().from(pumpTable).where(eq(pumpTable.id, productId))
       if (!existing) {
          return NextResponse.json({ error: 'Product not found' }, { status: 404 })
       }
@@ -99,7 +99,7 @@ export async function PUT(request: NextRequest) {
       const updatedRows = await db
          .update(pumpTable)
          .set({ status: nextStatus, updatedAt: new Date() })
-         .where(eq(pumpTable.id, +productId))
+         .where(eq(pumpTable.id, productId))
          .returning({ id: pumpTable.id, status: pumpTable.status })
 
       const updated = updatedRows?.[0] ?? null

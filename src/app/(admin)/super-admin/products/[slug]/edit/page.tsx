@@ -1,29 +1,23 @@
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
+import { ArrowLeft } from 'lucide-react'
+
 import { logger } from '@/lib/logger'
-import { isValidId } from '@/lib/utils'
 import { fetchAllCategories } from '@/actions/category'
-import { fetchProductById } from '@/actions/product'
-import { AdminErrorState } from '@/components/admin/admin-states'
+import { fetchProductBySlug } from '@/actions/product'
 import ProductForm from '@/components/admin/product-form'
+import { Button } from '@/components/ui/button'
 
 interface PageProps {
-   params: Promise<{ id: string }>
+   params: Promise<{ slug: string }>
 }
 
 export async function generateMetadata({ params }: PageProps) {
-   const { id } = await params
-
-   if (!isValidId(id)) {
-      return {
-         title: 'Product Not Found',
-      }
-   }
-
-   const productId = Number(id)
+   const { slug } = await params
 
    try {
-      const product = await fetchProductById(productId)
+      const product = await fetchProductBySlug(slug)
       return {
          title: product ? `Edit ${product.title}` : 'Product Not Found',
       }
@@ -35,17 +29,11 @@ export async function generateMetadata({ params }: PageProps) {
 }
 
 export default async function EditProductPage({ params }: PageProps) {
-   const { id } = await params
-
-   if (!isValidId(id)) {
-      notFound()
-   }
-
-   const productId = Number(id)
+   const { slug } = await params
 
    try {
       const [product, categories] = await Promise.all([
-         fetchProductById(productId),
+         fetchProductBySlug(slug),
          fetchAllCategories(),
       ])
 
@@ -57,11 +45,17 @@ export default async function EditProductPage({ params }: PageProps) {
    } catch (error) {
       logger.error('Error fetching product data', error)
       return (
-         <AdminErrorState
-            error="Failed to load product data"
-            backLink="/admin/products"
-            backLabel="Back to Products"
-         />
+         <div className="flex flex-col items-center gap-4 py-10">
+            <p className="text-rose-600 text-xl">Failed to load product</p>
+            <div className="flex flex-wrap gap-3">
+               <Link href="/super-admin/products">
+                  <Button variant="secondary">
+                     <ArrowLeft className="mr-2 size-4" />
+                     Back to Products
+                  </Button>
+               </Link>
+            </div>
+         </div>
       )
    }
 }

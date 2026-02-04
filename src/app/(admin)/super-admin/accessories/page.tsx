@@ -1,7 +1,10 @@
+import Link from 'next/link'
+
+import { PlusIcon } from 'lucide-react'
+
 import { fetchAllAccessories } from '@/actions/accessory'
-import AddItemBtn from '@/components/admin/add-item-btn'
 import ProductTable from '@/components/admin/product-table'
-import Heading from '@/components/client/heading'
+import { Button } from '@/components/ui/button'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,10 +12,18 @@ export default async function AdminAccessoriesPage() {
    const accessories = await fetchAllAccessories()
 
    return (
-      <main className="py-6 px-4 sm:px-[3%] space-y-6 max-w-[2000px] mx-auto">
+      <main className="space-y-6">
          <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center">
-            <Heading title="Manage Accessories" />
-            <AddItemBtn link='"/super-admin/add-accessory"' />
+            <hgroup>
+               <h2 className="text-4xl font-bold tracking-tight headingFont">Accessories</h2>
+               <p className="text-muted-foreground">Create, View, Edit, Delete accessories here.</p>
+            </hgroup>
+            <Link href="/super-admin/accessories/add">
+               <Button className="bg-secondary hover:bg-secondary/90 cursor-pointer">
+                  <PlusIcon className="size-4 fill-white" />
+                  Add Accessory
+               </Button>
+            </Link>
          </div>
          <ProductTable items={accessories} itemType="accessory" />
       </main>

@@ -30,7 +30,7 @@ function Analytics() {
             const data = await response.json()
 
             if (response.ok) {
-               setOrderItems(data.orderItems || [])
+               setOrderItems(data?.data?.orderItems || [])
             } else if (response.status === 401) {
                router.push('/signup')
             } else {
@@ -47,7 +47,7 @@ function Analytics() {
       fetchOrders()
    }, [router])
 
-   const handleStatusUpdate = (orderId: number, newStatus: string) => {
+   const handleStatusUpdate = (orderId: string, newStatus: string) => {
       setOrderItems((prev) =>
          prev.map((orderData) =>
             orderData.order.id === orderId
@@ -180,7 +180,7 @@ function OrderActions({
    onStatusUpdate,
 }: {
    order: OrderType
-   onStatusUpdate: (orderId: number, newStatus: string) => void
+   onStatusUpdate: (orderId: string, newStatus: string) => void
 }) {
    const [isUpdating, setIsUpdating] = useState(false)
    const [error, setError] = useState<string>('')

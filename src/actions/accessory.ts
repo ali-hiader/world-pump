@@ -8,7 +8,7 @@ import { logger } from '@/lib/logger'
 import { db } from '@/db'
 import { accessoryTable, productAccessoryTable } from '@/db/schema'
 
-const accessoryIdSchema = z.number().int().positive('Must be a positive integer')
+const accessoryIdSchema = z.string().min(1, 'Accessory ID is required')
 
 const accessorySlugSchema = z
    .string()
@@ -17,7 +17,7 @@ const accessorySlugSchema = z
 
 const updateAccessoryProductsSchema = z.object({
    accessoryId: accessoryIdSchema,
-   productIds: z.array(accessoryIdSchema),
+   productIds: z.array(z.string().min(1)),
 })
 
 export async function fetchAllAccessories() {
@@ -30,7 +30,7 @@ export async function fetchAllAccessories() {
    }
 }
 
-export async function fetchAccessoryById(id: number) {
+export async function fetchAccessoryById(id: string) {
    const validated = accessoryIdSchema.safeParse(id)
    if (!validated.success) {
       throw new ValidationError(validated.error.issues[0]?.message || 'Invalid accessory ID')
@@ -40,7 +40,7 @@ export async function fetchAccessoryById(id: number) {
       const [accessory] = await db
          .select()
          .from(accessoryTable)
-         .where(eq(accessoryTable.id, validated.data))
+      .where(eq(accessoryTable.id, validated.data))
       if (!accessory) {
          throw new NotFoundError('Accessory not found')
       }
@@ -74,7 +74,7 @@ export async function fetchAccessoryBySlug(slug: string) {
    }
 }
 
-export async function deleteAccessory(id: number) {
+export async function deleteAccessory(id: string) {
    const validated = accessoryIdSchema.safeParse(id)
    if (!validated.success) {
       throw new ValidationError(validated.error.issues[0]?.message || 'Invalid accessory ID')
@@ -95,7 +95,7 @@ export async function deleteAccessory(id: number) {
  * ============================================================================
  */
 
-export async function fetchAccessoryProductIds(accessoryId: number) {
+export async function fetchAccessoryProductIds(accessoryId: string) {
    const validated = accessoryIdSchema.safeParse(accessoryId)
    if (!validated.success) {
       throw new ValidationError(validated.error.issues[0]?.message || 'Invalid accessory ID')
@@ -115,7 +115,7 @@ export async function fetchAccessoryProductIds(accessoryId: number) {
    }
 }
 
-export async function updateAccessoryProducts(accessoryId: number, productIds: number[]) {
+export async function updateAccessoryProducts(accessoryId: string, productIds: string[]) {
    const validated = updateAccessoryProductsSchema.safeParse({ accessoryId, productIds })
    if (!validated.success) {
       throw new ValidationError(validated.error.issues[0]?.message || 'Invalid input')

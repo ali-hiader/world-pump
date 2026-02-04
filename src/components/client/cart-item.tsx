@@ -32,7 +32,7 @@ function CartItem({ product }: Props) {
       }
    }
 
-   async function decQty(productId: number) {
+   async function decQty(productId: string) {
       try {
          await decreaseQuantity(productId)
       } catch {
@@ -42,7 +42,7 @@ function CartItem({ product }: Props) {
       }
    }
 
-   async function deleteProduct(productId: number) {
+   async function deleteProduct(productId: string) {
       try {
          await removeItem(productId)
       } catch {

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { eq } from 'drizzle-orm'
 
+import { deleteImage, extractCloudinaryPublicId } from '@/lib/cloudinary'
 import { logger } from '@/lib/logger'
 import { uploadFormImage } from '@/lib/server'
 import { db } from '@/db'
@@ -10,12 +11,11 @@ import { accessoryTable, productAccessoryTable } from '@/db/schema'
 // PUT: Update accessory
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
    try {
-      const { id } = await params
-      const accessoryId = Number(id)
+      const { id: accessoryId } = await params
 
-      if (isNaN(accessoryId) || accessoryId <= 0) {
+      if (!accessoryId) {
          return NextResponse.json(
-            { success: false, error: 'Invalid accessory ID.' },
+            { success: false, error: 'Accessory ID is required.' },
             { status: 400 },
          )
       }
@@ -35,7 +35,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       const productIdsRaw = formData.get('productIds') as string | null
 
       // Parse productIds
-      let productIds: number[] = []
+      let productIds: string[] = []
       if (productIdsRaw) {
          try {
             productIds = JSON.parse(productIdsRaw)
@@ -85,9 +85,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       if (!productIds || !Array.isArray(productIds)) {
          productIds = []
       }
-      if (!productIds.every((pid) => typeof pid === 'number' && pid > 0)) {
+      if (!productIds.every((pid) => typeof pid === 'string' && pid.trim().length > 0)) {
          return NextResponse.json(
-            { success: false, error: 'All product IDs must be valid numbers.' },
+            { success: false, error: 'All product IDs must be valid strings.' },
             { status: 400 },
          )
       }
@@ -105,10 +105,22 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
          }
       }
 
+      const [existing] = await db
+         .select({ imageUrl: accessoryTable.imageUrl })
+         .from(accessoryTable)
+         .where(eq(accessoryTable.id, accessoryId))
+
+      if (!existing) {
+         return NextResponse.json(
+            { success: false, error: 'Accessory not found.' },
+            { status: 404 },
+         )
+      }
+
       // Handle image upload if a new image is provided
       let imageUrl: string | undefined = undefined
       if (image && image instanceof File && image.size > 0) {
-         imageUrl = await uploadFormImage(image)
+         imageUrl = await uploadFormImage(image, 'accessories')
       }
 
       // Update accessory
@@ -126,6 +138,19 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       }
       if (imageUrl) {
          updateData.imageUrl = imageUrl
+
+         if (existing.imageUrl) {
+            const publicId = extractCloudinaryPublicId(existing.imageUrl)
+            if (publicId) {
+               try {
+                  logger.debug('Deleting Cloudinary image', { publicId })
+                  const deleteResult = await deleteImage(publicId)
+                  logger.debug('Cloudinary delete result', { deleteResult })
+               } catch (imageError) {
+                  logger.warn('Failed to delete Cloudinary image', { error: imageError })
+               }
+            }
+         }
       }
 
       const updated = await db
@@ -146,7 +171,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
          .delete(productAccessoryTable)
          .where(eq(productAccessoryTable.accessoryId, accessoryId))
       if (productIds.length > 0) {
-         const relations = productIds.map((productId: number) => ({
+         const relations = productIds.map((productId: string) => ({
             productId,
             accessoryId,
          }))
@@ -164,12 +189,11 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 // DELETE: Delete accessory
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
    try {
-      const { id } = await params
-      const accessoryId = Number(id)
+      const { id: accessoryId } = await params
 
-      if (isNaN(accessoryId) || accessoryId <= 0) {
+      if (!accessoryId) {
          return NextResponse.json(
-            { success: false, error: 'Invalid accessory ID.' },
+            { success: false, error: 'Accessory ID is required.' },
             { status: 400 },
          )
       }
@@ -185,6 +209,20 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
             { success: false, error: 'Accessory not found.' },
             { status: 404 },
          )
+      }
+
+      if (existingAccessory.imageUrl) {
+         const publicId = extractCloudinaryPublicId(existingAccessory.imageUrl)
+         if (publicId) {
+            try {
+               logger.debug('Deleting Cloudinary image', { publicId })
+               const deleteResult = await deleteImage(publicId)
+               logger.debug('Cloudinary delete result', { deleteResult })
+            } catch (imageError) {
+               logger.warn('Failed to delete Cloudinary image', { error: imageError })
+               // Continue with accessory deletion even if image deletion fails
+            }
+         }
       }
 
       // Delete product-accessory relations first

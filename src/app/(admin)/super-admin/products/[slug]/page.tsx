@@ -2,7 +2,10 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+
+import { ArrowLeft, RefreshCcw } from 'lucide-react'
 
 import { ProductType } from '@/lib/types'
 import { formatPKR } from '@/lib/utils'
@@ -10,70 +13,11 @@ import { fetchProductBySlug } from '@/actions/product'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import CustomDialog from '@/components/admin/dialog'
 import Spinner from '@/icons/spinner'
 
 interface Props {
    params: Promise<{ slug: string }>
-}
-
-function LoadingSkeleton() {
-   return (
-      <main className="p-6 max-w-7xl mx-auto">
-         <div className="mb-6">
-            <div className="h-8 w-48 bg-gray-200 animate-pulse rounded mb-4" />
-            <div className="flex items-center justify-between">
-               <div className="flex gap-3 items-center">
-                  <div className="h-6 w-20 bg-gray-200 animate-pulse rounded" />
-                  <div className="h-6 w-28 bg-gray-200 animate-pulse rounded" />
-               </div>
-               <div className="flex gap-2">
-                  <div className="h-8 w-24 bg-gray-200 animate-pulse rounded" />
-                  <div className="h-8 w-32 bg-gray-200 animate-pulse rounded" />
-               </div>
-            </div>
-         </div>
-
-         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div>
-               <div className="bg-white rounded-lg overflow-hidden shadow-sm">
-                  <div className="h-80 bg-gray-100 animate-pulse" />
-                  <div className="p-4">
-                     <div className="h-4 w-32 bg-gray-200 animate-pulse rounded mb-2" />
-                     <div className="h-3 w-40 bg-gray-200 animate-pulse rounded mb-1" />
-                     <div className="h-3 w-24 bg-gray-200 animate-pulse rounded" />
-                  </div>
-               </div>
-            </div>
-
-            <div className="space-y-6">
-               {Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="bg-white p-4 rounded-lg shadow-sm">
-                     <div className="h-5 w-40 bg-gray-200 animate-pulse rounded mb-3" />
-                     <div className="grid grid-cols-2 gap-4">
-                        <div>
-                           <div className="h-6 w-full bg-gray-100 animate-pulse rounded mb-2" />
-                           <div className="h-4 w-28 bg-gray-200 animate-pulse rounded" />
-                        </div>
-                        <div>
-                           <div className="h-6 w-full bg-gray-100 animate-pulse rounded mb-2" />
-                           <div className="h-4 w-20 bg-gray-200 animate-pulse rounded" />
-                        </div>
-                     </div>
-                  </div>
-               ))}
-            </div>
-         </div>
-
-         <div className="mt-6 bg-white p-4 rounded-lg shadow-sm">
-            <div className="h-4 w-36 bg-gray-200 animate-pulse rounded mb-4" />
-            <div className="flex gap-3">
-               <div className="h-10 w-28 bg-gray-200 animate-pulse rounded" />
-               <div className="h-10 w-36 bg-gray-200 animate-pulse rounded" />
-               <div className="h-10 w-24 bg-gray-200 animate-pulse rounded" />
-            </div>
-         </div>
-      </main>
-   )
 }
 
 function ProductDetailsPage({ params }: Props) {
@@ -83,35 +27,37 @@ function ProductDetailsPage({ params }: Props) {
    const [deleting, setDeleting] = useState(false)
    const [error, setError] = useState('')
    const [successMessage, setSuccessMessage] = useState('')
+   const router = useRouter()
+
+   const loadProduct = useCallback(async () => {
+      setLoading(true)
+      try {
+         const slug = (await params).slug
+         const product = await fetchProductBySlug(slug)
+
+         setProduct(product)
+         setError('')
+      } catch (err: unknown) {
+         if (err instanceof Error) {
+            setError(err.message || 'Error fetching product')
+         } else {
+            setError('Error fetching product')
+         }
+         setProduct(null)
+      } finally {
+         setLoading(false)
+      }
+   }, [params])
 
    useEffect(() => {
-      async function fetchProduct() {
-         setLoading(true)
-         try {
-            const slug = (await params).slug
-            const product = await fetchProductBySlug(slug)
-
-            setProduct(product)
-            setError('')
-         } catch (err: unknown) {
-            if (err instanceof Error) {
-               setError(err.message || 'Error fetching product')
-            } else {
-               setError('Error fetching product')
-            }
-            setProduct(null)
-         } finally {
-            setLoading(false)
-         }
-      }
-      fetchProduct()
-   }, [params])
+      loadProduct()
+   }, [params, loadProduct])
 
    const toggleProductStatus = async () => {
       if (!product) return
       setUpdating(true)
       try {
-         const res = await fetch(`/api/admin/products?id=${product.id}`, {
+         const res = await fetch(`/api/products?id=${product.id}`, {
             method: 'PUT',
          })
          if (!res.ok) throw new Error('Failed to update status')
@@ -136,10 +82,11 @@ function ProductDetailsPage({ params }: Props) {
       setDeleting(true)
 
       try {
-         const res = await fetch(`/api/admin/products/${product.id}`, {
+         const res = await fetch(`/api/products/${product.id}`, {
             method: 'DELETE',
          })
          if (!res.ok) throw new Error('Failed to delete product')
+         router.push('/super-admin/products')
       } catch (err: unknown) {
          if (err instanceof Error) {
             setError(err.message || 'Error deleting product')
@@ -153,37 +100,31 @@ function ProductDetailsPage({ params }: Props) {
    }
 
    if (loading) {
-      return <LoadingSkeleton />
+      return <div className="text-center">Loading Product...</div>
    }
 
-   if (error && !product) {
+   if (error || !product) {
       return (
-         <main className="p-6 max-w-7xl mx-auto">
-            <div className="text-center py-12">
-               <p className="text-rose-600 font-semibold text-xl">{error}</p>
+         <div className="flex flex-col items-center gap-4 py-10">
+            <p className="text-rose-600 text-xl">Failed to load product</p>
+            <div className="flex flex-wrap gap-3">
+               <Button variant="outline" onClick={loadProduct} disabled={loading}>
+                  <RefreshCcw className="mr-2 size-4" />
+                  Refresh
+               </Button>
                <Link href="/super-admin/products">
-                  <Button className="mt-4">Back to Products</Button>
+                  <Button variant="secondary">
+                     <ArrowLeft className="mr-2 size-4" />
+                     Back to Products
+                  </Button>
                </Link>
             </div>
-         </main>
-      )
-   }
-
-   if (!product) {
-      return (
-         <main className="p-6 max-w-7xl mx-auto">
-            <div className="text-center py-12">
-               <p className="text-gray-600">Product not found</p>
-               <Link href="/super-admin/products">
-                  <Button className="mt-4">Back to Products</Button>
-               </Link>
-            </div>
-         </main>
+         </div>
       )
    }
 
    return (
-      <main className="p-6 max-w-7xl mx-auto">
+      <main className="">
          {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
                {error}
@@ -196,51 +137,48 @@ function ProductDetailsPage({ params }: Props) {
             </div>
          )}
 
-         <div className="mb-6">
+         {/* Breadcrumb */}
+         <div className="flex items-center space-x-2 text-sm text-gray-500 mb-4">
             <Link href="/super-admin/products">
-               <Button variant="ghost" className="mb-4">
-                  ← Back to Products
+               <Button className="aspect-square" variant={'ghostOutline'}>
+                  <ArrowLeft className="size-3" />
                </Button>
             </Link>
+            <Link href="/super-admin" className="hover:text-gray-700">
+               Admin
+            </Link>
+            <span>/</span>
+            <Link href="/super-admin/products" className="hover:text-gray-700">
+               Products
+            </Link>
+            <span>/</span>
+            <span className="hover:text-gray-700">{product.categoryName}</span>
+            <span>/</span>
+            <span className="text-gray-900 font-medium">{product.title}</span>
+         </div>
 
-            {/* Breadcrumb */}
-            <div className="flex items-center space-x-2 text-sm text-gray-500 mb-4">
-               <Link href="/super-admin" className="hover:text-gray-700">
-                  Admin
-               </Link>
-               <span>/</span>
-               <Link href="/super-admin/products" className="hover:text-gray-700">
-                  Products
-               </Link>
-               <span>/</span>
-               <Link
-                  href={`/super-admin/products?category=${product.categoryId}`}
-                  className="hover:text-gray-700"
-               >
-                  {product.categoryName}
-               </Link>
-               <span>/</span>
-               <span className="text-gray-900 font-medium">{product.title}</span>
-            </div>
-            <div className="flex items-center justify-between">
-               <div>
-                  <h1 className="text-3xl font-bold text-gray-900">{product.title}</h1>
-                  <p className="text-gray-600 mt-1">Product ID: {product.id}</p>
-               </div>
-               <div className="flex gap-2">
-                  <Badge variant={product.status === 'active' ? 'default' : 'secondary'}>
+         <div className="flex items-center justify-between mb-6">
+            <div>
+               <div className="flex gap-2 items-center">
+                  <h1 className="text-2xl font-bold text-gray-900">{product.title}</h1>
+                  <Badge
+                     variant={product.status === 'active' ? 'secondary' : 'destructive'}
+                     className="h-fit"
+                  >
                      {product.status}
                   </Badge>
-                  <Link href={`/super-admin/products/${product.slug}/edit`}>
-                     <Button variant="outline">Edit Product</Button>
-                  </Link>
                </div>
+               <p className="text-gray-600 text-sm mt-1">Product ID: {product.id}</p>
             </div>
+
+            <Link href={`/super-admin/products/${product.slug}/edit`}>
+               <Button variant="outline">Edit Product</Button>
+            </Link>
          </div>
          {/* Main grid layout for image and info */}
          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Left: Product Image */}
-            <div>
+            <div className="space-y-6">
                <Card>
                   <CardHeader>
                      <CardTitle className="flex items-center justify-between">
@@ -269,6 +207,23 @@ function ProductDetailsPage({ params }: Props) {
                            </div>
                         )}
                      </div>
+                  </CardContent>
+               </Card>
+               {/* Product Description */}
+               <Card>
+                  <CardHeader>
+                     <CardTitle>Product Description</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                     {product.description ? (
+                        <div className="prose max-w-none">
+                           <p className="text-gray-700 whitespace-pre-wrap">
+                              {product.description}
+                           </p>
+                        </div>
+                     ) : (
+                        <p className="text-gray-500 italic">No description available</p>
+                     )}
                   </CardContent>
                </Card>
             </div>
@@ -413,23 +368,6 @@ function ProductDetailsPage({ params }: Props) {
                      })()}
                   </CardContent>
                </Card>
-               {/* Product Description */}
-               <Card>
-                  <CardHeader>
-                     <CardTitle>Product Description</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                     {product.description ? (
-                        <div className="prose max-w-none">
-                           <p className="text-gray-700 whitespace-pre-wrap">
-                              {product.description}
-                           </p>
-                        </div>
-                     ) : (
-                        <p className="text-gray-500 italic">No description available</p>
-                     )}
-                  </CardContent>
-               </Card>
             </div>
          </div>
          {/* Quick Actions */}
@@ -439,7 +377,7 @@ function ProductDetailsPage({ params }: Props) {
             </CardHeader>
             <CardContent>
                <div className="flex flex-wrap gap-3 mb-4">
-                  <Link href={`/super-admin/products/edit/${product.id}`}>
+                  <Link href={`/super-admin/products/${product.slug}/edit`}>
                      <Button disabled={updating || deleting}>Edit Product</Button>
                   </Link>
                   <Link href={`/pumps/${product.categorySlug}/${product.slug}`} target="_blank">
@@ -461,20 +399,18 @@ function ProductDetailsPage({ params }: Props) {
                         <>{product.status === 'active' ? 'Deactivate' : 'Activate'} Product</>
                      )}
                   </Button>
-                  <Button
-                     variant="destructive"
-                     onClick={deleteProduct}
-                     disabled={updating || deleting}
-                  >
-                     {deleting ? (
-                        <>
-                           <Spinner className="animate-spin mr-1 h-3 w-3" />
-                           Deleting...
-                        </>
-                     ) : (
-                        'Delete Product'
-                     )}
-                  </Button>
+                  <CustomDialog onContinue={deleteProduct}>
+                     <Button variant="destructive" disabled={updating || deleting}>
+                        {deleting ? (
+                           <>
+                              <Spinner className="animate-spin mr-1 h-3 w-3" />
+                              Deleting...
+                           </>
+                        ) : (
+                           'Delete Product'
+                        )}
+                     </Button>
+                  </CustomDialog>
                </div>
                {/* Metadata */}
                <div className="pt-4 border-t border-gray-200">

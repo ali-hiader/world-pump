@@ -81,24 +81,7 @@ export default function AboutUsPage() {
          </section>
 
          <section className="max-w-7xl mx-auto mt-16">
-            <Heading
-               title="About World Pumps"
-               summary="Your trusted partner for water solutions, pools, and wellness spaces."
-            />
             <div className="mt-8 space-y-6">
-               <p className="text-lg text-gray-700">
-                  <strong>World Pumps</strong> is a leading provider of water engineering solutions,
-                  specializing in swimming pool design & construction, sauna room installation,
-                  water filtration systems, and pump technologies. With years of experience and a
-                  passion for innovation, we deliver end-to-end services for homes, businesses, and
-                  commercial projects across the region.
-               </p>
-               <p className="text-gray-600">
-                  Our team of experts handles everything from concept to completion—planning,
-                  structural work, plumbing, finishing, and ongoing maintenance. We pride ourselves
-                  on using the latest technology and premium materials to ensure long-lasting
-                  performance and customer satisfaction.
-               </p>
                <h4 className="text-lg font-semibold mt-6">Our Services</h4>
                <ul className="list-disc list-inside text-gray-600 space-y-2">
                   <li>Swimming pool design, construction, and renovation</li>

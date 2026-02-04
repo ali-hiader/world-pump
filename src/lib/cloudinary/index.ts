@@ -1,4 +1,4 @@
-import { UploadApiResponse, v2 as cloudinary } from 'cloudinary'
+import { UploadApiOptions, UploadApiResponse, v2 as cloudinary } from 'cloudinary'
 
 import { logger } from '@/lib/logger'
 
@@ -11,9 +11,13 @@ cloudinary.config({
 
 type UploadImageCallback = (result: UploadApiResponse | undefined) => void
 
-export const uploadImage = async (file: Buffer, cb: UploadImageCallback) => {
+export const uploadImage = async (
+   file: Buffer,
+   cb: UploadImageCallback,
+   options?: UploadApiOptions,
+) => {
    cloudinary.uploader
-      .upload_stream((error, uploadResult) => {
+      .upload_stream(options ?? {}, (error, uploadResult) => {
          if (error) {
             logger.error('Image upload failed', error)
             cb(undefined)
@@ -35,12 +39,39 @@ export const extractCloudinaryPublicId = (url: string) => {
       }
 
       // Handle different Cloudinary URL formats
-      const regex = /\/upload\/(?:v\d+\/)?(?:[^\/]+\/)*([^\/]+)(?:\.[^.]+)?$/
-      const match = url.match(regex)
-
+      const match = url.match(/\/upload\/(.+)$/)
       if (match && match[1]) {
-         // Remove any remaining file extension
-         return match[1].replace(/\.[^/.]+$/, '')
+         let path = match[1]
+
+         // Strip transformation segments (e.g., q_auto, f_auto, q_auto,f_auto)
+         const segments = path.split('/')
+         const isTransform = (seg: string) =>
+            seg.includes(',') ||
+            seg.startsWith('q_') ||
+            seg.startsWith('f_') ||
+            seg.startsWith('w_') ||
+            seg.startsWith('h_') ||
+            seg.startsWith('c_') ||
+            seg.startsWith('g_') ||
+            seg.startsWith('e_') ||
+            seg.startsWith('t_') ||
+            seg.startsWith('r_') ||
+            seg.startsWith('a_') ||
+            seg.startsWith('b_') ||
+            seg.startsWith('dpr_') ||
+            seg.startsWith('fl_')
+
+         while (segments.length > 0 && isTransform(segments[0])) {
+            segments.shift()
+         }
+
+         // Drop version segment if present (can appear after transformations)
+         if (segments.length > 0 && /^v\d+$/.test(segments[0])) {
+            segments.shift()
+         }
+
+         const cleaned = segments.join('/').replace(/\.[^/.]+$/, '')
+         return cleaned || null
       }
 
       return null

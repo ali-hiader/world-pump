@@ -10,14 +10,6 @@ export function cn(...inputs: ClassValue[]) {
    return twMerge(clsx(inputs))
 }
 
-export function getAdminContainerClasses(): string {
-   return 'container py-4 sm:py-8 px-2 sm:px-4 max-w-[95%] sm:max-w-[80%] mx-auto'
-}
-
-export function getAdminCenteredClasses(): string {
-   return 'text-center py-12'
-}
-
 export function getOrderStatusBadgeVariant(
    status: string,
 ): 'default' | 'secondary' | 'outline' | 'destructive' {
@@ -91,13 +83,6 @@ export function parseSpecsToArray(specs: unknown): SpecField[] {
    }
 
    return []
-}
-
-// Validation utilities
-
-export function isValidId(id: string): boolean {
-   const numId = Number(id)
-   return !isNaN(numId) && numId > 0
 }
 
 // File & image validation utilities

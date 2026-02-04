@@ -46,7 +46,7 @@ export function useCart(options: UseCartOptions = {}) {
       getUserCartItems,
    } = useCartStore()
 
-   async function addItem(productId: number) {
+   async function addItem(productId: string) {
       if (!userId) {
          logger.warn('Cannot add to cart - user not authenticated')
          return
@@ -70,7 +70,7 @@ export function useCart(options: UseCartOptions = {}) {
       }
    }
 
-   async function increaseQuantity(productId: number) {
+   async function increaseQuantity(productId: string) {
       if (!userId) {
          logger.warn('Cannot increase quantity - user not authenticated')
          return
@@ -92,7 +92,7 @@ export function useCart(options: UseCartOptions = {}) {
       }
    }
 
-   async function decreaseQuantity(productId: number) {
+   async function decreaseQuantity(productId: string) {
       if (!userId) {
          logger.warn('Cannot decrease quantity - user not authenticated')
          return
@@ -114,7 +114,7 @@ export function useCart(options: UseCartOptions = {}) {
       }
    }
 
-   async function removeItem(productId: number) {
+   async function removeItem(productId: string) {
       if (!userId) {
          logger.warn('Cannot remove item - user not authenticated')
          return

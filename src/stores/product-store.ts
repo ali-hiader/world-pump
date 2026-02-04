@@ -12,7 +12,7 @@ interface ProductStore {
 const useProductsStore = create<ProductStore>((set) => ({
    categories: [],
    selectedCategory: {
-      id: 1,
+      id: 'all',
       slug: 'all',
       name: 'All',
       isFeatured: false,

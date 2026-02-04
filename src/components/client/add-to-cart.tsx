@@ -9,7 +9,7 @@ import { useCart } from '@/hooks/use-cart'
 import Spinner from '@/icons/spinner'
 
 interface Props {
-   productId: number
+   productId: string
 }
 
 function AddToCartBtn({ productId }: Props) {

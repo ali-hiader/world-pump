@@ -5,10 +5,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
+import { ArrowLeft } from 'lucide-react'
+
 import { logger } from '@/lib/logger'
-import { formatPKR, isValidId } from '@/lib/utils'
-import { AdminPageLayout } from '@/components/admin/admin-page-layout'
-import { AdminLoadingState, AdminNotFoundState } from '@/components/admin/admin-states'
+import { formatPKR } from '@/lib/utils'
 import { showAlert } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -77,11 +77,6 @@ function AdminOrderDetailsPage({ params }: Props) {
    const [updatingStatus, setUpdatingStatus] = useState(false)
 
    useEffect(() => {
-      if (!isValidId(params.id)) {
-         router.push('/super-admin/orders')
-         return
-      }
-
       const parsedId = parseInt(params.id)
       setOrderId(parsedId)
 
@@ -194,16 +189,22 @@ function AdminOrderDetailsPage({ params }: Props) {
    }
 
    if (loading) {
-      return <AdminLoadingState message="Loading order details..." />
+      return <div className="text-center">Loading order details...</div>
    }
 
    if (!order) {
       return (
-         <AdminNotFoundState
-            message={'Order not found'}
-            backLink="/admin/orders"
-            backLabel="Back to Orders"
-         />
+         <div className="flex flex-col items-center gap-4 py-10">
+            <p className="text-rose-600 text-xl">Failed to load order</p>
+            <div className="flex flex-wrap gap-3">
+               <Link href="/super-admin/orders">
+                  <Button variant="secondary">
+                     <ArrowLeft className="mr-2 size-4" />
+                     Back to Orders
+                  </Button>
+               </Link>
+            </div>
+         </div>
       )
    }
 
@@ -240,7 +241,7 @@ function AdminOrderDetailsPage({ params }: Props) {
    }
 
    return (
-      <AdminPageLayout className="max-w-7xl">
+      <main>
          {/* Header */}
          <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-6 gap-4">
             <div>
@@ -468,7 +469,7 @@ function AdminOrderDetailsPage({ params }: Props) {
                )}
             </div>
          </div>
-      </AdminPageLayout>
+      </main>
    )
 }
 

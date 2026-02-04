@@ -39,10 +39,12 @@ export const addressTypeEnum = pgEnum('address_type', ['shipping', 'billing'])
 export const pumpTable = pgTable(
    'pump',
    {
-      id: integer().notNull().generatedAlwaysAsIdentity().primaryKey(),
+      id: text('id')
+         .primaryKey()
+         .$defaultFn(() => crypto.randomUUID()),
       title: varchar({ length: 255 }).notNull(),
       slug: varchar({ length: 255 }).notNull().unique(),
-      categoryId: integer()
+      categoryId: text('category_id')
          .notNull()
          .references(() => categoryTable.id, { onDelete: 'cascade' }),
       description: text().notNull(),
@@ -61,18 +63,20 @@ export const pumpTable = pgTable(
          .defaultNow()
          .$onUpdate(() => new Date()),
    },
-   (table) => ({
-      slugIdx: index('product_slug_idx').on(table.slug),
-      categoryIdx: index('product_category_idx').on(table.categoryId),
-      statusIdx: index('product_status_idx').on(table.status),
-      featuredIdx: index('product_featured_idx').on(table.isFeatured),
-   }),
+   (table) => [
+      index('product_slug_idx').on(table.slug),
+      index('product_category_idx').on(table.categoryId),
+      index('product_status_idx').on(table.status),
+      index('product_featured_idx').on(table.isFeatured),
+   ],
 )
 
 export const accessoryTable = pgTable(
    'accessory',
    {
-      id: integer().notNull().generatedAlwaysAsIdentity().primaryKey(),
+      id: text('id')
+         .primaryKey()
+         .$defaultFn(() => crypto.randomUUID()),
       title: varchar('title', { length: 255 }).notNull(),
       slug: varchar('slug', { length: 255 }).notNull().unique(),
       description: text('description'),
@@ -90,19 +94,19 @@ export const accessoryTable = pgTable(
          .defaultNow()
          .$onUpdate(() => new Date()),
    },
-   (table) => ({
-      slugIdx: index('accessory_slug_idx').on(table.slug),
-      statusIdx: index('accessory_status_idx').on(table.status),
-   }),
+   (table) => [
+      index('accessory_slug_idx').on(table.slug),
+      index('accessory_status_idx').on(table.status),
+   ],
 )
 
 export const productAccessoryTable = pgTable(
    'product_accessory',
    {
-      productId: integer('product_id')
+      productId: text('product_id')
          .notNull()
          .references(() => pumpTable.id, { onDelete: 'cascade' }),
-      accessoryId: integer('accessory_id')
+      accessoryId: text('accessory_id')
          .notNull()
          .references(() => accessoryTable.id, { onDelete: 'cascade' }),
       createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -111,17 +115,15 @@ export const productAccessoryTable = pgTable(
          .defaultNow()
          .$onUpdate(() => new Date()),
    },
-   (table) => {
-      return {
-         pk: primaryKey({ columns: [table.productId, table.accessoryId] }),
-      }
-   },
+   (table) => [primaryKey({ columns: [table.productId, table.accessoryId] })],
 )
 
 export const categoryTable = pgTable(
    'category',
    {
-      id: integer().notNull().generatedAlwaysAsIdentity().primaryKey(),
+      id: text('id')
+         .primaryKey()
+         .$defaultFn(() => crypto.randomUUID()),
       name: varchar({ length: 100 }).notNull().unique(),
       slug: varchar({ length: 100 }).notNull().unique(),
       isFeatured: boolean().default(false),
@@ -133,17 +135,17 @@ export const categoryTable = pgTable(
          .defaultNow()
          .$onUpdate(() => new Date()),
    },
-   (table) => ({
-      slugIdx: index('category_slug_idx').on(table.slug),
-   }),
+   (table) => [index('category_slug_idx').on(table.slug)],
 )
 
 export const cartTable = pgTable('cart', {
-   id: integer().notNull().generatedAlwaysAsIdentity().primaryKey(),
+   id: text('id')
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
    addedBy: text()
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
-   productId: integer()
+   productId: text('product_id')
       .notNull()
       .references(() => pumpTable.id, { onDelete: 'cascade' }),
    createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -157,7 +159,9 @@ export const cartTable = pgTable('cart', {
 export const orderTable = pgTable(
    'order',
    {
-      id: integer().notNull().generatedAlwaysAsIdentity().primaryKey(),
+      id: text('id')
+         .primaryKey()
+         .$defaultFn(() => crypto.randomUUID()),
       orderNumber: varchar('order_number', { length: 50 }) // human-readable ID
          .notNull()
          .unique(),
@@ -165,10 +169,10 @@ export const orderTable = pgTable(
          .notNull()
          .references(() => user.id, { onDelete: 'cascade' }),
       userEmail: varchar('user_email').notNull(),
-      shippingAddressId: integer('shipping_address_id').references(() => addressTable.id, {
+      shippingAddressId: text('shipping_address_id').references(() => addressTable.id, {
          onDelete: 'set null',
       }),
-      billingAddressId: integer('billing_address_id').references(() => addressTable.id, {
+      billingAddressId: text('billing_address_id').references(() => addressTable.id, {
          onDelete: 'set null',
       }),
       paymentStatus: paymentStatusEnum('payment_status').default('pending').notNull(),
@@ -181,20 +185,22 @@ export const orderTable = pgTable(
          .defaultNow()
          .$onUpdate(() => new Date()),
    },
-   (table) => ({
-      userEmailIdx: index('order_user_email_idx').on(table.userEmail),
-      statusIdx: index('order_status_idx').on(table.status),
-      paymentStatusIdx: index('order_payment_status_idx').on(table.paymentStatus),
-      createdAtIdx: index('order_created_at_idx').on(table.createdAt),
-   }),
+   (table) => [
+      index('order_user_email_idx').on(table.userEmail),
+      index('order_status_idx').on(table.status),
+      index('order_payment_status_idx').on(table.paymentStatus),
+      index('order_created_at_idx').on(table.createdAt),
+   ],
 )
 
 export const orderItemTable = pgTable('order_item', {
-   id: integer().notNull().generatedAlwaysAsIdentity().primaryKey(),
-   orderId: integer('order_id')
+   id: text('id')
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+   orderId: text('order_id')
       .notNull()
       .references(() => orderTable.id, { onDelete: 'cascade' }),
-   productId: integer('product_id')
+   productId: text('product_id')
       .notNull()
       .references(() => pumpTable.id, { onDelete: 'set null' }),
    productName: varchar('product_name', { length: 255 }).notNull(),
@@ -208,8 +214,10 @@ export const orderItemTable = pgTable('order_item', {
 })
 
 export const paymentTable = pgTable('payment', {
-   id: integer().notNull().generatedAlwaysAsIdentity().primaryKey(),
-   orderId: integer('order_id')
+   id: text('id')
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+   orderId: text('order_id')
       .notNull()
       .references(() => orderTable.id, { onDelete: 'cascade' }),
    method: paymentMethodEnum('method').notNull(),
@@ -224,7 +232,9 @@ export const paymentTable = pgTable('payment', {
 })
 
 export const addressTable = pgTable('address', {
-   id: integer().notNull().generatedAlwaysAsIdentity().primaryKey(),
+   id: text('id')
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
    userId: text('user_id')
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
