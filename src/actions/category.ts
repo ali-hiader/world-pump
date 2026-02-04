@@ -1,5 +1,7 @@
 'use server'
 
+import { unstable_cache } from 'next/cache'
+
 import { and, asc, eq, getTableColumns } from 'drizzle-orm'
 import { z } from 'zod'
 
@@ -13,18 +15,22 @@ const categorySlugSchema = z
    .min(1)
    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, { message: 'Invalid slug format' })
 
-export async function fetchAllCategories() {
-   try {
-      const categories = await db
-         .select({ ...getTableColumns(categoryTable) })
-         .from(categoryTable)
-         .orderBy(asc(categoryTable.name))
-      return categories
-   } catch (error) {
-      logger.error('Failed to fetch categories', error)
-      throw error
-   }
-}
+export const fetchAllCategories = unstable_cache(
+   async () => {
+      try {
+         const categories = await db
+            .select({ ...getTableColumns(categoryTable) })
+            .from(categoryTable)
+            .orderBy(asc(categoryTable.name))
+         return categories
+      } catch (error) {
+         logger.error('Failed to fetch categories', error)
+         throw error
+      }
+   },
+   ['categories:all'],
+   { tags: ['categories'] },
+)
 
 export async function fetchCategoryBySlug(slug: string) {
    const validated = categorySlugSchema.safeParse(slug)
@@ -32,17 +38,25 @@ export async function fetchCategoryBySlug(slug: string) {
       throw new ValidationError(validated.error.issues[0]?.message || 'Invalid slug')
    }
 
-   try {
-      const categories = await db
-         .select({ ...getTableColumns(categoryTable) })
-         .from(categoryTable)
-         .where(eq(categoryTable.slug, validated.data))
-         .limit(1)
-      return categories[0] || null
-   } catch (error) {
-      logger.error('Failed to fetch category by slug', error, { slug })
-      throw error
-   }
+   const cached = unstable_cache(
+      async () => {
+         try {
+            const categories = await db
+               .select({ ...getTableColumns(categoryTable) })
+               .from(categoryTable)
+               .where(eq(categoryTable.slug, validated.data))
+               .limit(1)
+            return categories[0] || null
+         } catch (error) {
+            logger.error('Failed to fetch category by slug', error, { slug })
+            throw error
+         }
+      },
+      [`categories:slug:${validated.data}`],
+      { tags: ['categories'] },
+   )
+
+   return cached()
 }
 
 export async function fetchCategoryBrands(slug: string) {
@@ -51,23 +65,31 @@ export async function fetchCategoryBrands(slug: string) {
       throw new ValidationError(validated.error.issues[0]?.message || 'Invalid slug')
    }
 
-   try {
-      const base = db
-         .select({ brand: pumpTable.brand })
-         .from(pumpTable)
-         .innerJoin(categoryTable, eq(pumpTable.categoryId, categoryTable.id))
+   const cached = unstable_cache(
+      async () => {
+         try {
+            const base = db
+               .select({ brand: pumpTable.brand })
+               .from(pumpTable)
+               .innerJoin(categoryTable, eq(pumpTable.categoryId, categoryTable.id))
 
-      const rows =
-         validated.data === 'all'
-            ? await base.where(eq(pumpTable.status, 'active'))
-            : await base.where(
-                 and(eq(categoryTable.slug, validated.data), eq(pumpTable.status, 'active')),
-              )
+            const rows =
+               validated.data === 'all'
+                  ? await base.where(eq(pumpTable.status, 'active'))
+                  : await base.where(
+                       and(eq(categoryTable.slug, validated.data), eq(pumpTable.status, 'active')),
+                    )
 
-      const set = new Set(rows.map((r) => r.brand).filter((b): b is string => Boolean(b)))
-      return Array.from(set).sort((a, b) => a.localeCompare(b))
-   } catch (error) {
-      logger.error('Failed to fetch category brands', error, { slug })
-      throw error
-   }
+            const set = new Set(rows.map((r) => r.brand).filter((b): b is string => Boolean(b)))
+            return Array.from(set).sort((a, b) => a.localeCompare(b))
+         } catch (error) {
+            logger.error('Failed to fetch category brands', error, { slug })
+            throw error
+         }
+      },
+      [`categories:brands:${validated.data}`],
+      { tags: ['products', 'categories'] },
+   )
+
+   return cached()
 }

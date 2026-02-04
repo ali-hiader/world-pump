@@ -1,5 +1,7 @@
 'use server'
 
+import { unstable_cache } from 'next/cache'
+
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 
@@ -20,15 +22,19 @@ const updateAccessoryProductsSchema = z.object({
    productIds: z.array(z.string().min(1)),
 })
 
-export async function fetchAllAccessories() {
-   try {
-      const accessories = await db.select().from(accessoryTable)
-      return accessories
-   } catch (error) {
-      logger.error('Failed to fetch accessories', error)
-      throw new DatabaseError('query', 'Failed to fetch accessories')
-   }
-}
+export const fetchAllAccessories = unstable_cache(
+   async () => {
+      try {
+         const accessories = await db.select().from(accessoryTable)
+         return accessories
+      } catch (error) {
+         logger.error('Failed to fetch accessories', error)
+         throw new DatabaseError('query', 'Failed to fetch accessories')
+      }
+   },
+   ['accessories:all'],
+   { tags: ['accessories'] },
+)
 
 export async function fetchAccessoryById(id: string) {
    const validated = accessoryIdSchema.safeParse(id)
@@ -36,20 +42,28 @@ export async function fetchAccessoryById(id: string) {
       throw new ValidationError(validated.error.issues[0]?.message || 'Invalid accessory ID')
    }
 
-   try {
-      const [accessory] = await db
-         .select()
-         .from(accessoryTable)
-      .where(eq(accessoryTable.id, validated.data))
-      if (!accessory) {
-         throw new NotFoundError('Accessory not found')
-      }
-      return accessory
-   } catch (error) {
-      if (error instanceof NotFoundError) throw error
-      logger.error('Failed to fetch accessory by ID', error, { id })
-      throw new DatabaseError('query', 'Failed to fetch accessory by ID')
-   }
+   const cached = unstable_cache(
+      async () => {
+         try {
+            const [accessory] = await db
+               .select()
+               .from(accessoryTable)
+               .where(eq(accessoryTable.id, validated.data))
+            if (!accessory) {
+               throw new NotFoundError('Accessory not found')
+            }
+            return accessory
+         } catch (error) {
+            if (error instanceof NotFoundError) throw error
+            logger.error('Failed to fetch accessory by ID', error, { id })
+            throw new DatabaseError('query', 'Failed to fetch accessory by ID')
+         }
+      },
+      [`accessories:id:${validated.data}`],
+      { tags: ['accessories'] },
+   )
+
+   return cached()
 }
 
 export async function fetchAccessoryBySlug(slug: string) {
@@ -58,20 +72,28 @@ export async function fetchAccessoryBySlug(slug: string) {
       throw new ValidationError(validated.error.issues[0]?.message || 'Invalid slug')
    }
 
-   try {
-      const [accessory] = await db
-         .select()
-         .from(accessoryTable)
-         .where(eq(accessoryTable.slug, validated.data))
-      if (!accessory) {
-         throw new NotFoundError('Accessory not found')
-      }
-      return accessory
-   } catch (error) {
-      if (error instanceof NotFoundError) throw error
-      logger.error('Failed to fetch accessory by slug', error, { slug })
-      throw new DatabaseError('query', 'Failed to fetch accessory by slug')
-   }
+   const cached = unstable_cache(
+      async () => {
+         try {
+            const [accessory] = await db
+               .select()
+               .from(accessoryTable)
+               .where(eq(accessoryTable.slug, validated.data))
+            if (!accessory) {
+               throw new NotFoundError('Accessory not found')
+            }
+            return accessory
+         } catch (error) {
+            if (error instanceof NotFoundError) throw error
+            logger.error('Failed to fetch accessory by slug', error, { slug })
+            throw new DatabaseError('query', 'Failed to fetch accessory by slug')
+         }
+      },
+      [`accessories:slug:${validated.data}`],
+      { tags: ['accessories'] },
+   )
+
+   return cached()
 }
 
 export async function deleteAccessory(id: string) {
@@ -101,18 +123,26 @@ export async function fetchAccessoryProductIds(accessoryId: string) {
       throw new ValidationError(validated.error.issues[0]?.message || 'Invalid accessory ID')
    }
 
-   try {
-      const relations = await db
-         .select({ productId: productAccessoryTable.productId })
-         .from(productAccessoryTable)
-         .where(eq(productAccessoryTable.accessoryId, validated.data))
-      return relations.map((r) => r.productId)
-   } catch (error) {
-      logger.error('Failed to fetch accessory product relations', error, {
-         accessoryId: validated.data,
-      })
-      throw new DatabaseError('query', 'Failed to fetch accessory product relations')
-   }
+   const cached = unstable_cache(
+      async () => {
+         try {
+            const relations = await db
+               .select({ productId: productAccessoryTable.productId })
+               .from(productAccessoryTable)
+               .where(eq(productAccessoryTable.accessoryId, validated.data))
+            return relations.map((r) => r.productId)
+         } catch (error) {
+            logger.error('Failed to fetch accessory product relations', error, {
+               accessoryId: validated.data,
+            })
+            throw new DatabaseError('query', 'Failed to fetch accessory product relations')
+         }
+      },
+      [`accessories:relations:${validated.data}`],
+      { tags: ['accessories', 'products'] },
+   )
+
+   return cached()
 }
 
 export async function updateAccessoryProducts(accessoryId: string, productIds: string[]) {

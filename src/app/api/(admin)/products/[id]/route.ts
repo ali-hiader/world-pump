@@ -1,3 +1,4 @@
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { NextResponse } from 'next/server'
 
 import { eq } from 'drizzle-orm'
@@ -76,6 +77,13 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
       await db.update(pumpTable).set(updateData).where(eq(pumpTable.id, productId))
 
+      revalidateTag('products', 'default')
+      revalidatePath('/super-admin')
+      revalidatePath('/super-admin/products')
+      revalidatePath('/pumps')
+      revalidatePath('/pumps/all')
+      revalidatePath('/')
+
       return NextResponse.json({ success: true })
    } catch (error) {
       logger.error('Error updating product', error)
@@ -119,6 +127,13 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
       }
 
       await db.delete(pumpTable).where(eq(pumpTable.id, productId))
+
+      revalidateTag('products', 'default')
+      revalidatePath('/super-admin')
+      revalidatePath('/super-admin/products')
+      revalidatePath('/pumps')
+      revalidatePath('/pumps/all')
+      revalidatePath('/')
 
       return NextResponse.json({
          success: true,

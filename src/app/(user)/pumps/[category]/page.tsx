@@ -9,8 +9,6 @@ import FiltersSheet from '@/components/client/filters-sheet'
 import Heading from '@/components/client/heading'
 import ProductCard from '@/components/client/product-card'
 
-export const dynamic = 'force-dynamic'
-
 type SearchParams = {
    minPrice?: string
    maxPrice?: string

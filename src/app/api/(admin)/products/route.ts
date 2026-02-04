@@ -1,3 +1,4 @@
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { NextRequest, NextResponse } from 'next/server'
 
 import { eq } from 'drizzle-orm'
@@ -62,6 +63,13 @@ export async function POST(request: NextRequest) {
          isFeatured,
          specs: parsedSpecs,
       })
+
+      revalidateTag('products', 'default')
+      revalidatePath('/super-admin')
+      revalidatePath('/super-admin/products')
+      revalidatePath('/pumps')
+      revalidatePath('/pumps/all')
+      revalidatePath('/')
 
       return NextResponse.json({ success: true })
    } catch (error) {

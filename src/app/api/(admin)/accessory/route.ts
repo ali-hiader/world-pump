@@ -1,3 +1,4 @@
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { NextResponse } from 'next/server'
 
 import { eq } from 'drizzle-orm'
@@ -189,6 +190,13 @@ export async function POST(req: Request) {
             await db.insert(productAccessoryTable).values(relations)
          }
       }
+
+      revalidateTag('accessories', 'default')
+      revalidateTag('products', 'default')
+      revalidatePath('/super-admin')
+      revalidatePath('/super-admin/accessories')
+      revalidatePath('/accessories')
+
       return NextResponse.json({ success: true, accessory, relations })
    } catch (error) {
       logger.error('Accessory creation error', error)

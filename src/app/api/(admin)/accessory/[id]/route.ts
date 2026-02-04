@@ -1,3 +1,4 @@
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { NextResponse } from 'next/server'
 
 import { eq } from 'drizzle-orm'
@@ -178,6 +179,12 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
          await db.insert(productAccessoryTable).values(relations)
       }
 
+      revalidateTag('accessories', 'default')
+      revalidateTag('products', 'default')
+      revalidatePath('/super-admin')
+      revalidatePath('/super-admin/accessories')
+      revalidatePath('/accessories')
+
       return NextResponse.json({ success: true, accessory: updated[0] })
    } catch (error) {
       logger.error('Accessory update error', error)
@@ -232,6 +239,12 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 
       // Delete the accessory
       await db.delete(accessoryTable).where(eq(accessoryTable.id, accessoryId))
+
+      revalidateTag('accessories', 'default')
+      revalidateTag('products', 'default')
+      revalidatePath('/super-admin')
+      revalidatePath('/super-admin/accessories')
+      revalidatePath('/accessories')
 
       return NextResponse.json({ success: true, message: 'Accessory deleted successfully.' })
    } catch (error) {

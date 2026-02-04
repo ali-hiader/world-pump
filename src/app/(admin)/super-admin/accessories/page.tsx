@@ -6,8 +6,6 @@ import { fetchAllAccessories } from '@/actions/accessory'
 import ProductTable from '@/components/admin/product-table'
 import { Button } from '@/components/ui/button'
 
-export const dynamic = 'force-dynamic'
-
 export default async function AdminAccessoriesPage() {
    const accessories = await fetchAllAccessories()
 
