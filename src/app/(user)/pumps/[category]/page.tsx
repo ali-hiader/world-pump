@@ -1,3 +1,5 @@
+import type { Metadata } from 'next'
+
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -22,6 +24,16 @@ type SearchParams = {
 interface PageProps {
    params: { category: string }
    searchParams: SearchParams
+}
+
+export async function generateMetadata({ params }: Pick<PageProps, 'params'>): Promise<Metadata> {
+   const categorySlug = (await params).category
+   const category = await fetchCategoryBySlug(categorySlug)
+   const title = categorySlug === 'all' ? 'All Pumps' : category?.name ?? 'Pumps'
+
+   return {
+      title: `${title} | World Pumps`,
+   }
 }
 
 export default async function CategoryPage({ params, searchParams }: PageProps) {

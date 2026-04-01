@@ -1,3 +1,5 @@
+import type { Metadata } from 'next'
+
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
@@ -5,6 +7,10 @@ import React from 'react'
 import { getAllPosts } from '@/lib/blog'
 import Heading from '@/components/client/heading'
 import NewsletterSignUp from '@/components/client/newsletter'
+
+export const metadata: Metadata = {
+   title: 'Blogs | World Pumps',
+}
 
 function BlogsPage() {
    const allPosts = getAllPosts()

@@ -1,5 +1,11 @@
+import type { Metadata } from 'next'
+
 import { fetchAllAccessories } from '@/actions/accessory'
 import AccessoryCard from '@/components/client/accessory-card'
+
+export const metadata: Metadata = {
+   title: 'Accessories | World Pumps',
+}
 
 export default async function AccessoriesPage() {
    const accessories = await fetchAllAccessories()

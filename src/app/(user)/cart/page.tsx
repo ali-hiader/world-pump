@@ -1,3 +1,5 @@
+import type { Metadata } from 'next'
+
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
@@ -5,6 +7,9 @@ import { auth } from '@/lib/auth/auth'
 import CartList from '@/components/client/cart-list'
 
 export const dynamic = 'force-dynamic'
+export const metadata: Metadata = {
+   title: 'Cart | World Pumps',
+}
 
 export default async function Cart() {
    const session = await auth.api.getSession({

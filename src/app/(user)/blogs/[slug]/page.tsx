@@ -1,3 +1,5 @@
+import type { Metadata } from 'next'
+
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
@@ -19,6 +21,14 @@ export async function generateStaticParams() {
 interface BlogPageProps {
    params: {
       slug: string
+   }
+}
+
+export async function generateMetadata({ params }: BlogPageProps): Promise<Metadata> {
+   const post = await getPostBySlug((await params).slug)
+
+   return {
+      title: `${post?.title ?? 'Blog'} | World Pumps`,
    }
 }
 

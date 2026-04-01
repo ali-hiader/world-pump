@@ -1,3 +1,5 @@
+import type { Metadata } from 'next'
+
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -14,6 +16,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 interface AccessoryDetailPageProps {
    params: {
       slug: string
+   }
+}
+
+export async function generateMetadata({
+   params,
+}: AccessoryDetailPageProps): Promise<Metadata> {
+   const accessory = await fetchAccessoryBySlug((await params).slug)
+
+   return {
+      title: `${accessory?.title ?? 'Accessory'} | World Pumps`,
    }
 }
 

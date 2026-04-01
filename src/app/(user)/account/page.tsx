@@ -1,3 +1,5 @@
+import type { Metadata } from 'next'
+
 import { headers } from 'next/headers'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
@@ -5,6 +7,10 @@ import React from 'react'
 
 import { auth } from '@/lib/auth/auth'
 import SignOutBtn from '@/components/client/sign-out'
+
+export const metadata: Metadata = {
+   title: 'My Account | World Pumps',
+}
 
 async function UserAccountPage() {
    const session = await auth.api.getSession({
@@ -37,7 +43,7 @@ async function UserAccountPage() {
             </hgroup>
             <hgroup className="flex gap-2 items-center">
                <h3 className="text-lg font-medium ">Joined On -</h3>
-               <p>{`${joinedDate.getDate()}/${joinedDate.getMonth()}/${joinedDate.getFullYear()} `}</p>
+               <p>{`${joinedDate.getDate()}/${joinedDate.getMonth() + 1}/${joinedDate.getFullYear()} `}</p>
             </hgroup>
          </section>
 

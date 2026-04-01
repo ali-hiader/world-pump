@@ -1,3 +1,5 @@
+import type { Metadata } from 'next'
+
 import { headers } from 'next/headers'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
@@ -5,6 +7,10 @@ import { redirect } from 'next/navigation'
 import { auth } from '@/lib/auth/auth'
 import { logger } from '@/lib/logger'
 import { clearCart } from '@/actions/cart'
+
+export const metadata: Metadata = {
+   title: 'Success | World Pumps',
+}
 
 interface SuccessPageProps {
    searchParams: {

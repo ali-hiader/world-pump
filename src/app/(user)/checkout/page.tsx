@@ -1,3 +1,5 @@
+import type { Metadata } from 'next'
+
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
@@ -6,6 +8,9 @@ import { fetchUserCart } from '@/actions/cart'
 import Checkout from '@/components/client/checkout'
 
 export const dynamic = 'force-dynamic'
+export const metadata: Metadata = {
+   title: 'Checkout | World Pumps',
+}
 
 async function CheckoutPage() {
    const session = await auth.api.getSession({

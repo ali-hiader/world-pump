@@ -1,3 +1,5 @@
+import type { Metadata } from 'next'
+
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -15,6 +17,15 @@ interface Props {
    params: {
       category: string
       pump_slug: string
+   }
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+   const { pump_slug } = await params
+   const product = await fetchProductBySlug(decodeURIComponent(pump_slug))
+
+   return {
+      title: `${product?.title ?? 'Pump'} | World Pumps`,
    }
 }
 

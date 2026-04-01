@@ -1,3 +1,5 @@
+import type { Metadata } from 'next'
+
 import Image from 'next/image'
 import Link from 'next/link'
 import { Fragment } from 'react'
@@ -16,6 +18,10 @@ import {
    CarouselNext,
    CarouselPrevious,
 } from '@/components/ui/carousel'
+
+export const metadata: Metadata = {
+   title: 'Home | World Pumps',
+}
 
 async function HomePage() {
    const products = await fetchFeaturedProducts(8)
